@@ -1,0 +1,17 @@
+    <!-- ===================== CALCULADORA ===================== -->
+    <section class="view" id="view-calc">
+      <div class="calc-layout">
+        <div class="card">
+          <div class="calc-screen"><div class="calc-prev" id="calcPrev"></div><div class="calc-expr" id="calcExpr">0</div></div>
+          <div class="calc-keys" id="calcKeys"></div>
+          <p class="muted small" style="margin-top:12px">Teclado: números, <kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd> <kbd>%</kbd> <kbd>(</kbd> <kbd>)</kbd>, <kbd>Enter</kbd>, <kbd>⌫</kbd> y <kbd>Esc</kbd>. «200 + 10 %» = 220.</p>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>🕘 Historial</h3>
+            <div class="row"><button class="btn sm" id="calcCopy">📋 Copiar resultado</button><button class="btn sm danger" id="calcClearHist">Limpiar</button></div>
+          </div>
+          <p class="muted small" style="margin-bottom:8px">Haz clic en una operación para recuperar su resultado.</p>
+          <div class="list hist" id="calcHist"></div>
+        </div>
+      </div>
+    </section>

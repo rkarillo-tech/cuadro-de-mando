@@ -1,0 +1,97 @@
+    <!-- ===================== MAPAS ===================== -->
+    <section class="view" id="view-maps">
+      <div class="row maps-head">
+        <div class="seg" id="mapsMode">
+          <button data-mode="mind" class="on">🧠 Mapas mentales</button>
+          <button data-mode="graph">🕸️ Conexiones entre notas</button>
+        </div>
+        <div class="grow"></div>
+        <button class="btn sm ghost" id="mapsHelpBtn" title="Cómo funciona">❔ Ayuda</button>
+      </div>
+
+      <!-- ---------- Mapas mentales ---------- -->
+      <div class="maps-pane" data-pane="mind">
+        <div class="card mm-card">
+          <div class="mm-bar">
+            <select class="field" id="mmSelect" title="Mapa abierto"></select>
+            <button class="btn primary" id="mmNew">＋ Nuevo</button>
+            <button class="btn icon" id="mmMenuBtn" title="Renombrar, exportar, convertir en nota…">⋯</button>
+            <span class="tb-sep"></span>
+            <div class="mm-tools" id="mmTools">
+              <button class="btn sm" data-mm="child" title="Añadir idea hija (Tab)">＋ Hija</button>
+              <button class="btn sm" data-mm="sibling" title="Añadir idea hermana (Enter)">＋ Hermana</button>
+              <button class="btn sm icon" data-mm="edit" title="Editar texto (F2, doble clic o empieza a escribir)">✏️</button>
+              <button class="btn sm icon" data-mm="color" title="Color de la rama">🎨</button>
+              <button class="btn sm icon" data-mm="note" title="Enlazar con una nota">📝</button>
+              <button class="btn sm icon" data-mm="todo" title="Enviar a Tareas o al Kanban">☑️</button>
+              <button class="btn sm icon" data-mm="done" title="Marcar como hecha">✓</button>
+              <button class="btn sm icon" data-mm="fold" title="Plegar o desplegar (Ctrl + .)">⊖</button>
+              <button class="btn sm icon" data-mm="del" title="Eliminar la rama (Supr)">🗑️</button>
+            </div>
+            <div class="grow"></div>
+            <div class="mm-zoom">
+              <button class="btn sm icon ghost" data-mm="undo" title="Deshacer (Ctrl + Z)">↶</button>
+              <button class="btn sm icon ghost" data-mm="redo" title="Rehacer (Ctrl + Y)">↷</button>
+              <button class="btn sm icon ghost" data-mm="zout" title="Alejar">−</button>
+              <span class="muted small" id="mmZoom">100%</span>
+              <button class="btn sm icon ghost" data-mm="zin" title="Acercar">＋</button>
+              <button class="btn sm icon ghost" data-mm="fit" title="Encajar todo el mapa (Ctrl + 0)">⛶</button>
+            </div>
+          </div>
+          <div class="mm-stage" id="mmStage" tabindex="0" aria-label="Mapa mental">
+            <svg id="mmSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+            <textarea id="mmEdit" class="mm-edit" hidden spellcheck="true" rows="1"></textarea>
+            <div class="mm-empty" id="mmEmpty" hidden>
+              <div style="font-size:2.6rem">🧠</div>
+              <h3>Aún no tienes mapas mentales</h3>
+              <p class="muted">Ordena ideas alrededor de un tema central. Puedes empezar en blanco, con una plantilla o convertir una de tus notas.</p>
+              <button class="btn primary" id="mmEmptyNew">＋ Crear mi primer mapa</button>
+            </div>
+            <div class="mm-hint" id="mmHint"><kbd>Tab</kbd> hija · <kbd>Enter</kbd> hermana · <kbd>F2</kbd> editar · <kbd>Supr</kbd> borrar · <kbd>←↑↓→</kbd> moverse · arrastra una idea sobre otra para reorganizar · <kbd>Ctrl</kbd>+rueda zoom</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- Grafo de conexiones ---------- -->
+      <div class="maps-pane" data-pane="graph" hidden>
+        <div class="card gr-card">
+          <div class="mm-bar">
+            <input class="field" id="grSearch" placeholder="🔍 Buscar y resaltar…" style="max-width:220px">
+            <label class="check-row" title="Mostrar también las notas que no enlazan ni están enlazadas"><input type="checkbox" class="check" id="grOrphans" checked> Notas sueltas</label>
+            <label class="check-row" title="Tareas y tarjetas Kanban que mencionan [[una nota]]"><input type="checkbox" class="check" id="grTasks" checked> Tareas</label>
+            <label class="check-row" title="Mapas mentales con ideas enlazadas a notas"><input type="checkbox" class="check" id="grMaps" checked> Mapas</label>
+            <label class="check-row" title="Relación página → subpágina de la wiki (línea discontinua)"><input type="checkbox" class="check" id="grTree" checked> Jerarquía wiki</label>
+            <span id="grFocus"></span>
+            <div class="grow"></div>
+            <div class="mm-zoom">
+              <button class="btn sm icon ghost" data-gr="zout" title="Alejar">−</button>
+              <span class="muted small" id="grZoom">100%</span>
+              <button class="btn sm icon ghost" data-gr="zin" title="Acercar">＋</button>
+              <button class="btn sm icon ghost" data-gr="fit" title="Encajar">⛶</button>
+              <button class="btn sm icon ghost" data-gr="relayout" title="Recolocar">🔀</button>
+              <button class="btn sm icon ghost" data-gr="png" title="Descargar imagen PNG">⬇️</button>
+            </div>
+          </div>
+          <div class="gr-stage" id="grStage">
+            <canvas id="grCanvas"></canvas>
+            <div class="gr-info card" id="grInfo" hidden></div>
+            <div class="mm-empty" id="grEmpty" hidden>
+              <div style="font-size:2.6rem">🕸️</div>
+              <h3>Todavía no hay conexiones</h3>
+              <p class="muted">En una nota, escribe <kbd>[[</kbd> y elige otra nota para enlazarlas. Aquí verás cómo se relacionan todas tus notas, tareas y mapas.</p>
+              <button class="btn" data-goto="notes">📝 Ir a Notas</button>
+            </div>
+          </div>
+          <div class="gr-legend">
+            <span><i class="lg-dot" style="background:var(--accent)"></i> Nota (más grande = más conexiones)</span>
+            <span><i class="lg-dot" style="background:var(--warning)"></i> Nota fijada</span>
+            <span><i class="lg-dot" style="background:var(--muted)"></i> Nota suelta</span>
+            <span><i class="lg-sq" style="background:var(--success)"></i> Tarea / tarjeta</span>
+            <span><i class="lg-dia" style="background:var(--info)"></i> Mapa mental</span>
+            <span><i class="lg-dash"></i> Página → subpágina</span>
+            <span class="muted" id="grPerf" title="Con muchos nodos el grafo cambia solo a un cálculo aproximado mucho más rápido"></span>
+            <span class="muted">Clic: detalles · doble clic: abrir · arrastra nodos o el fondo · rueda: zoom</span>
+          </div>
+        </div>
+      </div>
+    </section>

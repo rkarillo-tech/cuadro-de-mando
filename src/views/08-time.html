@@ -1,0 +1,37 @@
+    <!-- ===================== HORAS ===================== -->
+    <section class="view" id="view-time">
+      <div class="tt-layout">
+        <div class="grid">
+          <div class="card">
+            <div class="card-h"><h3>⏱️ Cronómetro</h3><button class="btn sm" id="ttManual">＋ Registro manual</button></div>
+            <div class="tt-timer">
+              <select class="field" id="ttProject"></select>
+              <input class="field" id="ttDesc" placeholder="¿En qué estás trabajando?" maxlength="200">
+              <button class="btn primary" id="ttToggle" style="min-width:120px;padding:10px 16px">▶ Iniciar</button>
+            </div>
+            <div class="row" style="margin-top:14px;justify-content:space-between">
+              <div class="tt-clock" id="ttClock">0:00:00</div>
+              <div class="muted small" id="ttTodayInfo"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <div class="row"><button class="btn icon sm" id="ttPrevWeek" title="Semana anterior">◀</button><h3 id="ttWeekTitle"></h3><button class="btn icon sm" id="ttNextWeek" title="Semana siguiente">▶</button><button class="btn sm ghost" id="ttThisWeek">Esta semana</button></div>
+              <button class="btn sm" id="ttExport">⬇️ Exportar CSV</button>
+            </div>
+            <div class="table-wrap"><table class="table" id="ttSummary"></table></div>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <div class="card-h"><h3>🗂️ Proyectos</h3><button class="btn sm" id="ttNewProject">＋ Proyecto</button></div>
+            <div class="list" id="ttProjects"></div>
+            <label class="check-row" style="margin-top:10px"><input type="checkbox" class="check" id="ttShowArchived"> Mostrar archivados</label>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>🧾 Registros de la semana</h3></div>
+            <div id="ttEntries"></div>
+          </div>
+        </div>
+      </div>
+    </section>

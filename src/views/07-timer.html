@@ -1,0 +1,55 @@
+    <!-- ===================== POMODORO ===================== -->
+    <section class="view" id="view-timer">
+      <div class="timer-layout">
+        <div class="card" style="text-align:center">
+          <div class="seg" id="pomoModes">
+            <button data-mode="focus">🍅 Foco</button>
+            <button data-mode="short">☕ Descanso</button>
+            <button data-mode="long">🛋️ Descanso largo</button>
+          </div>
+          <div class="ring-wrap">
+            <svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="54" fill="none" stroke-width="7"/><circle class="ring-fg" id="pomoRing" cx="60" cy="60" r="54" fill="none" stroke-width="7"/></svg>
+            <div class="ring-center"><div class="time" id="pomoTime">25:00</div><div class="muted small" id="pomoLabel"></div></div>
+          </div>
+          <div class="dots" id="pomoDots" title="Sesiones de foco hasta el descanso largo"></div>
+          <div class="row" style="justify-content:center;margin-top:18px">
+            <button class="btn icon" id="pomoReset" title="Reiniciar">↺</button>
+            <button class="btn primary" id="pomoToggle" style="min-width:150px;padding:12px 20px;font-size:1rem">▶ Iniciar</button>
+            <button class="btn icon" id="pomoSkip" title="Saltar a la siguiente fase">⏭</button>
+          </div>
+          <div style="margin:20px auto 0;max-width:380px;text-align:left">
+            <label class="lbl" for="pomoTask">Trabajando en (opcional · suma 🍅 a la tarea)</label>
+            <select class="field" id="pomoTask"></select>
+          </div>
+          <div style="margin:12px auto 0;max-width:380px;text-align:left">
+            <label class="lbl" for="pomoProject">Registrar el tiempo en el proyecto (opcional · sección Horas)</label>
+            <select class="field" id="pomoProject"></select>
+          </div>
+          <p class="muted small" style="margin-top:12px">Atajo: <kbd>Espacio</kbd> inicia o pausa. El tiempo sigue contando aunque cambies de pestaña o recargues.</p>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <div class="card-h"><h3>📊 Hoy</h3></div>
+            <div class="row" style="gap:28px;margin-bottom:10px">
+              <div><div class="big" id="pomoTodayCount">0</div><div class="muted small">pomodoros</div></div>
+              <div><div class="big" id="pomoTodayMin">0</div><div class="muted small">minutos de foco</div></div>
+            </div>
+            <div class="list" id="pomoToday"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>⚙️ Ajustes</h3></div>
+            <div class="form-grid">
+              <div><label class="lbl" for="pomoFocus">Foco (min)</label><input class="field" type="number" id="pomoFocus" min="1" max="180"></div>
+              <div><label class="lbl" for="pomoShort">Descanso corto (min)</label><input class="field" type="number" id="pomoShort" min="1" max="60"></div>
+              <div><label class="lbl" for="pomoLong">Descanso largo (min)</label><input class="field" type="number" id="pomoLong" min="1" max="90"></div>
+              <div><label class="lbl" for="pomoEvery">Largo cada (sesiones)</label><input class="field" type="number" id="pomoEvery" min="2" max="10"></div>
+            </div>
+            <div class="grid" style="gap:10px;margin-top:14px">
+              <label class="check-row"><input type="checkbox" class="check" id="pomoAuto"> Encadenar fases automáticamente</label>
+              <label class="check-row"><input type="checkbox" class="check" id="pomoSound"> Sonido al terminar</label>
+              <div><button class="btn sm" id="pomoNotif">🔔 Activar notificaciones del sistema</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>

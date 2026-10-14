@@ -1,0 +1,116 @@
+    <!-- ===================== AJUSTES ===================== -->
+    <section class="view" id="view-settings">
+      <div class="settings-grid">
+        <div class="card span-all" id="protectCard">
+          <div class="card-h"><h3>🛡️ Cómo se protegen tus datos</h3></div>
+          <p class="small" style="margin-top:0">Todo lo que haces aquí se guarda <b>solo en este navegador</b>, sin internet. Si se borran los datos del navegador o cambias de equipo, lo perderías… salvo que uses estas protecciones. Cada una cubre un riesgo distinto:</p>
+          <div id="protectStatus" class="prot-status"></div>
+          <div class="prot-grid">
+            <div class="prot">
+              <div class="prot-h">🔒 Bloqueo con contraseña</div>
+              <div class="prot-k">Qué hace</div><div>Cifra los datos <b>dentro del navegador</b> y pide la contraseña al abrir.</div>
+              <div class="prot-k">Te protege de</div><div>Alguien que use tu ordenador o copie los archivos del navegador.</div>
+              <div class="prot-k">No te protege de</div><div>Perder los datos: siguen estando solo aquí.</div>
+            </div>
+            <div class="prot">
+              <div class="prot-h">🕘 Historial de versiones</div>
+              <div class="prot-k">Qué hace</div><div>Guarda <b>fotos anteriores</b> de tus datos: al abrir la app, cada 30 min de uso y antes de importar o restaurar.</div>
+              <div class="prot-k">Te protege de</div><div>Tus propios errores: borrar algo sin querer, importar la copia equivocada…</div>
+              <div class="prot-k">No te protege de</div><div>Perder el navegador: las versiones viven en él. Se cifran si el bloqueo está activo.</div>
+            </div>
+            <div class="prot">
+              <div class="prot-h">🗄️ Archivo en tu disco (sincronización)</div>
+              <div class="prot-k">Qué hace</div><div>Mantiene un <b>.json en tu ordenador</b> que se reescribe solo 1,5 s después de cada cambio. Si está en OneDrive/Dropbox, lo tienes también en otro equipo.</div>
+              <div class="prot-k">Te protege de</div><div>Que se borre el navegador o se estropee el equipo (si está en una carpeta en la nube).</div>
+              <div class="prot-k">No te protege de</div><div>Errores: guarda <b>solo la última versión</b>; si borras algo, también desaparece del archivo. Se cifra si el bloqueo está activo.</div>
+            </div>
+            <div class="prot">
+              <div class="prot-h">💾 Copia exportada</div>
+              <div class="prot-k">Qué hace</div><div>Descarga una <b>foto fija</b> de todo cuando tú lo pides. Puede ir <b>cifrada</b> (con contraseña) o sin cifrar (JSON legible).</div>
+              <div class="prot-k">Te protege de</div><div>Casi todo, si la guardas fuera del equipo (pendrive, nube). Es tu «seguro» a largo plazo.</div>
+              <div class="prot-k">No te protege de</div><div>Los cambios posteriores: solo contiene lo que había al exportarla.</div>
+            </div>
+          </div>
+          <details class="prot-more">
+            <summary>Configuración recomendada y preguntas frecuentes</summary>
+            <ol class="small">
+              <li><b>Activa el bloqueo</b> si alguien más usa tu ordenador o si guardas cosas sensibles. Así el historial y el archivo de disco también van cifrados.</li>
+              <li><b>Vincula un archivo</b> dentro de una carpeta que se sincronice (OneDrive, Dropbox…). Es la protección «diaria» y automática.</li>
+              <li>El <b>historial</b> funciona solo: no tienes que hacer nada. Antes de un cambio grande, pulsa «Guardar versión ahora».</li>
+              <li><b>Exporta una copia cifrada</b> de vez en cuando (por ejemplo, al mes) y guárdala fuera del ordenador.</li>
+            </ol>
+            <p class="small"><b>¿Cómo restauro una copia exportada?</b> En «Copias de seguridad» → «⬆️ Importar copia». Si está cifrada, te pedirá la contraseña con la que la creaste. Sustituye todos los datos actuales (antes se guarda una versión de seguridad en el historial).</p>
+            <p class="small"><b>¿Cómo sé si un archivo está cifrado?</b> El nombre termina en <code>_cifrada.json</code>. Si lo abres con un editor de texto verás <code>"encrypted":true</code> y un bloque de caracteres ilegibles en lugar de tus notas.</p>
+            <p class="small"><b>¿Y si olvido la contraseña?</b> No hay forma de recuperarla. Las copias o versiones cifradas con ella quedan inservibles; solo te salvará una copia sin cifrar o cifrada con otra contraseña que recuerdes.</p>
+            <p class="small"><b>¿Uso el archivo en dos equipos a la vez?</b> Mejor no a la vez. Al abrir la app, si el archivo es más reciente que lo que hay en el navegador, te pregunta qué datos conservar. Lee bien la pregunta: los otros se sustituyen (aunque quedan en el historial).</p>
+          </details>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>🔒 Bloqueo con contraseña</h3></div>
+          <div class="status-line" id="secStatus"></div>
+          <div class="row" id="secBtns"></div>
+          <div style="margin-top:14px" id="secAutoWrap">
+            <label class="lbl" for="secAuto">Bloquear automáticamente tras inactividad</label>
+            <select class="field" id="secAuto" style="max-width:240px">
+              <option value="0">Nunca</option><option value="5">5 minutos</option><option value="15">15 minutos</option><option value="30">30 minutos</option><option value="60">1 hora</option>
+            </select>
+          </div>
+          <p class="hint">Con el bloqueo activado, todos los datos se guardan cifrados (AES-256-GCM) y hace falta la contraseña para abrir la app. La contraseña no se guarda en ningún sitio: si la olvidas, solo podrás recuperar los datos desde una copia de seguridad.</p>
+        </div>
+
+        <div class="card" id="histCard">
+          <div class="card-h"><h3>🕘 Historial de versiones</h3></div>
+          <div class="status-line" id="histStatus"></div>
+          <div class="row">
+            <button class="btn primary" id="histSave">📌 Guardar versión ahora</button>
+            <button class="btn ghost" id="histClear" hidden>Vaciar historial</button>
+          </div>
+          <div class="ver-list" id="histList"></div>
+          <p class="hint">Se guarda una versión al abrir la app y cada 30 minutos de uso (solo si hay cambios), y siempre antes de importar una copia, cargar el archivo vinculado o restaurar otra versión. Se conservan todas las de las últimas 24 h, una por día durante 30 días, las 10 últimas «de seguridad» y hasta 30 manuales. Restaurar una versión nunca es irreversible: antes se guarda lo que tenías.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>💾 Copias de seguridad</h3></div>
+          <div class="status-line" id="bkStatus"></div>
+          <div class="row">
+            <button class="btn primary" id="bkExport">⬇️ Exportar copia</button>
+            <button class="btn" id="bkImport">⬆️ Importar copia</button>
+            <input type="file" id="bkImportFile" accept=".json,application/json" hidden>
+          </div>
+          <div style="margin-top:14px">
+            <label class="lbl" for="bkRemind">Recordarme hacer copia cada</label>
+            <select class="field" id="bkRemind" style="max-width:240px">
+              <option value="0">No recordar</option><option value="7">7 días</option><option value="14">14 días</option><option value="30">30 días</option>
+            </select>
+          </div>
+          <p class="hint"><b>Exportar</b> descarga un archivo con todo (notas, tareas, Kanban, calendario, horas, hábitos, marcadores, almacén, festivos y ajustes). Al exportar eliges <b>🔐 cifrada</b> (con contraseña; recomendada) o <b>📄 sin cifrar</b>. <b>Importar</b> sustituye todos los datos por los de la copia y te pide la contraseña si está cifrada.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>🗄️ Guardar en un archivo de tu disco</h3></div>
+          <div class="status-line" id="fsStatus"></div>
+          <div class="row" id="fsBtns"></div>
+          <p class="hint" id="fsHint"><b>Vincular nuevo archivo</b>: eliges dónde crear un .json (mejor en una carpeta de OneDrive o Dropbox) y la app lo reescribe sola tras cada cambio. <b>Abrir archivo existente</b>: para usar en este equipo un archivo que ya creaste en otro. Si el bloqueo está activado, el archivo se guarda cifrado; si no, en claro. Solo guarda la última versión (para volver atrás, usa el historial). Disponible en Chrome, Edge y Brave.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>🎨 Personalización</h3></div>
+          <div class="form-grid">
+            <div><label class="lbl" for="setName">Tu nombre (para el saludo)</label><input class="field" id="setName" maxlength="40" placeholder="Opcional"></div>
+            <div><label class="lbl" for="setTheme">Tema</label><select class="field" id="setTheme"><option value="system">Según el sistema</option><option value="dark">Oscuro</option><option value="light">Claro</option></select></div>
+            <div><label class="lbl" for="setStart">Al abrir, mostrar</label><select class="field" id="setStart"><option value="last">La última sección usada</option><option value="dashboard">Inicio</option><option value="todos">Tareas</option><option value="calendar">Calendario</option><option value="notes">Notas</option></select></div>
+          </div>
+          <div class="row" style="margin-top:14px"><button class="btn" id="setShortcuts">⌨️ Ver atajos de teclado</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>📊 Datos y almacenamiento</h3></div>
+          <div id="dataUsage"></div>
+          <div id="legacyBox"></div>
+          <hr class="sep">
+          <div class="row"><button class="btn danger" id="wipeAll">🗑️ Borrar todos los datos</button></div>
+          <p class="hint">Los datos se guardan en <b>IndexedDB</b>, la base de datos interna del navegador: sin el límite de 5 MB de localStorage y sin bloquear la pantalla al guardar. Si un navegador no la permite, la app usa localStorage automáticamente. Al ser solo texto, ocupan muy poco.</p>
+        </div>
+      </div>
+    </section>

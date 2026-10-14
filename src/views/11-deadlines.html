@@ -1,0 +1,59 @@
+    <!-- ===================== PLAZOS ===================== -->
+    <section class="view" id="view-deadlines">
+      <div class="dl-layout">
+        <div class="grid">
+          <div class="card">
+            <div class="card-h"><h3>📆 Calcular fecha de vencimiento</h3></div>
+            <div class="form-grid">
+              <div><label class="lbl" for="dlStart">Fecha inicial (notificación, publicación…)</label><input type="date" class="field" id="dlStart"></div>
+              <div><label class="lbl" for="dlN">Plazo</label><input type="number" class="field" id="dlN" value="10" min="-3650" max="3650"></div>
+              <div><label class="lbl" for="dlUnit">Unidad</label>
+                <select class="field" id="dlUnit">
+                  <option value="habiles">Días hábiles</option>
+                  <option value="naturales">Días naturales</option>
+                  <option value="meses">Meses</option>
+                  <option value="anios">Años</option>
+                </select></div>
+            </div>
+            <div class="opts-grid">
+              <label class="check-row"><input type="checkbox" class="check" id="dlNext" checked> Empezar a contar el día siguiente</label>
+              <label class="check-row"><input type="checkbox" class="check" id="dlRoll" checked> Si vence en inhábil, pasa al siguiente hábil</label>
+              <label class="check-row"><input type="checkbox" class="check" id="dlSat" checked> Sábados inhábiles</label>
+              <label class="check-row"><input type="checkbox" class="check" id="dlAug"> Agosto inhábil (plazos judiciales)</label>
+            </div>
+            <div class="result-box" id="dlResult"></div>
+            <div class="row" style="margin-top:12px">
+              <button class="btn" id="dlToCal">📅 Añadir al calendario</button>
+              <button class="btn" id="dlToTodo">☑️ Crear tarea con esta fecha</button>
+            </div>
+            <p class="hint">Cálculo orientativo según el art. 30 de la Ley 39/2015: los días hábiles excluyen sábados, domingos y festivos; los plazos se cuentan desde el día siguiente; en meses y años vencen el mismo día del mes de vencimiento (o el último día si no existe); si el último día es inhábil se prorroga al siguiente hábil. Usa un número negativo para contar hacia atrás. Verifica siempre los plazos oficiales.</p>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>↔️ Días entre dos fechas</h3></div>
+            <div class="form-grid">
+              <div><label class="lbl" for="dlFrom">Desde</label><input type="date" class="field" id="dlFrom"></div>
+              <div><label class="lbl" for="dlTo">Hasta</label><input type="date" class="field" id="dlTo"></div>
+            </div>
+            <div class="result-box" id="dlBetween"></div>
+            <p class="hint">Se cuenta desde el día siguiente a «Desde» hasta «Hasta», ambos incluidos. Usa las mismas opciones de días inhábiles de arriba.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>🎉 Festivos</h3>
+            <div class="row"><button class="btn icon sm" id="hdPrev">◀</button><b id="hdYear"></b><button class="btn icon sm" id="hdNext">▶</button></div>
+          </div>
+          <div class="row" style="margin-bottom:12px">
+            <button class="btn sm" id="hdNational">＋ Nacionales del año</button>
+            <button class="btn sm" id="hdThursday">＋ Jueves Santo</button>
+            <button class="btn sm danger" id="hdClearYear">Borrar los del año</button>
+          </div>
+          <div class="row" style="margin-bottom:10px">
+            <input type="date" class="field" id="hdDate" style="width:auto;flex:0 0 170px">
+            <input class="field" id="hdName" placeholder="Nombre (p. ej. San Isidro)" maxlength="80" style="width:auto;flex:1 1 160px">
+            <button class="btn primary" id="hdAdd">Añadir</button>
+          </div>
+          <div class="list" id="hdList"></div>
+          <p class="hint">Los festivos se usan en el cálculo de plazos y aparecen en el calendario. Añade también los de tu comunidad autónoma y tu municipio, y revisa el calendario oficial de cada año: algunas comunidades trasladan al lunes los festivos que caen en domingo.</p>
+        </div>
+      </div>
+    </section>

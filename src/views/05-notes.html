@@ -1,0 +1,84 @@
+    <!-- ===================== NOTAS ===================== -->
+    <section class="view" id="view-notes">
+      <div class="notes-layout">
+        <aside class="card notes-side">
+          <div class="row" style="flex-wrap:nowrap">
+            <input class="field" id="noteSearch" placeholder="🔍 Buscar en notas…">
+            <button class="btn primary icon" id="newNoteBtn" title="Nueva nota (Alt+N)">＋</button>
+            <button class="btn icon" id="tplBtn" title="Nueva nota desde plantilla">📄</button>
+          </div>
+          <div class="seg seg-full" id="notesMode" title="Ver las notas como lista o como árbol (wiki)">
+            <button data-nm2="list" class="on">📄 Lista</button><button data-nm2="tree">🌳 Wiki</button>
+          </div>
+          <div class="row">
+            <button class="btn sm" id="importNoteBtn" title="Importar archivos .md o .txt como notas, o un .ctd de CherryTree como rama de la wiki">⬆️ Importar .md / .txt / .ctd</button>
+            <input type="file" id="importNoteFile" accept=".md,.markdown,.txt,.ctd,.ctb,.ctz,.ctx,text/plain,text/markdown" multiple hidden>
+            <span class="muted small" id="notesTotal"></span>
+          </div>
+          <div class="notes-list" id="notesList"></div>
+        </aside>
+
+        <div class="card empty-state" id="noteEmpty" hidden>
+          <div style="font-size:2.6rem">📝</div>
+          <h3>No tienes notas</h3>
+          <p class="muted">Crea tu primera nota o importa un archivo Markdown.</p>
+          <button class="btn primary" id="emptyNewNote">＋ Nueva nota</button>
+        </div>
+
+        <div class="card editor-card" id="editorCard">
+          <div class="wiki-crumbs" id="wikiCrumbs" hidden></div>
+          <div class="row" style="flex-wrap:nowrap">
+            <input class="title-input" id="noteTitle" placeholder="Título de la nota" maxlength="120">
+            <button class="btn icon ghost" id="tocBtn" title="Índice de la página (sus títulos)">☰</button>
+            <button class="btn icon ghost" id="subPageBtn" title="Añadir una subpágina (wiki)">⊕</button>
+            <button class="btn icon ghost" id="pinNoteBtn" title="Fijar arriba">📌</button>
+            <button class="btn icon ghost" id="noteMenuBtn" title="Exportar y más opciones">⋯</button>
+          </div>
+          <div class="toolbar" id="toolbar">
+            <select class="tb-select" id="blockSelect" title="Estilo de párrafo">
+              <option value="div">Texto normal</option>
+              <option value="h1">Título 1</option>
+              <option value="h2">Título 2</option>
+              <option value="h3">Título 3</option>
+              <option value="blockquote">Cita</option>
+              <option value="pre">Código</option>
+            </select>
+            <button class="tb" data-action="icode" title="Código en línea (selecciona el texto). Para un bloque: elige «Código» o escribe ``` y Enter">‹/›</button>
+            <span class="tb-sep"></span>
+            <button class="tb" data-cmd="bold" title="Negrita (Ctrl+B)"><b>B</b></button>
+            <button class="tb" data-cmd="italic" title="Cursiva (Ctrl+I)"><i>I</i></button>
+            <button class="tb" data-cmd="underline" title="Subrayado (Ctrl+U)"><u>U</u></button>
+            <button class="tb" data-cmd="strikeThrough" title="Tachado"><s>S</s></button>
+            <span class="tb-sep"></span>
+            <button class="tb" data-cmd="insertUnorderedList" title="Lista con viñetas">• Lista</button>
+            <button class="tb" data-cmd="insertOrderedList" title="Lista numerada">1. Lista</button>
+            <button class="tb" data-action="checkbox" title="Casilla de tarea en el cursor (Ctrl+Shift+X)">☑ Tarea</button>
+            <button class="tb" data-cmd="outdent" title="Reducir sangría (Shift+Tab en listas)">⇤</button>
+            <button class="tb" data-cmd="indent" title="Aumentar sangría (Tab en listas)">⇥</button>
+            <span class="tb-sep"></span>
+            <span class="color-tool">
+              <button class="tb" data-action="fore" title="Aplicar el color de texto a la selección">🖍️ Color texto</button>
+              <input type="color" id="foreColor" value="#f5b94a" title="Elegir color de texto">
+            </span>
+            <span class="color-tool">
+              <button class="tb" data-action="hilite" title="Aplicar el resaltado a la selección">🖌️ Resaltado</button>
+              <input type="color" id="hiliteColor" value="#6c5ce7" title="Elegir color de resaltado">
+            </span>
+            <button class="tb" data-cmd="removeFormat" title="Quitar formato y colores de la selección">⌀ Limpiar</button>
+            <span class="tb-sep"></span>
+            <button class="tb" data-action="link" title="Insertar enlace web (Ctrl+K)">🔗</button>
+            <button class="tb" data-action="wikilink" title="Enlazar con otra nota (o escribe [[ )">[[ ]] Nota</button>
+            <button class="tb" data-cmd="insertHorizontalRule" title="Línea separadora">―</button>
+            <button class="tb" data-action="emoji" id="emojiBtn" title="Insertar emoji">😊</button>
+            <button class="tb" data-action="date" title="Insertar fecha y hora">📅</button>
+            <span class="tb-sep"></span>
+            <button class="tb" data-cmd="undo" title="Deshacer (Ctrl+Z)">↶</button>
+            <button class="tb" data-cmd="redo" title="Rehacer (Ctrl+Y)">↷</button>
+          </div>
+          <div class="editor" id="editor" contenteditable="true" spellcheck="true" data-placeholder="Empieza a escribir…"></div>
+          <div class="status"><span id="noteCount"></span><span id="noteSaved"></span></div>
+          <div class="subpages bl-row" id="subpages" hidden></div>
+          <div class="backlinks" id="backlinks"></div>
+        </div>
+      </div>
+    </section>

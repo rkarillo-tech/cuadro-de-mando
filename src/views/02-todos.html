@@ -1,0 +1,23 @@
+    <!-- ===================== LISTA DE TAREAS ===================== -->
+    <section class="view" id="view-todos">
+      <div class="todo-layout">
+        <aside class="card todo-side" id="todoSide">
+          <div id="todoSmart" style="display:contents"></div>
+          <hr class="sep" style="margin:8px 0">
+          <div class="row lbl-row" style="justify-content:space-between;padding:0 4px 0 10px"><span class="lbl" style="margin:0">Mis listas</span><button class="btn icon sm ghost" id="todoNewList" title="Nueva lista">＋</button></div>
+          <div id="todoLists" style="display:contents"></div>
+        </aside>
+        <div class="card">
+          <div class="card-h" style="margin-bottom:10px">
+            <div style="min-width:0"><h2 id="todoTitle" style="font-size:1.25rem"></h2><div class="muted small" id="todoSub"></div></div>
+            <div class="row">
+              <button class="btn sm" id="todoNewListMobile" title="Nueva lista">＋ Lista</button>
+              <button class="btn icon ghost" id="todoMenuBtn" title="Opciones">⋯</button>
+            </div>
+          </div>
+          <div class="todo-add"><span class="plus">＋</span><input id="todoInput" placeholder="Añadir tarea…  (ej.: «Revisar informe el viernes #trabajo !»)" autocomplete="off" maxlength="300"></div>
+          <div class="todo-preview" id="todoPreview"></div>
+          <div class="todo-items" id="todoItems"></div>
+        </div>
+      </div>
+    </section>

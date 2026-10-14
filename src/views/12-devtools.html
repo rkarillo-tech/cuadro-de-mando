@@ -1,0 +1,224 @@
+    <!-- ===================== HERRAMIENTAS ===================== -->
+    <section class="view" id="view-devtools">
+      <div class="seg tool-tabs" id="toolTabs">
+        <button data-tool="json" class="on">{ } JSON / XML</button>
+        <button data-tool="b64">Base64</button>
+        <button data-tool="url">URL</button>
+        <button data-tool="jwt">JWT</button>
+        <button data-tool="hash">Hash</button>
+        <button data-tool="diff">Comparar</button>
+        <button data-tool="regex">Regex</button>
+        <button data-tool="uuid">UUID</button>
+        <button data-tool="time">Fechas / epoch</button>
+        <button data-tool="valid">NIF · CIF · IBAN</button>
+        <button data-tool="text">Texto</button>
+      </div>
+
+      <div class="card tool-pane active" data-pane="json">
+        <div class="row" style="margin-bottom:10px">
+          <div class="seg" id="jxMode"><button data-m="json" class="on">JSON</button><button data-m="xml">XML</button></div>
+          <select class="field" id="jxIndent" style="max-width:140px"><option value="2">2 espacios</option><option value="4">4 espacios</option><option value="tab">Tabulador</option></select>
+          <button class="btn primary" id="jxFormat">Formatear</button>
+          <button class="btn" id="jxMinify">Minificar</button>
+          <button class="btn" id="jxSort">Ordenar claves</button>
+          <button class="btn" id="jxCopy">📋 Copiar</button>
+          <button class="btn ghost" id="jxClear">Limpiar</button>
+        </div>
+        <textarea class="field code" id="jxIn" rows="18" spellcheck="false" placeholder="Pega aquí un JSON o un XML…"></textarea>
+        <div class="small" id="jxStatus" style="margin-top:8px;min-height:1.3em"></div>
+      </div>
+
+      <div class="card tool-pane" data-pane="b64">
+        <div class="row" style="margin-bottom:10px">
+          <label class="check-row"><input type="checkbox" class="check" id="b64Url"> Variante URL-safe (- _ sin =)</label>
+          <button class="btn sm" id="b64FileBtn">📁 Archivo → Base64</button>
+          <input type="file" id="b64File" hidden>
+          <button class="btn sm" id="b64DownBtn">⬇️ Base64 → archivo</button>
+        </div>
+        <div class="two-col">
+          <div><label class="lbl" for="b64Plain">Texto</label><textarea class="field code" id="b64Plain" rows="12" spellcheck="false" placeholder="Escribe texto y se codifica al momento…"></textarea></div>
+          <div><label class="lbl" for="b64Enc">Base64</label><textarea class="field code" id="b64Enc" rows="12" spellcheck="false" placeholder="…o pega Base64 y se decodifica"></textarea></div>
+        </div>
+        <div class="small" id="b64Status" style="margin-top:8px;min-height:1.3em"></div>
+      </div>
+
+      <div class="card tool-pane" data-pane="url">
+        <div class="two-col">
+          <div><label class="lbl" for="urlPlain">Texto / URL decodificada</label><textarea class="field code" id="urlPlain" rows="7" spellcheck="false"></textarea></div>
+          <div><label class="lbl" for="urlEnc">Codificado (percent-encoding)</label><textarea class="field code" id="urlEnc" rows="7" spellcheck="false"></textarea></div>
+        </div>
+        <label class="check-row" style="margin-top:10px"><input type="checkbox" class="check" id="urlFull"> Codificar como URL completa (respeta : / ? &amp; =)</label>
+        <h4 class="section-h" style="margin-top:18px">Análisis de la URL</h4>
+        <div id="urlParts" class="muted small">Escribe una URL completa (https://…) para ver sus partes.</div>
+      </div>
+
+      <div class="card tool-pane" data-pane="jwt">
+        <label class="lbl" for="jwtIn">Token JWT</label>
+        <textarea class="field code" id="jwtIn" rows="5" spellcheck="false" placeholder="eyJhbGciOi…" style="white-space:pre-wrap;word-break:break-all"></textarea>
+        <p class="hint">Solo se decodifica: la firma no se verifica. Nada sale de tu navegador.</p>
+        <div id="jwtClaims" style="margin-top:10px"></div>
+        <div class="two-col" style="margin-top:10px">
+          <div><h4 class="section-h">Cabecera</h4><pre class="out-box" id="jwtHead"></pre></div>
+          <div><h4 class="section-h">Contenido (payload)</h4><pre class="out-box" id="jwtBody"></pre></div>
+        </div>
+      </div>
+
+      <div class="card tool-pane" data-pane="hash">
+        <div class="row" style="margin-bottom:10px">
+          <div class="seg" id="hashMode"><button data-m="text" class="on">Texto</button><button data-m="file">Archivo</button></div>
+          <label class="check-row"><input type="checkbox" class="check" id="hashUpper"> Mayúsculas</label>
+        </div>
+        <textarea class="field code" id="hashIn" rows="6" spellcheck="false" placeholder="Texto del que calcular el hash (UTF-8)…"></textarea>
+        <div class="dropzone" id="hashDrop" hidden>📁 Arrastra un archivo o haz clic para elegirlo<br><span class="muted small" id="hashFileInfo">Ningún archivo</span></div>
+        <input type="file" id="hashFile" hidden>
+        <div style="margin-top:12px"><input class="field mono" id="hashExpect" placeholder="Pega un hash esperado para comprobarlo (opcional)"></div>
+        <div id="hashOut" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card tool-pane" data-pane="diff">
+        <div class="two-col">
+          <div><label class="lbl" for="diffA">Original</label><textarea class="field code" id="diffA" rows="12" spellcheck="false"></textarea></div>
+          <div><label class="lbl" for="diffB">Modificado</label><textarea class="field code" id="diffB" rows="12" spellcheck="false"></textarea></div>
+        </div>
+        <div class="row" style="margin:10px 0">
+          <button class="btn primary" id="diffRun">Comparar</button>
+          <label class="check-row"><input type="checkbox" class="check" id="diffWs"> Ignorar espacios</label>
+          <label class="check-row"><input type="checkbox" class="check" id="diffCase"> Ignorar mayúsculas</label>
+          <label class="check-row"><input type="checkbox" class="check" id="diffOnly" checked> Solo cambios y contexto</label>
+          <span class="muted small" id="diffStats"></span>
+        </div>
+        <div class="diff" id="diffOut"></div>
+      </div>
+
+      <div class="card tool-pane" data-pane="regex">
+        <div class="rx-bar">
+          <span class="mono muted">/</span>
+          <input class="field mono" id="rxPat" placeholder="Escribe o construye el patrón, p. ej. ^\d{8}[A-Z]$" spellcheck="false" autocomplete="off">
+          <span class="mono muted">/</span>
+          <div class="chips" id="rxFlags" style="flex-wrap:nowrap"></div>
+          <button class="btn icon sm" id="rxUndo" title="Deshacer el último cambio del patrón">↶</button>
+          <button class="btn icon sm" id="rxCopy" title="Copiar el patrón">📋</button>
+          <button class="btn icon sm ghost" id="rxClear" title="Vaciar el patrón">✕</button>
+        </div>
+        <div class="rx-view" id="rxView"></div>
+        <div class="small" id="rxSummary" style="min-height:1.3em"></div>
+        <div class="seg rx-tabs" id="rxTabs">
+          <button data-rt="test" class="on">🧪 Probar</button>
+          <button data-rt="explain">📖 Explicar</button>
+          <button data-rt="build">🧱 Construir</button>
+          <button data-rt="infer">🔍 Desde ejemplos</button>
+          <button data-rt="library">📚 Biblioteca</button>
+          <button data-rt="code">💻 Código</button>
+        </div>
+
+        <div class="rx-pane active" data-rp="test">
+          <div class="row" style="justify-content:space-between;margin-bottom:6px">
+            <label class="lbl" for="rxText" style="margin:0">Texto de prueba</label>
+            <label class="check-row small"><input type="checkbox" class="check" id="rxByLine"> Validar línea a línea</label>
+          </div>
+          <textarea class="field code" id="rxText" rows="7" spellcheck="false" style="white-space:pre-wrap" placeholder="Pega aquí el texto en el que buscar, o una lista de valores (uno por línea) para validarlos"></textarea>
+          <div class="small" id="rxStatus" style="margin:8px 0;min-height:1.3em"></div>
+          <div class="out-box" id="rxHighlight"></div>
+          <div class="list" id="rxLines" style="margin-top:10px" hidden></div>
+          <div class="two-col" style="margin-top:12px">
+            <div><div class="row" style="justify-content:space-between"><h4 class="section-h">Coincidencias</h4><button class="btn sm ghost" id="rxCopyMatches">📋 Copiar</button></div><div class="out-box" id="rxMatches" style="white-space:normal"></div></div>
+            <div><h4 class="section-h">Reemplazar</h4><input class="field mono" id="rxRepl" placeholder="Reemplazo, p. ej. $3-$2-$1" spellcheck="false"><pre class="out-box" id="rxReplOut" style="margin-top:8px"></pre></div>
+          </div>
+        </div>
+
+        <div class="rx-pane" data-rp="explain">
+          <p class="muted small" style="margin-bottom:8px">Cada pieza del patrón, en castellano. Pasa el ratón por una fila para ver dónde está en el patrón (y por el patrón para ver qué significa cada parte).</p>
+          <div id="rxExplain"></div>
+          <div id="rxWarnings" style="margin-top:12px"></div>
+        </div>
+
+        <div class="rx-pane" data-rp="build">
+          <p class="muted small" style="margin-bottom:10px">Pulsa los bloques para insertarlos donde está el cursor del patrón. Los de «Grupos» envuelven el texto que tengas seleccionado. Las cantidades se aplican a lo que va justo delante.</p>
+          <div id="rxBlocks"></div>
+          <div class="rx-build-grid">
+            <div class="rx-tool-box">
+              <h5>🔢 Repetir lo anterior</h5>
+              <div class="row"><label class="small">mín.</label><input type="number" class="field" id="rxQMin" value="2" min="0" style="width:80px"><label class="small">máx.</label><input type="number" class="field" id="rxQMax" value="4" min="0" style="width:80px" placeholder="∞"><button class="btn sm primary" id="rxQIns">Insertar</button></div>
+              <div class="hint" id="rxQPrev"></div>
+            </div>
+            <div class="rx-tool-box">
+              <h5>🔤 Texto literal</h5>
+              <div class="row" style="flex-wrap:nowrap"><input class="field" id="rxLit" placeholder="p. ej. www.boe.es o (1+1)?"><button class="btn sm primary" id="rxLitIns">Insertar</button></div>
+              <div class="hint" id="rxLitPrev">Escapa automáticamente los caracteres especiales.</div>
+            </div>
+            <div class="rx-tool-box">
+              <h5>🎯 Conjunto a medida <code>[ … ]</code></h5>
+              <div class="chips" id="rxSetOpts"></div>
+              <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input class="field mono" id="rxSetExtra" placeholder="Otros caracteres, p. ej. /#@"><label class="check-row small" style="white-space:nowrap"><input type="checkbox" class="check" id="rxSetNeg"> Excepto estos</label></div>
+              <div class="row" style="margin-top:8px"><code class="mono" id="rxSetPrev"></code><button class="btn sm primary" id="rxSetIns">Insertar</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rx-pane" data-rp="infer">
+          <p class="muted small" style="margin-bottom:10px">Escribe ejemplos de lo que quieres reconocer y te propongo un patrón. Cuantos más ejemplos (y más variados), mejor.</p>
+          <div class="two-col">
+            <div><label class="lbl" for="rxInfPos">✅ Deben coincidir (uno por línea)</label><textarea class="field code" id="rxInfPos" rows="6" spellcheck="false" placeholder="12345678Z&#10;87654321X"></textarea></div>
+            <div><label class="lbl" for="rxInfNeg">⛔ NO deben coincidir (opcional)</label><textarea class="field code" id="rxInfNeg" rows="6" spellcheck="false" placeholder="1234567Z&#10;12345678"></textarea></div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="seg" id="rxInfMode"><button data-m="exact" class="on">Precisa</button><button data-m="loose">Flexible</button></div>
+            <label class="check-row small"><input type="checkbox" class="check" id="rxInfAnchor" checked> Texto completo (<code>^</code> … <code>$</code>)</label>
+          </div>
+          <div class="result-box" id="rxInfOut"><span class="muted">Escribe al menos un ejemplo.</span></div>
+        </div>
+
+        <div class="rx-pane" data-rp="library">
+          <input class="field" id="rxLibSearch" placeholder="🔍 Buscar: dni, fecha, iban, correo, html…" style="max-width:360px;margin-bottom:12px">
+          <div class="rx-lib" id="rxLib"></div>
+        </div>
+
+        <div class="rx-pane" data-rp="code">
+          <div class="row" style="margin-bottom:12px">
+            <div class="seg" id="rxCodeMode"><button data-m="test" class="on">¿Coincide?</button><button data-m="find">Buscar todas</button><button data-m="replace">Reemplazar</button></div>
+            <span class="muted small">Usa el patrón, los modificadores y el reemplazo actuales.</span>
+          </div>
+          <div id="rxCode"></div>
+        </div>
+      </div>
+
+      <div class="card tool-pane" data-pane="uuid">
+        <div class="row" style="margin-bottom:10px">
+          <label class="lbl" for="uuidN" style="margin:0">Cantidad</label><input type="number" class="field" id="uuidN" value="5" min="1" max="500" style="max-width:100px">
+          <label class="check-row"><input type="checkbox" class="check" id="uuidUpper"> Mayúsculas</label>
+          <label class="check-row"><input type="checkbox" class="check" id="uuidNoDash"> Sin guiones</label>
+          <button class="btn primary" id="uuidGen">Generar UUID v4</button>
+          <button class="btn" id="uuidCopy">📋 Copiar</button>
+        </div>
+        <textarea class="field code" id="uuidOut" rows="10" readonly></textarea>
+      </div>
+
+      <div class="card tool-pane" data-pane="time">
+        <div class="status-line row"><span>Ahora:</span><b class="mono" id="epNowS"></b><span class="muted small">s</span><b class="mono" id="epNowMs"></b><span class="muted small">ms</span><button class="btn sm" id="epCopyNow">📋</button></div>
+        <div class="two-col">
+          <div>
+            <label class="lbl" for="epIn">Epoch (segundos o milisegundos)</label>
+            <input class="field mono" id="epIn" placeholder="1760000000">
+            <dl class="kv" id="epOut" style="margin-top:12px"></dl>
+          </div>
+          <div>
+            <label class="lbl" for="epDate">Fecha y hora local</label>
+            <input type="datetime-local" class="field" id="epDate" step="1">
+            <dl class="kv" id="epDateOut" style="margin-top:12px"></dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="card tool-pane" data-pane="valid">
+        <label class="lbl" for="valIn">NIF / DNI, NIE, CIF o IBAN</label>
+        <input class="field mono" id="valIn" placeholder="12345678Z · X1234567L · B12345674 · ES91 2100 0418 4502 0005 1332" spellcheck="false" style="font-size:1.05rem">
+        <div class="result-box" id="valOut"><span class="muted">Escribe un documento o una cuenta y se detecta el tipo automáticamente. Con 8 dígitos calcula la letra del DNI.</span></div>
+        <p class="hint">Comprueba solo el dígito o letra de control: no confirma que el documento o la cuenta existan.</p>
+      </div>
+
+      <div class="card tool-pane" data-pane="text">
+        <textarea class="field" id="txIn" rows="10" placeholder="Pega aquí un texto para contarlo o transformarlo…"></textarea>
+        <div class="small muted" id="txStats" style="margin:8px 0"></div>
+        <div class="row" id="txBtns"></div>
+      </div>
+    </section>

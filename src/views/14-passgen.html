@@ -1,0 +1,55 @@
+    <!-- ===================== CONTRASEÑAS ===================== -->
+    <section class="view" id="view-passgen">
+      <div class="crypto-layout">
+        <div class="card">
+          <div class="card-h"><h3>🔑 Generador</h3>
+            <div class="seg" id="pgModes"><button data-pg="random" class="on">Aleatoria</button><button data-pg="phrase">Frase de palabras</button></div>
+          </div>
+          <div class="pw-out" id="pgOut"></div>
+          <div class="meter"><span id="pgMeter"></span></div>
+          <div class="row small muted" style="justify-content:space-between;margin-top:4px"><span id="pgStrength"></span><span id="pgLenInfo"></span></div>
+          <div class="row" style="margin-top:14px">
+            <button class="btn primary" id="pgGen">🎲 Generar otra</button>
+            <button class="btn" id="pgCopy">📋 Copiar</button>
+            <button class="btn" id="pgUse">🔐 Usar en el encriptador</button>
+          </div>
+          <div id="pgRandomOpts" style="margin-top:18px">
+            <label class="lbl" for="pgLen">Longitud: <b id="pgLenVal">20</b></label>
+            <input type="range" class="range" id="pgLen" min="6" max="64" value="20">
+            <div class="opts-grid">
+              <label class="check-row"><input type="checkbox" class="check" id="pgUpper" checked> Mayúsculas (A-Z)</label>
+              <label class="check-row"><input type="checkbox" class="check" id="pgLower" checked> Minúsculas (a-z)</label>
+              <label class="check-row"><input type="checkbox" class="check" id="pgDigits" checked> Números (0-9)</label>
+              <label class="check-row"><input type="checkbox" class="check" id="pgSymbols" checked> Símbolos (!@#$…)</label>
+              <label class="check-row"><input type="checkbox" class="check" id="pgNoAmb"> Evitar ambiguos (I l 1 O 0)</label>
+            </div>
+          </div>
+          <div id="pgPhraseOpts" style="margin-top:18px" hidden>
+            <label class="lbl" for="pgWords">Palabras: <b id="pgWordsVal">5</b></label>
+            <input type="range" class="range" id="pgWords" min="3" max="10" value="5">
+            <div class="opts-grid">
+              <div><label class="lbl" for="pgSep">Separador</label>
+                <select class="field" id="pgSep"><option value="-">Guion (-)</option><option value=".">Punto (.)</option><option value="_">Guion bajo (_)</option><option value=" ">Espacio</option><option value="">Ninguno</option></select></div>
+              <label class="check-row"><input type="checkbox" class="check" id="pgCap" checked> Inicial en mayúscula</label>
+              <label class="check-row"><input type="checkbox" class="check" id="pgNum" checked> Añadir un número</label>
+            </div>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <div class="card-h"><h3>🕘 Copiadas en esta sesión</h3></div>
+            <p class="muted small" style="margin-bottom:8px">No se guardan: desaparecen al cerrar la página.</p>
+            <div class="list" id="pgHist"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>🧪 Comprobar una contraseña</h3></div>
+            <div class="pw-wrap">
+              <input class="field" type="password" id="pgCheck" autocomplete="off" spellcheck="false" placeholder="Escribe una contraseña (no se guarda)">
+              <button class="btn icon sm ghost eye" id="pgCheckEye" title="Mostrar u ocultar">👁</button>
+            </div>
+            <div class="meter"><span id="pgCheckMeter"></span></div>
+            <div class="small muted" id="pgCheckLabel" style="margin-top:4px;min-height:1.2em"></div>
+          </div>
+        </div>
+      </div>
+    </section>

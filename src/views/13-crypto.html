@@ -1,0 +1,51 @@
+    <!-- ===================== ENCRIPTADOR ===================== -->
+    <section class="view" id="view-crypto">
+      <div class="crypto-layout">
+        <div class="grid">
+          <div class="card">
+            <div class="card-h"><h3>🔐 Cifrar y descifrar</h3>
+              <div class="seg" id="cryptoTabs"><button data-ct="text" class="on">Texto</button><button data-ct="file">Archivo</button></div>
+            </div>
+            <div id="ctText">
+              <label class="lbl" for="cIn">Texto normal o mensaje cifrado</label>
+              <textarea class="field mono" id="cIn" rows="6" placeholder="Escribe o pega aquí…"></textarea>
+            </div>
+            <div id="ctFile" hidden>
+              <div class="dropzone" id="dropzone">📁 Arrastra un archivo aquí o haz clic para elegirlo<br><span class="muted small" id="fileInfo">Ningún archivo seleccionado</span></div>
+              <input type="file" id="cFile" hidden>
+              <p class="muted small" style="margin-top:8px">Al cifrar se descarga «archivo.cdm». Al descifrar un .cdm se recupera el archivo original con su nombre.</p>
+            </div>
+            <div style="margin-top:12px">
+              <label class="lbl" for="cPass">Contraseña</label>
+              <div class="pw-wrap">
+                <input class="field" type="password" id="cPass" autocomplete="off" spellcheck="false" placeholder="Contraseña">
+                <button class="btn icon sm ghost eye" id="cEye" title="Mostrar u ocultar">👁</button>
+              </div>
+              <div class="meter"><span id="cMeter"></span></div>
+              <div class="small muted" id="cStrength" style="margin-top:4px;min-height:1.2em"></div>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button class="btn primary" id="cEnc">🔒 Encriptar</button>
+              <button class="btn" id="cDec">🔓 Desencriptar</button>
+              <button class="btn ghost" id="cClear">🧹 Limpiar todo</button>
+            </div>
+          </div>
+          <div class="card" id="cOutCard">
+            <div class="card-h"><h3>Resultado</h3><button class="btn sm ghost" id="cOutClear">✕ Borrar resultado</button></div>
+            <textarea class="field mono" id="cOut" rows="6" placeholder="Aquí aparecerá el resultado…"></textarea>
+            <div class="row" style="margin-top:10px">
+              <button class="btn" id="cCopy">📋 Copiar</button>
+              <button class="btn" id="cSwap">⇅ Usar como entrada</button>
+              <button class="btn" id="cSave">💾 Guardar en almacén</button>
+              <button class="btn" id="cDownload">⬇️ Descargar .txt</button>
+            </div>
+          </div>
+          <p class="muted small">AES-256-GCM con clave derivada por PBKDF2-SHA256 (600.000 iteraciones) y sal aleatoria por mensaje. La contraseña nunca se guarda: si la pierdes, el contenido no se puede recuperar. Los textos cifrados con versiones anteriores de esta app se siguen descifrando.</p>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>📦 Almacén de cifrados</h3><span class="badge" id="vaultCount">0</span></div>
+          <input class="field" id="vaultSearch" placeholder="🔍 Buscar por nombre…" style="margin-bottom:10px">
+          <div class="vault-list" id="vaultList"></div>
+        </div>
+      </div>
+    </section>

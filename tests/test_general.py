@@ -1,0 +1,281 @@
+import os as _os, sys as _sys, tempfile as _tf
+_ROOT = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), '..'))
+_HTML = 'file://' + _os.path.join(_ROOT, 'CuadroDeMando.html')
+if len(_sys.argv) < 2: _sys.argv.append(_tf.mkdtemp(prefix='cdm-test-'))
+import json, sys, re, os
+from playwright.sync_api import sync_playwright
+URL=_HTML
+SC=sys.argv[1]
+errs=[]; fails=[]
+def ok(c,m):
+    print(('PASS ' if c else 'FAIL ')+m)
+    if not c: fails.append(m)
+def modal_ok(pg): pg.click('.modal-foot .btn.primary, .modal-foot .btn.danger-solid'); pg.wait_for_timeout(120)
+with sync_playwright() as p:
+    b=p.chromium.launch()
+    ctx=b.new_context(viewport={'width':1400,'height':900}, accept_downloads=True)
+    pg=ctx.new_page()
+    pg.on('pageerror', lambda e: errs.append('PAGEERR '+str(e)))
+    pg.on('console', lambda m: errs.append('console:'+m.text) if m.type=='error' else None)
+    pg.goto(URL)
+    # ---------- A. Migración desde v2 ----------
+    pg.evaluate("""()=>{localStorage.clear(); indexedDB.deleteDatabase('cdm-data');
+      const s=(k,v)=>localStorage.setItem('cdm.'+k,JSON.stringify(v));
+      s('migrated',true); s('theme','light'); s('lastTab','kanban');
+      s('notes',[{id:'n1',title:'Nota v2',html:'<div>hola v2</div>',text:'',pinned:false,created:1,updated:1}]);
+      s('tasks',[{id:'k1',title:'Tarjeta v2',desc:'',col:'todo',priority:'alta',due:'',tags:[],subtasks:[],created:1}]);
+      s('vault',[{id:'v1',name:'secreto v2',content:'cdm2:xxx',created:1}]);
+      s('calcHistory',[{expr:'1+1',result:'2',at:1}]);
+      s('pomoSettings',{focus:30,short:5,long:15,every:4,auto:false,sound:false});
+    }""")
+    pg.goto('about:blank'); pg.goto(URL); pg.wait_for_timeout(500)
+    ok(pg.evaluate("S.notes[0].title")=='Nota v2' and pg.evaluate("S.tasks[0].title")=='Tarjeta v2','datos v2 conservados')
+    ok(pg.evaluate("S.pomo.focus")==30,'ajustes pomodoro v2 conservados')
+    ok(pg.evaluate("currentTab")=='kanban','abre en la última sección (v2)')
+    ok(pg.evaluate("document.documentElement.dataset.theme")=='light','tema v2 conservado')
+    ok(pg.evaluate("S.todoLists[0].id")=='inbox','lista por defecto creada')
+    # ---------- B. Tareas ----------
+    r=pg.evaluate("""()=>{const T=parseDay(todayKey()); const k=d=>dayKey(d); const nextWd=(wd,min)=>{let d=addDays(T,min);while(d.getDay()!==wd)d=addDays(d,1);return k(d)};
+      const P=s=>parseTodoInput(s,S.todoLists);
+      return {
+        a:P('Llamar a Ana mañana #tareas !'), aExp:k(addDays(T,1)),
+        b:P('Revisar informe el viernes'), bExp:nextWd(5,1),
+        c:P('Pagar recibo 15/11'),
+        d:P('Reunión de equipo todos los lunes'), dExp:nextWd(1,0),
+        e:P('Regar plantas cada día'),
+        f:P('Correr por la mañana'),
+        g:P('Renovar DNI en 3 días'), gExp:k(addDays(T,3)),
+        h:P('Enviar informe mensual'),
+        i:P('Llamar pasado mañana'), iExp:k(addDays(T,2)),
+        j:P('Preparar sprint la próxima semana'), jExp:nextWd(1,1),
+        today:todayKey()}}""")
+    ok(r['a']['due']==r['aExp'] and r['a']['important'] and r['a']['listId']=='inbox' and r['a']['text']=='Llamar a Ana','parser: mañana #lista !  → '+str(r['a']))
+    ok(r['b']['due']==r['bExp'] and r['b']['text']=='Revisar informe','parser: el viernes → '+str(r['b']))
+    ok(r['c']['due'].endswith('-11-15') and r['c']['text']=='Pagar recibo','parser: 15/11 → '+str(r['c']))
+    ok(r['d']['repeat']=='weekly' and r['d']['due']==r['dExp'] and r['d']['text']=='Reunión de equipo','parser: todos los lunes → '+str(r['d']))
+    ok(r['e']['repeat']=='daily' and r['e']['due']==r['today'],'parser: cada día')
+    ok(r['f']['due']=='' and r['f']['text']=='Correr por la mañana','parser: «por la mañana» no es fecha')
+    ok(r['g']['due']==r['gExp'] and r['g']['text']=='Renovar DNI','parser: en 3 días')
+    ok(r['h']['repeat']=='' and r['h']['text']=='Enviar informe mensual','parser: «mensual» se respeta')
+    ok(r['i']['due']==r['iExp'],'parser: pasado mañana')
+    ok(r['j']['due']==r['jExp'] and r['j']['text']=='Preparar sprint','parser: la próxima semana → '+str(r['j']))
+    pg.evaluate("showTab('todos'); setTodoView('today')")
+    pg.fill('#todoInput','Comprar pan !'); ok('Importante' in pg.inner_text('#todoPreview'),'vista previa de lo detectado')
+    pg.press('#todoInput','Enter'); pg.wait_for_timeout(100)
+    ok(pg.locator('#todoItems .todo-item').count()==1 and 'Comprar pan' in pg.inner_text('#todoItems'),'añadir en Mi día (fecha hoy)')
+    pg.fill('#todoInput','Regar plantas cada día'); pg.press('#todoInput','Enter'); pg.wait_for_timeout(80)
+    pg.locator('.todo-item',has_text='Regar').locator('.todo-check').click(); pg.wait_for_timeout(400)
+    rep=pg.evaluate("S.todos.filter(t=>t.text==='Regar plantas')")
+    ok(len(rep)==2 and any(t['done'] for t in rep) and any((not t['done']) and t['due']>pg.evaluate('todayKey()') for t in rep),'completar repetitiva crea la siguiente')
+    # nueva lista
+    pg.click('#todoNewList'); pg.fill('.modal input[name=v]','Trabajo'); modal_ok(pg)
+    ok(pg.evaluate("todoView").startswith('list:') and 'Trabajo' in pg.inner_text('#todoTitle'),'crear lista y abrirla')
+    for t in ['Uno','Dos','Tres']: pg.fill('#todoInput',t); pg.press('#todoInput','Enter'); pg.wait_for_timeout(50)
+    order=lambda: [x.strip() for x in pg.locator('#todoItems .todo-text').all_inner_texts()]
+    ok(order()==['Tres','Dos','Uno'],'nuevas arriba: '+str(order()))
+    pg.locator('.todo-item',has_text='Uno').drag_to(pg.locator('.todo-item',has_text='Tres')); pg.wait_for_timeout(150)
+    ok(order()[0]=='Uno','reordenar arrastrando: '+str(order()))
+    pg.locator('.todo-item',has_text='Dos').drag_to(pg.locator('.todo-nav[data-list="inbox"]')); pg.wait_for_timeout(150)
+    ok(pg.evaluate("S.todos.find(t=>t.text==='Dos').listId")=='inbox','mover a otra lista arrastrando')
+    # editar con pasos y pasar a kanban
+    pg.locator('.todo-item',has_text='Tres').locator('.todo-main').click(); pg.wait_for_timeout(100)
+    pg.fill('#stNew','paso 1'); pg.press('#stNew','Enter'); pg.fill('#stNew','paso 2'); pg.click('#stAdd')
+    pg.click('#tdQuick [data-q="1"]'); pg.check('.modal input[name=important]')
+    modal_ok(pg)
+    t3=pg.evaluate("S.todos.find(t=>t.text==='Tres')")
+    ok(len(t3['steps'])==2 and t3['important'] and t3['due']==r['aExp'],'editar: pasos, fecha rápida, importante')
+    pg.locator('.todo-item',has_text='Tres').locator('.todo-main').click(); pg.wait_for_timeout(100)
+    pg.click('.modal-foot button:has-text("Pasar a Kanban")'); pg.wait_for_timeout(150)
+    kt=pg.evaluate("S.tasks.find(t=>t.title==='Tres')")
+    ok(kt and kt['priority']=='alta' and len(kt['subtasks'])==2 and not pg.evaluate("S.todos.some(t=>t.text==='Tres')"),'pasar tarea a Kanban')
+    pg.screenshot(path=SC+'/t_todos.png')
+    # ---------- C. Calendario ----------
+    pg.evaluate("showTab('calendar')")
+    pg.click('#calNew'); pg.fill('.modal input[name=title]','Daily'); pg.uncheck('.modal input[name=allDay]')
+    pg.fill('.modal input[name=start]','09:30'); pg.fill('.modal input[name=end]','09:45'); pg.select_option('.modal select[name=repeat]','weekdays'); modal_ok(pg)
+    ok(pg.evaluate("S.events.length")==1,'crear evento')
+    n=pg.evaluate("eventDates(S.events[0], todayKey(), dayKey(addDays(new Date(),13))).length")
+    ok(n==10,'laborables en 14 días = 10 (%d)'%n)
+    ok(pg.locator('#calGrid .cal-chip',has_text='Daily').count()>=8,'eventos dibujados en el mes')
+    ics=pg.evaluate("buildIcs(true)")
+    ok('RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR' in ics and 'DTSTART:' in ics and 'Tarjeta v2' not in ics,'exportar .ics')
+    back=pg.evaluate("parseIcs(buildIcs(false))")
+    ok(back[0]['repeat']=='weekdays' and back[0]['start']=='09:30' and back[0]['end']=='09:45','ics ida y vuelta')
+    open(SC+'/in.ics','w').write('BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nDTSTART;VALUE=DATE:20261224\r\nSUMMARY:Cena\\, familia\r\nRRULE:FREQ=YEARLY\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nDTSTART:20261020T080000Z\r\nDTEND:20261020T090000Z\r\nSUMMARY:Llamada\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
+    pg.set_input_files('#calImportFile', SC+'/in.ics'); pg.wait_for_timeout(200)
+    ev=pg.evaluate("S.events.map(e=>[e.title,e.date,e.allDay,e.start,e.repeat])")
+    ok(['Cena, familia','2026-12-24',True,'09:00','yearly'] in ev and any(e[0]=='Llamada' and e[3]=='10:00' for e in ev),'importar .ics (UTC→local) '+str(ev))
+    pg.screenshot(path=SC+'/t_cal.png')
+    # ---------- D. Notas y plantillas ----------
+    pg.evaluate("showTab('notes')")
+    pg.click('#tplBtn'); pg.click('#tplPop [data-tpl="b-acta"]'); pg.wait_for_timeout(150)
+    ok(pg.input_value('#noteTitle').startswith('Reunión · ') and 'Orden del día' in pg.inner_text('#editor'),'nota desde plantilla con {{fecha}}')
+    pg.click('#noteMenuBtn'); pg.click('#noteMenu [data-nm="template"]'); pg.fill('.modal input[name=v]','Mi acta'); modal_ok(pg)
+    pg.click('#tplBtn'); ok('Mi acta' in pg.inner_text('#tplPop'),'guardar como plantilla')
+    pg.keyboard.press('Escape')
+    pg.click('#newNoteBtn'); pg.keyboard.press('Enter'); pg.keyboard.type('Linea'); pg.keyboard.press('Home'); pg.click('#toolbar [data-action=checkbox]')
+    ok(pg.locator('#editor input.chk').count()==1,'casilla en el cursor sigue funcionando')
+    # ---------- E. Marcadores ----------
+    pg.evaluate("showTab('bookmarks')")
+    pg.click('#bmNew'); pg.fill('.modal input[name=url]','example.com/docs'); pg.fill('.modal input[name=category]','Trabajo'); modal_ok(pg)
+    bm=pg.evaluate("S.bookmarks[0]"); print('  DBG', bm, pg.is_visible('#modalBack'), pg.evaluate('currentTab'), pg.inner_text('#toasts'))
+    ok(bm['url']=='https://example.com/docs' and bm['title']=='example.com','añadir marcador (https y nombre automáticos)')
+    open(SC+'/bm.html','w').write('<!DOCTYPE NETSCAPE-Bookmark-file-1><DL><p><DT><H3>Dev</H3><DL><p><DT><A HREF="https://developer.mozilla.org/" ADD_DATE="1700000000">MDN</A><DT><A HREF="https://example.com/docs">dup</A><DT><A HREF="javascript:alert(1)">mal</A></DL><p></DL>')
+    pg.set_input_files('#bmImportFile', SC+'/bm.html'); pg.wait_for_timeout(200)
+    ok(pg.evaluate("S.bookmarks.length")==2 and pg.evaluate("S.bookmarks[1].category")=='Dev','importar marcadores (omite duplicados y javascript:)')
+    ok(pg.locator('.bm-card').count()==2,'tarjetas de marcadores')
+    # ---------- F. Horas ----------
+    pg.evaluate("showTab('time')")
+    pg.click('#ttToggle'); pg.fill('.modal input[name=v]','Proyecto Alfa'); modal_ok(pg); pg.wait_for_timeout(150)
+    ok(pg.evaluate("!!ttRun") and pg.is_visible('#ttPill'),'cronómetro en marcha y visible arriba')
+    pg.evaluate("ttRun.start=Date.now()-90*60000")
+    pg.wait_for_timeout(1100); ok(pg.inner_text('#ttClock').startswith('1:30'),'reloj 1:30 → '+pg.inner_text('#ttClock'))
+    pg.click('#ttToggle'); pg.wait_for_timeout(100)
+    ok(pg.evaluate("S.timeEntries.length")==1 and abs(pg.evaluate("S.timeEntries[0].end-S.timeEntries[0].start")-5400000)<5000,'registro guardado al detener')
+    ok('1:30' in pg.inner_text('#ttSummary'),'resumen semanal')
+    pg.click('#ttManual'); pg.fill('.modal input[name=desc]','Reunión'); pg.fill('.modal input[name=start]','22:00'); pg.fill('.modal input[name=end]','01:00'); modal_ok(pg)
+    ok(pg.evaluate("Math.round((S.timeEntries[1].end-S.timeEntries[1].start)/3600000)")==3,'registro manual que cruza medianoche')
+    pg.click('#ttExport')
+    with pg.expect_download() as d: modal_ok(pg)
+    csv=open(d.value.path(),encoding='utf-8-sig').read()
+    ok(csv.startswith('Fecha;Proyecto') and 'Proyecto Alfa' in csv and '1,50' in csv,'exportar CSV (; y coma decimal)')
+    # ---------- G. Hábitos ----------
+    pg.evaluate("showTab('habits')")
+    pg.click('#habNew'); pg.fill('.modal input[name=name]','Leer'); modal_ok(pg)
+    pg.locator('.habit .hday.today button').click(); pg.wait_for_timeout(80)
+    ok(pg.evaluate("habitStats(S.habits[0]).current")==1,'marcar hoy → racha 1')
+    pg.evaluate("const h=S.habits[0]; for(let i=1;i<=4;i++) h.log[dayKey(addDays(new Date(),-i))]=1; save.habits(); renderHabits();")
+    ok(pg.evaluate("habitStats(S.habits[0]).current")==5,'racha de 5 días')
+    pg.evaluate("const h=S.habits[0]; delete h.log[todayKey()]; save.habits();")
+    ok(pg.evaluate("habitStats(S.habits[0]).current")==4,'hoy sin marcar no rompe la racha')
+    pg.evaluate("toggleHabitDay(S.habits[0].id, todayKey())")
+    # ---------- H. Plazos ----------
+    pg.evaluate("showTab('deadlines'); hdYear=2026; renderHolidays();")
+    pg.click('#hdNational'); pg.wait_for_timeout(80)
+    ok(pg.evaluate("S.holidays.some(h=>h.date==='2026-04-03' && h.name==='Viernes Santo')"),'Viernes Santo 2026 = 3 de abril')
+    ok(pg.evaluate("dayKey(addDays(easterSunday(2027),-2))")=='2027-03-26','Viernes Santo 2027 = 26 de marzo')
+    O="{next:true,roll:true,sat:true,aug:false}"
+    ok(pg.evaluate(f"computeDeadline('2026-10-09',10,'habiles',{O}).end")=='2026-10-26','10 hábiles desde 9/10/2026 (salta 12-oct) = 26/10')
+    ok(pg.evaluate(f"computeDeadline('2026-01-31',1,'meses',{O}).end")=='2026-03-02','1 mes desde 31/01 → 28/02 (sábado) → 2/03')
+    ok(pg.evaluate(f"computeDeadline('2026-12-20',5,'naturales',{O}).end")=='2026-12-28','5 naturales caen en Navidad → 28/12')
+    ok(pg.evaluate(f"computeDeadline('2026-10-26',-10,'habiles',{O}).end")=='2026-10-09','contar hacia atrás')
+    pg.fill('#dlStart','2026-10-09'); pg.fill('#dlN','10'); pg.dispatch_event('#dlStart','change'); pg.wait_for_timeout(80)
+    ok('26 de octubre' in pg.inner_text('#dlResult'),'resultado en pantalla: '+pg.inner_text('#dlResult').split('\n')[1])
+    pg.click('#dlToTodo'); modal_ok(pg)
+    ok(pg.evaluate("S.todos.some(t=>t.due==='2026-10-26' && t.important)"),'crear tarea desde el plazo')
+    pg.screenshot(path=SC+'/t_dl.png')
+    # ---------- I. Herramientas ----------
+    pg.evaluate("showTab('devtools')")
+    ok(pg.evaluate("toHex(md5(te.encode('')))")=='d41d8cd98f00b204e9800998ecf8427e' and pg.evaluate("toHex(md5(te.encode('abc')))")=='900150983cd24fb0d6963f7d28e17f72','MD5 correcto')
+    ok(pg.evaluate("toHex(md5(te.encode('a'.repeat(1000))))")=='cabe45dcc9ae5b66ba86600cca6b8ba8','MD5 multibloque')
+    pg.fill('#jxIn','{"b":1,"a":[1,2,{"c":true}]}'); pg.click('#jxSort')
+    ok(pg.input_value('#jxIn').startswith('{\n  "a"') and 'JSON válido' in pg.inner_text('#jxStatus'),'JSON formatear + ordenar claves')
+    pg.fill('#jxIn','{\n  "a": 1,\n  "b": ,\n}'); pg.click('#jxFormat')
+    ok('línea 3' in pg.inner_text('#jxStatus'),'error JSON con línea: '+pg.inner_text('#jxStatus'))
+    pg.click('#jxMode [data-m=xml]'); pg.fill('#jxIn','<?xml version="1.0"?><a x="1"><b>t&amp;x</b><c/></a>'); pg.click('#jxFormat')
+    ok(pg.input_value('#jxIn')=='<?xml version="1.0"?>\n<a x="1">\n  <b>t&amp;x</b>\n  <c/>\n</a>','XML formatear')
+    pg.click('#toolTabs [data-tool=b64]'); pg.fill('#b64Plain','ñandú 😀'); 
+    enc=pg.input_value('#b64Enc'); ok(enc=='w7FhbmTDuiDwn5iA','Base64 UTF-8: '+enc)
+    pg.fill('#b64Plain',''); pg.fill('#b64Enc','w7FhbmTDuiDwn5iA'); ok(pg.input_value('#b64Plain')=='ñandú 😀','Base64 decodificar')
+    pg.click('#toolTabs [data-tool=url]'); pg.fill('#urlPlain','https://a.es/ruta?q=año&x=1#f')
+    ok('q' in pg.inner_text('#urlParts') and 'año' in pg.inner_text('#urlParts'),'URL analizar parámetros')
+    pg.click('#toolTabs [data-tool=jwt]'); pg.fill('#jwtIn','eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMiLCJleHAiOjE2MDAwMDAwMDB9.x')
+    ok('Caducado' in pg.inner_text('#jwtClaims') and '"sub": "123"' in pg.inner_text('#jwtBody'),'JWT decodificar')
+    pg.click('#toolTabs [data-tool=hash]'); pg.fill('#hashIn','abc'); pg.wait_for_timeout(400)
+    ok('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad' in pg.inner_text('#hashOut'),'SHA-256')
+    pg.click('#toolTabs [data-tool=diff]'); pg.fill('#diffA','a\nb\nc\nd'); pg.fill('#diffB','a\nB\nc\nd\ne'); pg.click('#diffRun')
+    ok('+2' in pg.inner_text('#diffStats') and '−1' in pg.inner_text('#diffStats'),'comparar textos: '+pg.inner_text('#diffStats'))
+    pg.click('#toolTabs [data-tool=regex]'); pg.fill('#rxPat',r'(\d{2})/(\d{2})/(\d{4})'); pg.fill('#rxText','Hoy 13/10/2026 y 01/01/2027'); pg.fill('#rxRepl','$3-$2-$1'); pg.wait_for_timeout(350)
+    ok('2 coincidencias' in pg.inner_text('#rxStatus') and pg.inner_text('#rxReplOut')=='Hoy 2026-10-13 y 2027-01-01','regex y reemplazo')
+    pg.click('#toolTabs [data-tool=uuid]'); ok(re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$', pg.input_value('#uuidOut').split('\n')[0]) is not None,'UUID v4')
+    pg.click('#toolTabs [data-tool=valid]')
+    for v,exp,lbl in [('12345678Z',True,'DNI'),('12345678A',False,'DNI mal'),('X1234567L',True,'NIE'),('B12345674',True,'CIF'),('ES91 2100 0418 4502 0005 1332',True,'IBAN'),('ES91 2100 0418 4502 0005 1333',False,'IBAN mal')]:
+        pg.fill('#valIn',v); t=pg.inner_text('#valOut'); ok(('✓ Válido' in t)==exp, f'validador {lbl}')
+    pg.fill('#valIn','21000418450200051332'); ok('ES91 2100 0418 4502 0005 1332' in pg.inner_text('#valOut'),'CCC → IBAN')
+    pg.fill('#valIn','12345678'); ok('Z' in pg.inner_text('#valOut'),'calcular letra DNI')
+    pg.click('#toolTabs [data-tool=text]'); pg.fill('#txIn','Hola Mundo\nhola mundo'); pg.click('#txBtns [data-tx="7"]')
+    ok(pg.input_value('#txIn')=='hola_mundo\nhola_mundo','texto → snake_case')
+    pg.click('#toolTabs [data-tool=time]'); pg.fill('#epIn','1760000000'); ok('2025' in pg.inner_text('#epOut'),'epoch → fecha')
+    # ---------- L. Búsqueda global ----------
+    pg.keyboard.press('Escape'); pg.click('body'); pg.keyboard.press('Control+k'); pg.wait_for_timeout(80)
+    ok(pg.is_visible('#paletteBack'),'Ctrl+K abre la búsqueda')
+    pg.keyboard.type('comprar'); pg.wait_for_timeout(80)
+    ok('Comprar pan' in pg.inner_text('#palList'),'encuentra la tarea')
+    pg.keyboard.press('Enter'); pg.wait_for_timeout(200)
+    ok(pg.evaluate("currentTab")=='todos' and pg.is_visible('.modal input[name=text]') and pg.input_value('.modal input[name=text]')=='Comprar pan','Enter abre la tarea')
+    pg.keyboard.press('Escape')
+    pg.keyboard.press('Control+k'); pg.keyboard.type('nueva nota'); pg.keyboard.press('Enter'); pg.wait_for_timeout(200)
+    ok(pg.evaluate("currentTab")=='notes','acción «Nueva nota» desde la búsqueda')
+    pg.keyboard.press('Control+k'); pg.keyboard.type('mdn'); pg.wait_for_timeout(80); ok('MDN' in pg.inner_text('#palList'),'busca marcadores'); pg.keyboard.press('Escape')
+    # ---------- Inicio ----------
+    pg.evaluate("showTab('dashboard')"); pg.wait_for_timeout(100)
+    ok('Comprar pan' in pg.inner_text('#dashToday') and 'Leer' in pg.inner_text('#dashHabits') and 'Daily' in pg.inner_text('#dashAgenda'),'Inicio: hoy, hábitos y agenda')
+    pg.fill('#quickText','Llamar al banco mañana'); pg.click('#quickTodoBtn')
+    ok(pg.evaluate("S.todos.some(t=>t.text==='Llamar al banco' && t.due===dayKey(addDays(new Date(),1)))"),'captura rápida → tarea con fecha')
+    pg.screenshot(path=SC+'/t_dash.png', full_page=True)
+    # ---------- K. Archivo en disco (simulado) ----------
+    pg.evaluate("""()=>{ window.__fsData=''; const h={name:'datos.json', queryPermission:async()=>'granted', requestPermission:async()=>'granted', getFile:async()=>new File([window.__fsData],'datos.json'), createWritable:async()=>({ buf:'', async write(s){this.buf+=s}, async close(){ window.__fsData=this.buf; } })}; window.showSaveFilePicker=async()=>h; }""")
+    pg.evaluate("showTab('settings')"); pg.evaluate("fsLinkNew()"); pg.wait_for_timeout(300)
+    d=json.loads(pg.evaluate("window.__fsData"))
+    ok(d['app']=='cuadro-de-mando' and len(d['data']['todos'])>=5,'archivo vinculado: guarda todo')
+    ok('Guardado' in pg.inner_text('#syncPill'),'indicador de guardado arriba')
+    pg.evaluate("addTodoFromText('Tarea para el archivo','inbox')"); pg.wait_for_timeout(1900)
+    ok('Tarea para el archivo' in pg.evaluate("window.__fsData"),'los cambios se escriben solos en el archivo')
+    # ---------- J. Bloqueo con contraseña ----------
+    snap_notes=pg.evaluate("S.notes.length"); snap_todos=pg.evaluate("S.todos.length")
+    pg.click('#secBtns [data-sec=on]'); pg.fill('.modal input[name=p1]','clave-larga-123'); pg.fill('.modal input[name=p2]','clave-larga-123'); modal_ok(pg); pg.wait_for_timeout(2500)
+    keys=pg.evaluate("ls.keys().sort()")
+    ok(keys==['enc','lock','migrated','theme'],'tras activar, solo queda el bloque cifrado: '+str(keys))
+    ok('Comprar' not in pg.evaluate("ls.raw('enc')"),'el contenido no es legible')
+    pg.wait_for_timeout(1800)
+    ok(json.loads(pg.evaluate("window.__fsData")).get('encrypted') is True,'el archivo vinculado pasa a guardarse cifrado')
+    with pg.expect_download() as d:
+        pg.click('#bkExport'); modal_ok(pg)
+    bk=json.load(open(d.value.path())); ok(bk['encrypted'] and 'Comprar' not in json.dumps(bk),'copia cifrada')
+    shutil_path=SC+'/backup_enc.json'; open(shutil_path,'w').write(json.dumps(bk))
+    pg.reload(); pg.wait_for_timeout(400)
+    ok(pg.is_visible('#lockScreen') and not pg.evaluate("APP_READY"),'al recargar pide contraseña')
+    pg.fill('#lockPass','mala'); pg.click('#lockBtn'); pg.wait_for_timeout(1500)
+    ok('incorrecta' in pg.inner_text('#lockErr'),'contraseña incorrecta rechazada')
+    pg.fill('#lockPass','clave-larga-123'); pg.click('#lockBtn'); pg.wait_for_timeout(1800)
+    ok(pg.evaluate("APP_READY") and pg.evaluate("S.notes.length")==snap_notes and pg.evaluate("S.todos.length")==snap_todos,'desbloquear recupera todo')
+    pg.evaluate("addTodoFromText('Escrita cifrada','inbox')"); pg.wait_for_timeout(600)
+    pg.evaluate("lastActivity=Date.now()-20*60000; ls.set('lock',{...lockMeta(),autoLock:15})")
+    pg.wait_for_timeout(16500)
+    ok(pg.is_visible('#lockScreen'),'bloqueo automático por inactividad')
+    pg.fill('#lockPass','clave-larga-123'); pg.click('#lockBtn'); pg.wait_for_timeout(1800)
+    ok(pg.evaluate("S.todos.some(t=>t.text==='Escrita cifrada')"),'los cambios cifrados persisten')
+    # importar la copia cifrada (misma contraseña → sin preguntar)
+    pg.evaluate("showTab('settings')")
+    pg.set_input_files('#bkImportFile', shutil_path); pg.wait_for_timeout(300)
+    ok('Se reemplazarán' in pg.inner_text('#modal'),'importar copia cifrada pide confirmación')
+    modal_ok(pg); pg.wait_for_timeout(1500)
+    pg.fill('#lockPass','clave-larga-123'); pg.click('#lockBtn'); pg.wait_for_timeout(1800)
+    ok(pg.evaluate("S.todos.length")==snap_todos and not pg.evaluate("S.todos.some(t=>t.text==='Escrita cifrada')"),'copia cifrada restaurada')
+    # desactivar bloqueo
+    pg.evaluate("showTab('settings')"); pg.click('#secBtns [data-sec=off]'); pg.fill('.modal input[name=p]','clave-larga-123'); modal_ok(pg); pg.wait_for_timeout(1500); modal_ok(pg); pg.wait_for_timeout(800)
+    ok(pg.evaluate("ls.raw('enc')") is None and pg.evaluate("JSON.parse(ls.raw('todos')).length")==snap_todos,'desactivar devuelve los datos sin cifrar')
+    # copia con otra contraseña
+    with pg.expect_download() as d:
+        pg.click('#bkExport'); pg.fill('.modal input[name=p1]','otra123'); pg.fill('.modal input[name=p2]','otra123'); modal_ok(pg)
+    pg.wait_for_timeout(1200)
+    open(SC+'/b2.json','w').write(open(d.value.path()).read())
+    pg.evaluate("S.todos=[]; save.todos()")
+    pg.set_input_files('#bkImportFile', SC+'/b2.json'); pg.wait_for_timeout(200)
+    pg.fill('.modal input[name=p]','otra123'); modal_ok(pg); pg.wait_for_timeout(1500); modal_ok(pg); pg.wait_for_timeout(1200)
+    ok(pg.evaluate("S.todos.length")==snap_todos,'importar copia cifrada con otra contraseña')
+    # ---------- M. Móvil ----------
+    m=ctx.new_page(); m.set_viewport_size({'width':390,'height':844}); m.on('pageerror', lambda e: errs.append('m:'+str(e)))
+    m.goto(URL); m.wait_for_timeout(400)
+    over=[]
+    for t in ['dashboard','todos','kanban','calendar','notes','bookmarks','timer','time','habits','calc','deadlines','devtools','crypto','passgen','settings']:
+        m.evaluate(f"showTab('{t}')"); m.wait_for_timeout(80)
+        w=m.evaluate("document.documentElement.scrollWidth")
+        if w>390: over.append((t,w))
+        if t in ('todos','calendar','dashboard','time'): m.screenshot(path=f'{SC}/m_{t}.png')
+    ok(not over,'móvil sin scroll horizontal '+str(over))
+    m.click('#mobileNav [data-more]'); m.wait_for_timeout(300); ok(m.evaluate("document.getElementById('sidebar').getBoundingClientRect().left")>=0,'menú lateral en móvil'); m.screenshot(path=SC+'/m_drawer.png')
+    m.click('#nav [data-tab=habits]'); m.wait_for_timeout(300); ok(m.evaluate("currentTab")=='habits' and not m.evaluate("document.getElementById('sidebar').classList.contains('open')"),'navegar desde el menú lo cierra')
+    print('ERRORS:',errs)
+    print('FAILS:',len(fails), fails)
+    b.close()

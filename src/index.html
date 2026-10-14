@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<!--CSP-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>Cuadro de Mando</title>
+<style>
+/*CSS*/
+</style>
+</head>
+<body class="booting">
+<!-- Pantalla de bloqueo -->
+<div class="lock" id="lockScreen" hidden>
+  <form class="lock-card" id="lockForm" autocomplete="off">
+    <div class="brand-logo">🔒</div>
+    <div><h2 style="font-size:1.2rem">Cuadro de Mando</h2><p class="muted small">Tus datos están cifrados. Introduce la contraseña para abrirlos.</p></div>
+    <div class="pw-wrap">
+      <input class="field" type="password" id="lockPass" placeholder="Contraseña" autocomplete="current-password" spellcheck="false">
+      <button type="button" class="btn icon sm ghost eye" id="lockEye" title="Mostrar u ocultar">👁</button>
+    </div>
+    <button class="btn primary" id="lockBtn" type="submit" style="padding:11px">Desbloquear</button>
+    <div class="lock-err" id="lockErr"></div>
+    <button type="button" class="btn ghost sm" id="lockForgot">¿Has olvidado la contraseña?</button>
+  </form>
+</div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor</div>
+  </aside>
+  <div class="nav-backdrop" id="navBackdrop"></div>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="row" style="flex-wrap:nowrap;gap:12px;min-width:0">
+        <button class="btn icon" id="menuBtn" title="Menú">☰</button>
+        <div style="min-width:0"><h1 id="pageTitle">Inicio</h1><div class="sub" id="pageSub"></div></div>
+      </div>
+      <div class="row">
+        <button class="pill live" id="ttPill" hidden title="Cronómetro de horas en marcha"></button>
+        <button class="pill" id="syncPill" hidden title="Archivo de sincronización"></button>
+        <button class="search-btn" id="searchBtn" title="Buscar y ejecutar acciones (Ctrl+K)">🔍 <span class="lbl-txt">Buscar…</span><span class="kbd-hint"><kbd>Ctrl</kbd><kbd>K</kbd></span></button>
+        <span class="muted small" id="clock"></span>
+        <button class="btn icon" id="lockNowBtn" title="Bloquear ahora" hidden>🔒</button>
+        <button class="btn icon" id="helpBtn" title="Atajos de teclado">⌨️</button>
+        <button class="btn icon" id="themeBtn" title="Cambiar tema">☀️</button>
+      </div>
+    </header>
+
+<!--VIEWS-->
+  </main>
+</div>
+
+<nav class="mobile-nav" id="mobileNav"></nav>
+
+<div class="popover" id="emojiPop"><div class="emoji-grid" id="emojiGrid"></div></div>
+<div class="popover menu" id="noteMenu">
+  <button data-nm="md">⬇️ Descargar como Markdown (.md)</button>
+  <button data-nm="copymd">📋 Copiar como Markdown</button>
+  <button data-nm="html">🌐 Descargar como HTML</button>
+  <button data-nm="print">🖨️ Imprimir / guardar PDF</button>
+  <hr>
+  <button data-nm="dup">🗐 Duplicar nota</button>
+  <button data-nm="template">📄 Guardar como plantilla</button>
+  <button data-nm="encrypt">🔐 Cifrar esta nota</button>
+  <hr>
+  <button data-nm="move">↪ Mover a… (wiki)</button>
+  <button data-nm="branchhtml">📚 Exportar con subpáginas como manual HTML</button>
+  <button data-nm="branchmd">⬇️ Exportar con subpáginas como Markdown</button>
+  <button data-nm="branchmap">🧠 Página y subpáginas como mapa mental</button>
+  <hr>
+  <button data-nm="graph">🕸️ Ver sus conexiones</button>
+  <button data-nm="mindmap">🧠 Convertir en mapa mental</button>
+  <hr>
+  <button data-nm="delete" class="danger">🗑️ Eliminar nota</button>
+</div>
+<div class="popover menu" id="tplPop"></div>
+<div class="popover menu" id="ctxMenu"></div>
+
+<div class="palette-back" id="paletteBack">
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Buscar">
+    <div class="palette-input">🔍<input id="palInput" placeholder="Busca notas, tareas, eventos, marcadores… o escribe una acción" autocomplete="off" spellcheck="false"><kbd>Esc</kbd></div>
+    <div class="pal-list" id="palList"></div>
+    <div class="pal-foot"><span><kbd>↑</kbd><kbd>↓</kbd> moverse</span><span><kbd>Enter</kbd> abrir</span><span><kbd>Esc</kbd> cerrar</span></div>
+  </div>
+</div>
+<div class="modal-back" id="modalBack"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="toasts" id="toasts"></div>
+<div id="printArea"></div>
+
+<script>
+/*JS*/
+</script>
+</body>
+</html>

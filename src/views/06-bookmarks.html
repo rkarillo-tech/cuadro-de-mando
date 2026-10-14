@@ -1,0 +1,19 @@
+    <!-- ===================== MARCADORES ===================== -->
+    <section class="view" id="view-bookmarks">
+      <div class="card" style="margin-bottom:16px">
+        <div class="row">
+          <input class="field" id="bmSearch" placeholder="🔍 Buscar marcadores…" style="max-width:320px">
+          <select class="field" id="bmSort" style="max-width:190px">
+            <option value="cat">Agrupar por categoría</option>
+            <option value="used">Más usados</option>
+            <option value="new">Más recientes</option>
+            <option value="az">A → Z</option>
+          </select>
+          <button class="btn primary" id="bmNew">＋ Marcador</button>
+          <button class="btn icon" id="bmMenuBtn" title="Importar / exportar">⋯</button>
+          <input type="file" id="bmImportFile" accept=".html,.htm,text/html" hidden>
+        </div>
+        <div class="chips" id="bmCats" style="margin-top:12px"></div>
+      </div>
+      <div id="bmList"></div>
+    </section>

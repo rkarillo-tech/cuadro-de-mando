@@ -1,0 +1,30 @@
+    <!-- ===================== CALENDARIO ===================== -->
+    <section class="view" id="view-calendar">
+      <div class="cal-layout">
+        <div class="card">
+          <div class="cal-head">
+            <button class="btn icon" id="calPrev" title="Mes anterior">◀</button>
+            <button class="btn" id="calToday">Hoy</button>
+            <button class="btn icon" id="calNext" title="Mes siguiente">▶</button>
+            <h2 id="calTitle"></h2>
+            <div class="row" style="margin-left:auto">
+              <button class="btn primary" id="calNew">＋ Evento</button>
+              <button class="btn icon" id="calMenuBtn" title="Importar / exportar">⋯</button>
+              <input type="file" id="calImportFile" accept=".ics,text/calendar" hidden>
+            </div>
+          </div>
+          <div class="chips" id="calFilters" style="margin-bottom:12px"></div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <div class="card-h"><h3 id="calDayTitle"></h3><button class="btn sm" id="calDayAdd">＋ Añadir</button></div>
+            <div class="list" id="calDayList"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>🗓️ Próximos 14 días</h3></div>
+            <div class="list" id="calUpcoming"></div>
+          </div>
+        </div>
+      </div>
+    </section>

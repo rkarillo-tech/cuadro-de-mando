@@ -29,11 +29,12 @@ function wkNormalize(list) { list.forEach((n, i) => { n.order = i; }); }
 
 /* ---------- Árbol lateral ---------- */
 function wikiRenderTree() {
-  const q = norm($('#noteSearch').value.trim());
-  let visible = null;
+  renderTagFilter('notes');
+  const q0 = norm($('#noteSearch').value.trim()), tf = tagFilters.notes, q = q0 || tf;
+  let visible = null, hits = null;
   if (q) {
-    visible = new Set();
-    S.notes.filter(n => norm(n.title).includes(q) || norm(n.text || '').includes(q)).forEach(n => { visible.add(n.id); wkAncestors(n).forEach(a => visible.add(a.id)); });
+    visible = new Set(); hits = new Set();
+    S.notes.filter(n => (!tf || tagMatch(allNoteTags(n), tf)) && (!q0 || norm(n.title).includes(q0) || norm(n.text || '').includes(q0))).forEach(n => { visible.add(n.id); hits.add(n.id); wkAncestors(n).forEach(a => visible.add(a.id)); });
   }
   const cur = getNote(currentNoteId);
   if (cur) wkAncestors(cur).forEach(a => wkOpen.add(a.id));
@@ -41,14 +42,14 @@ function wikiRenderTree() {
   const rec = (pid, d) => wkKids(pid).forEach(n => {
     if (visible && !visible.has(n.id)) return;
     const kids = wkKids(n.id), open = q ? true : wkOpen.has(n.id);
-    rows.push(`<div class="wk-row${n.id === currentNoteId ? ' active' : ''}" data-id="${esc(n.id)}" draggable="true" tabindex="0" style="--d:${d}">
+    rows.push(`<div class="wk-row${n.id === currentNoteId ? ' active' : ''}${hits && !hits.has(n.id) ? ' wk-ctx' : ''}" data-id="${esc(n.id)}" draggable="true" tabindex="0" style="--d:${d}">
       ${kids.length ? `<button type="button" class="wk-tg" data-tg title="${open ? 'Plegar' : 'Desplegar'}">${open ? '▾' : '▸'}</button>` : '<span class="wk-tg wk-leaf">•</span>'}
       <span class="wk-t ellipsis">${n.pinned ? '📌 ' : ''}${esc(n.title)}</span>${kids.length ? `<span class="wk-n">${kids.length}</span>` : ''}
       <button type="button" class="wk-add" data-add title="Añadir subpágina">＋</button></div>`);
     if (open) rec(n.id, d + 1);
   });
   rec(null, 0);
-  $('#notesList').innerHTML = (rows.join('') || `<div class="empty">${q ? 'Sin resultados' : 'No hay páginas todavía'}</div>`)
+  $('#notesList').innerHTML = (rows.join('') || `<div class="empty">${q ? 'Sin resultados' + tagFilterEmpty('notes') : 'No hay páginas todavía'}</div>`)
     + `<div class="wk-foot"><button type="button" class="btn sm ghost" data-wkroot>＋ Página en la raíz</button>${S.notes.some(n => wkKids(n.id).length) ? '<button type="button" class="btn sm ghost" data-wkall title="Desplegar o plegar todo">⇕</button>' : ''}</div>`;
   $('#notesTotal').textContent = `${S.notes.length} página${S.notes.length === 1 ? '' : 's'}`;
 }

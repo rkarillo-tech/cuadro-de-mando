@@ -52,18 +52,20 @@ function initNotes() {
 function renderNoteList() {
   if (notesMode === 'tree') { wikiRenderTree(); return; }
   const q = $('#noteSearch').value.trim().toLowerCase();
-  let list = sortedNotes().filter(n => !q || n.title.toLowerCase().includes(q) || (n.text || '').toLowerCase().includes(q));
+  renderTagFilter('notes');
+  const tf = tagFilters.notes, tok = n => !tf || tagMatch(allNoteTags(n), tf);
+  let list = sortedNotes().filter(n => tok(n) && (!q || n.title.toLowerCase().includes(q) || (n.text || '').toLowerCase().includes(q)));
   let fuzzy = false;
   if (q.length >= 3 && list.length < 3) {
     const nq = norm(q), seen = new Set(list.map(n => n.id));
-    const extra = S.notes.filter(n => !seen.has(n.id)).map(n => ({ n, s: fuzzyScore(nq, n.title) * 2 + fuzzyScore(nq, n.text || '') })).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 10).map(x => x.n);
+    const extra = S.notes.filter(n => !seen.has(n.id) && tok(n)).map(n => ({ n, s: fuzzyScore(nq, n.title) * 2 + fuzzyScore(nq, n.text || '') })).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 10).map(x => x.n);
     if (extra.length) { fuzzy = true; list = list.concat(extra); }
   }
   $('#notesList').innerHTML = list.length ? list.map(n => `<div class="note-item${n.id === currentNoteId ? ' active' : ''}" data-id="${esc(n.id)}" tabindex="0">
       <div class="t">${n.pinned ? '📌' : ''}<span class="ellipsis">${esc(n.title)}</span></div>${wkParent(n) ? `<div class="p ellipsis">📚 ${esc(wkPath(n))}</div>` : ''}
       <div class="s">${esc((n.text || '').slice(0, 90)) || '<i>Vacía</i>'}</div>
-      <div class="d">${relTime(n.updated)}</div></div>`).join('')
-    : `<div class="empty">${q ? 'Sin resultados' : 'No hay notas todavía'}</div>`;
+      <div class="d">${relTime(n.updated)}${tagPills(allNoteTags(n), 3)}</div></div>`).join('')
+    : `<div class="empty">${q || tf ? 'Sin resultados' + tagFilterEmpty('notes') : 'No hay notas todavía'}</div>`;
   if (fuzzy) $('#notesList').insertAdjacentHTML('beforeend', '<div class="muted small" style="padding:4px 8px">≈ Incluye resultados parecidos (erratas o abreviaturas)</div>');
   $('#notesTotal').textContent = `${S.notes.length} nota${S.notes.length === 1 ? '' : 's'}`;
 }
@@ -446,7 +448,7 @@ function mdToHtml(md) {
   closeList();
   return html;
 }
-const noteToMd = n => `# ${n.title}\n\n` + htmlToMd(parseHtml(sanitize(n.html)));
+const noteToMd = n => mdFrontFor(n) + `# ${n.title}\n\n` + htmlToMd(parseHtml(sanitize(n.html)));
 const noteToHtmlDoc = n => `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(n.title)}</title><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;line-height:1.6;color:#222}a.wl{color:#6c5ce7;font-weight:600;text-decoration:none}a.wl::before{content:"[["}a.wl::after{content:"]]"}blockquote{border-left:3px solid #6c5ce7;margin:0;padding:4px 12px;color:#555}pre{background:#f4f4f8;padding:10px;border-radius:6px;white-space:pre-wrap}code{background:#f4f4f8;padding:1px 4px;border-radius:4px}${CODE_CSS_EXPORT}</style></head><body><h1>${esc(n.title)}</h1>${sanitize(n.html)}</body></html>`;
 
 /* ---------- Menú de nota ---------- */
@@ -491,14 +493,17 @@ $('#importNoteFile').addEventListener('change', async e => {
   for (const f of files) {
     if (/\.ct[bdzx]$/i.test(f.name)) { const r = await importWikiFile(f); if (r) wikiRoot = r; continue; }
     try {
-      const text = await f.text();
+      let text = await f.text();
       const isMd = /\.(md|markdown)$/i.test(f.name);
+      let front = [];
+      if (isMd) { const fm = mdFrontTags(text); front = fm.tags; text = fm.body.replace(/^\s*\n/, ''); }
       let title = f.name.replace(/\.[^.]+$/, '');
       let body = text;
       const h = text.match(/^#\s+(.+)\n/);
       if (isMd && h) { title = h[1].trim(); body = text.slice(h[0].length).replace(/^\n+/, ''); }
       const html = isMd ? mdToHtml(body) : body.split(/\r?\n/).map(l => l.trim() ? `<div>${esc(l)}</div>` : '<div><br></div>').join('');
       last = createNote(title, html, false);
+      if (front.length) { last.tags = front; save.notes(); }
     } catch { toast(`No se pudo leer ${f.name}`, 'danger'); }
   }
   if (wikiRoot) { setNotesMode('tree'); currentNoteId = wikiRoot.id; renderNotesView(); }

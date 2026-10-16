@@ -337,6 +337,7 @@ function loadState() {
   S.bookmarks = store.get('bookmarks', []) || [];
   S.templates = store.get('templates', []) || [];
   S.mindmaps = (store.get('mindmaps', []) || []).filter(m => m && m.root);
+  S.tagColors = store.get('tagColors', {}) || {};
   S.prefs = Object.assign({ start: 'last', backupDays: 14 }, store.get('prefs', {}));
 }
 const save = {
@@ -356,5 +357,6 @@ const save = {
   bookmarks: () => store.set('bookmarks', S.bookmarks),
   templates: () => store.set('templates', S.templates),
   mindmaps: () => store.set('mindmaps', S.mindmaps),
+  tagColors: () => store.set('tagColors', S.tagColors),
   prefs: () => store.set('prefs', S.prefs)
 };

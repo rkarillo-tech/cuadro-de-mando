@@ -229,7 +229,7 @@ function grDraw(forExport = false) {
     n._sx = x; n._sy = y; n._r = r;
     const dim = (hi && !hi.has(n.id)) || (match && !match.has(n.id));
     ctx.globalAlpha = dim ? 0.15 : n.done ? 0.55 : 1;
-    const col = n.kind === 'note' ? (n.pinned ? C.warning : n.deg ? C.accent : C.muted) : n.kind === 'map' ? C.info : n.kind === 'tag' ? '#e36bd0' : C.success;
+    const col = n.kind === 'note' ? (n.pinned ? C.warning : n.deg ? C.accent : C.muted) : n.kind === 'map' ? C.info : n.kind === 'tag' ? tagColorCss(n.ref) : C.success;
     ctx.fillStyle = col;
     ctx.beginPath();
     if (n.kind === 'note') ctx.arc(x, y, r, 0, Math.PI * 2);

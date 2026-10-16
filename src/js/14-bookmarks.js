@@ -16,7 +16,7 @@ function bmCardHtml(b) {
   const letter = (b.title || dom || '?').replace(/^[^\p{L}\p{N}]+/u, '').charAt(0) || '🔖';
   return `<a class="bm-card" href="${esc(b.url)}" target="_blank" rel="noopener noreferrer" data-id="${esc(b.id)}" title="${esc(b.url)}${b.notes ? '\n' + esc(b.notes) : ''}">
     <span class="bm-avatar" style="background:${hashColor(dom)}">${esc(letter)}</span>
-    <span class="grow" style="min-width:0"><span class="ellipsis" style="display:block;font-weight:650">${esc(b.title)}</span><span class="muted small ellipsis" style="display:block">${esc(dom)}${b.visits ? ` · ${b.visits} ${b.visits === 1 ? 'visita' : 'visitas'}` : ''}</span></span>
+    <span class="grow" style="min-width:0"><span class="ellipsis" style="display:block;font-weight:650">${esc(b.title)}</span><span class="muted small ellipsis" style="display:block">${esc(dom)}${b.visits ? ` · ${b.visits} ${b.visits === 1 ? 'visita' : 'visitas'}` : ''}</span>${tagPills(b.tags || [], 3)}</span>
     <span class="acts"><button class="btn icon sm ghost" data-bm="edit" title="Editar">✏️</button><button class="btn icon sm ghost" data-bm="del" title="Eliminar">🗑️</button></span>
   </a>`;
 }
@@ -26,13 +26,15 @@ function renderBookmarks() {
   const cats = [...new Set(S.bookmarks.map(bmCatOf))].sort((a, b) => a.localeCompare(b, 'es'));
   if (bmCat && !cats.includes(bmCat)) bmCat = '';
   $('#bmCats').innerHTML = S.bookmarks.length ? [`<span class="chip${!bmCat ? ' on' : ''}" data-cat="">Todas · ${S.bookmarks.length}</span>`].concat(cats.map(c => `<span class="chip${bmCat === c ? ' on' : ''}" data-cat="${esc(c)}">${esc(c)} · ${S.bookmarks.filter(b => bmCatOf(b) === c).length}</span>`)).join('') : '';
-  const list = S.bookmarks.filter(b => (!bmCat || bmCatOf(b) === bmCat) && (!q || norm(`${b.title} ${b.url} ${b.category || ''} ${b.notes || ''}`).includes(q)));
+  renderTagFilter('bookmarks');
+  const tf = tagFilters.bookmarks;
+  const list = S.bookmarks.filter(b => (!bmCat || bmCatOf(b) === bmCat) && (!tf || tagMatch(bmTags(b), tf)) && (!q || norm(`${b.title} ${b.url} ${b.category || ''} ${b.notes || ''}`).includes(q)));
   if (!S.bookmarks.length) {
     $('#bmList').innerHTML = '<div class="card empty-state"><div style="font-size:2.4rem">🔖</div><h3>Aún no tienes marcadores</h3><p class="muted">Guarda tus webs frecuentes o importa los marcadores de tu navegador (menú ⋯ → Importar).</p><button class="btn primary" id="bmEmptyNew">＋ Añadir marcador</button></div>';
     $('#bmEmptyNew').onclick = () => openBookmark(null);
     return;
   }
-  if (!list.length) { $('#bmList').innerHTML = '<div class="card empty">Sin resultados</div>'; return; }
+  if (!list.length) { $('#bmList').innerHTML = `<div class="card empty">Sin resultados${tagFilterEmpty('bookmarks')}</div>`; return; }
   let html = '';
   if (sort === 'cat') {
     cats.filter(c => list.some(b => bmCatOf(b) === c)).forEach(c => {
@@ -56,7 +58,9 @@ async function openBookmark(id, preset = {}) {
     body: `<div><label class="lbl">Dirección (URL)</label><input class="field" type="text" name="url" value="${esc(b.url)}" placeholder="https://…"></div>
       <div><label class="lbl">Nombre</label><input class="field" type="text" name="title" value="${esc(b.title)}" placeholder="Si lo dejas vacío, se usa el dominio" maxlength="120"></div>
       <div><label class="lbl">Categoría</label><input class="field" type="text" name="category" value="${esc(b.category || '')}" list="bmCatList" placeholder="Trabajo, Herramientas, Lectura…" maxlength="40"><datalist id="bmCatList">${cats.map(c => `<option value="${esc(c)}">`).join('')}</datalist></div>
-      <div><label class="lbl">Notas</label><input class="field" type="text" name="notes" value="${esc(b.notes || '')}" maxlength="300"></div>`,
+      <div><label class="lbl">Notas</label><input class="field" type="text" name="notes" value="${esc(b.notes || '')}" maxlength="300"></div>
+      ${tagFieldHtml('tags', b.tags || [], { src: 'title,notes' })}`,
+    onOpen: form => tagFieldInit(form),
     actions: [
       ...(ex ? [{ label: '🗑️ Eliminar', value: 'delete', cls: 'danger left' }] : []),
       { label: 'Cancelar', value: null, cls: 'ghost' },
@@ -66,7 +70,8 @@ async function openBookmark(id, preset = {}) {
   if (!r) return;
   if (r.action === 'delete') { deleteBookmark(ex.id); return; }
   const url = normalizeUrl(r.data.url);
-  Object.assign(b, { url, title: r.data.title.trim() || bmDomain(url), category: r.data.category.trim(), notes: r.data.notes.trim() });
+  Object.assign(b, { url, title: r.data.title.trim() || bmDomain(url), category: r.data.category.trim(), notes: r.data.notes.trim(), tags: tagsFromField(r.data.tags) });
+  if (!b.tags.length) delete b.tags;
   if (ex) Object.assign(ex, b); else S.bookmarks.push(b);
   save.bookmarks(); renderBookmarks();
 }

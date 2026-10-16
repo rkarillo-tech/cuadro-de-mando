@@ -31,11 +31,11 @@ function noteTags(n) {
 function taggedItems() {
   const out = [];
   const listName = id => (S.todoLists.find(l => l.id === id) || {}).name || '';
-  S.notes.forEach(n => { const t = noteTags(n); if (t.length) out.push({ kind: 'note', id: n.id, label: n.title, sub: wkParent(n) ? '📚 ' + wkPath(n) : '', tags: t }); });
-  S.todos.forEach(t => { const tg = tagsIn([t.text, t.notes || '', ...(t.steps || []).map(s => s.text)].join('\n')); if (tg.length) out.push({ kind: 'todo', id: t.id, label: t.text, sub: [listName(t.listId), t.due ? fmtDayLabel(t.due) : ''].filter(Boolean).join(' · '), done: !!t.done, tags: tg }); });
-  S.tasks.forEach(t => { const tg = (t.tags || []).concat(tagsIn([t.title, t.desc || '', ...(t.subtasks || []).map(s => s.text)].join('\n'))); if (tg.length) out.push({ kind: 'kanban', id: t.id, label: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', done: t.col === 'done', tags: tg }); });
-  S.events.forEach(ev => { const tg = tagsIn(ev.title + '\n' + (ev.notes || '')); if (tg.length) out.push({ kind: 'event', id: ev.id, label: ev.title, sub: fmtDayLabel(ev.date), tags: tg }); });
-  S.bookmarks.forEach(b => { const tg = tagsIn(b.title + '\n' + (b.notes || '')); if (tg.length) out.push({ kind: 'bookmark', id: b.id, label: b.title, sub: b.url, tags: tg }); });
+  S.notes.forEach(n => { const t = allNoteTags(n); if (t.length) out.push({ kind: 'note', id: n.id, label: n.title, sub: wkParent(n) ? '📚 ' + wkPath(n) : '', tags: t }); });
+  S.todos.forEach(t => { const tg = todoTags(t); if (tg.length) out.push({ kind: 'todo', id: t.id, label: t.text, sub: [listName(t.listId), t.due ? fmtDayLabel(t.due) : ''].filter(Boolean).join(' · '), done: !!t.done, tags: tg }); });
+  S.tasks.forEach(t => { const tg = taskTags(t); if (tg.length) out.push({ kind: 'kanban', id: t.id, label: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', done: t.col === 'done', tags: tg }); });
+  S.events.forEach(ev => { const tg = eventTags(ev); if (tg.length) out.push({ kind: 'event', id: ev.id, label: ev.title, sub: fmtDayLabel(ev.date), tags: tg }); });
+  S.bookmarks.forEach(b => { const tg = bmTags(b); if (tg.length) out.push({ kind: 'bookmark', id: b.id, label: b.title, sub: b.url, tags: tg }); });
   S.mindmaps.forEach(m => { const tg = []; mmWalk(m.root, x => { tg.push(...tagsIn(x.text)); }); if (tg.length) out.push({ kind: 'map', id: m.id, label: m.title, sub: `${mmCount(m.root)} ideas`, tags: tg }); });
   return out;
 }
@@ -58,6 +58,7 @@ function tagIndex() {
   // padres implícitos (#proyecto para #proyecto/portal)
   [...map.keys()].forEach(k => tagParents(k).forEach(pk => { if (!map.has(pk)) map.set(pk, { key: pk, name: map.get(k).name.split('/').slice(0, pk.split('/').length).join('/'), items: [], count: 0, implicit: true }); }));
   tagIdxCache = { stamp, map };
+  try { tagStyleRefresh(); } catch {}
   return map;
 }
 /** Elementos de una etiqueta, incluidos los de sus subetiquetas. */
@@ -107,7 +108,7 @@ function tagAcChoose(i) {
     const sel = getSelection();
     const end = sel.rangeCount && sel.anchorNode === node ? sel.anchorOffset : a.start + 1 + a.q.length;
     const r = document.createRange(); r.setStart(node, a.start); r.setEnd(node, end); r.deleteContents();
-    const span = document.createElement('span'); span.className = 'tg'; span.textContent = '#' + word;
+    const span = document.createElement('span'); span.className = 'tg'; span.textContent = '#' + word; span.dataset.tk = tagKey(word);
     const sp = document.createTextNode(' ');
     r.insertNode(sp); r.insertNode(span);
     r.setStartAfter(sp); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); savedRange = r.cloneRange();
@@ -151,11 +152,15 @@ editor.addEventListener('input', () => {
     const start = off - 1 - t[2].length - 1;
     const r = document.createRange(); r.setStart(node, start); r.setEnd(node, off - 1);
     const span = document.createElement('span'); span.className = 'tg';
-    r.surroundContents(span);
+    r.surroundContents(span); span.dataset.tk = tagKey(span.textContent);
     const after = span.nextSibling;
     if (after && after.nodeType === 3) { const rr = document.createRange(); rr.setStart(after, Math.min(1, after.nodeValue.length)); rr.collapse(true); sel.removeAllRanges(); sel.addRange(rr); }
     markDirty();
   }
+});
+editor.addEventListener('input', () => {
+  const sel = getSelection(), a = sel.rangeCount && sel.anchorNode, sp = a && (a.nodeType === 3 ? a.parentElement : a).closest('span.tg');
+  if (sp && editor.contains(sp)) { const k = tagKey(sp.textContent); if (sp.dataset.tk !== k) { sp.dataset.tk = k; try { tagStyleRefresh([k]); } catch {} } }
 });
 editor.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== editor) tagAcClose(); }, 150));
 /** Marca visualmente las etiquetas del editor (al abrir una nota). */
@@ -173,6 +178,7 @@ function tagDecorateEditor() {
       node = rest;
     }
   });
+  editor.querySelectorAll('span.tg').forEach(s => { s.dataset.tk = tagKey(s.textContent); });
 }
 editor.addEventListener('click', e => {
   const t = e.target.closest('span.tg'); if (!t || !(e.ctrlKey || e.metaKey)) return;
@@ -239,23 +245,31 @@ function tagRename(key, newName) {
   flushNote();
   let total = 0;
   const fix = s => { const [o, n] = tagReplaceIn(s, key, newName); total += n; return o; };
+  const hit = k => k === key || k.startsWith(key + '/');
+  const fixArr = arr => { if (!arr || !arr.length) return arr; const seen = new Set(); return arr.map(g => { const k = tagKey(g); if (hit(k)) { total++; return newName + g.slice(g.split('/').slice(0, key.split('/').length).join('/').length); } return g; }).filter(g => { const k = tagKey(g); if (seen.has(k)) return false; seen.add(k); return true; }); };
   let notes = false;
   S.notes.forEach(n => {
-    if (!noteTags(n).some(t => { const k = tagKey(t); return k === key || k.startsWith(key + '/'); })) return;
+    if (n.tags && n.tags.some(t => hit(tagKey(t)))) { n.tags = fixArr(n.tags); notes = true; }
+    if (!noteTags(n).some(t => hit(tagKey(t)))) return;
     const body = parseHtml(n.html);
     const w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, { acceptNode: x => x.parentElement.closest('pre,code,a') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
     const nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
     nodes.forEach(t => { t.nodeValue = fix(t.nodeValue); });
     n.html = body.innerHTML; n.text = htmlText(n.html); notes = true;
   });
-  S.todos.forEach(t => { t.text = fix(t.text); t.notes = fix(t.notes); (t.steps || []).forEach(s => { s.text = fix(s.text); }); });
+  S.todos.forEach(t => { t.text = fix(t.text); t.notes = fix(t.notes); (t.steps || []).forEach(s => { s.text = fix(s.text); }); if (t.tags) t.tags = fixArr(t.tags); });
   S.tasks.forEach(t => {
     t.title = fix(t.title); t.desc = fix(t.desc); (t.subtasks || []).forEach(s => { s.text = fix(s.text); });
-    if (t.tags) { const seen = new Set(); t.tags = t.tags.map(g => { const k = tagKey(g); if (k === key || k.startsWith(key + '/')) { total++; return newName + g.slice(g.split('/').slice(0, key.split('/').length).join('/').length); } return g; }).filter(g => { const k = tagKey(g); if (seen.has(k)) return false; seen.add(k); return true; }); }
+    if (t.tags) t.tags = fixArr(t.tags);
   });
-  S.events.forEach(ev => { ev.title = fix(ev.title); ev.notes = fix(ev.notes); });
-  S.bookmarks.forEach(b => { b.title = fix(b.title); b.notes = fix(b.notes); });
+  S.events.forEach(ev => { ev.title = fix(ev.title); ev.notes = fix(ev.notes); if (ev.tags) ev.tags = fixArr(ev.tags); });
+  S.bookmarks.forEach(b => { b.title = fix(b.title); b.notes = fix(b.notes); if (b.tags) b.tags = fixArr(b.tags); });
   S.mindmaps.forEach(m => mmWalk(m.root, x => { x.text = fix(x.text); }));
+  // colores: pasan al nuevo nombre (si el destino ya tenía color propio, se conserva el suyo)
+  const C = S.tagColors || {}, nk = tagKey(newName); let colors = false;
+  Object.keys(C).forEach(k => { if (!hit(k)) return; const to = nk + k.slice(key.length); if (to !== k) { if (!C[to]) C[to] = C[k]; delete C[k]; colors = true; } });
+  if (colors) save.tagColors();
+  Object.keys(tagFilters).forEach(sc => { const f = tagFilters[sc]; if (f && hit(f)) tagFilters[sc] = nk + f.slice(key.length); });
   if (notes) save.notes();
   save.todos(); save.tasks(); save.events(); save.bookmarks(); save.mindmaps();
   tagIdxCache = null;

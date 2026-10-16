@@ -156,6 +156,7 @@ function todoItemHtml(t, opts = {}) {
   if (t.steps && t.steps.length) meta.push(`<span>☑ ${t.steps.filter(s => s.done).length}/${t.steps.length}</span>`);
   if (t.notes) { const ln = wlTextTitles(t.notes); meta.push(ln.length ? `<span title="Notas enlazadas: ${esc(ln.join(', '))}">🔗 ${ln.length} nota${ln.length === 1 ? '' : 's'}</span>` : '<span title="Tiene notas">📝</span>'); }
   if (t.done && t.doneAt) meta.push(`<span>✓ ${esc(relTime(t.doneAt))}</span>`);
+  if (t.tags && t.tags.length) meta.push(tagPills(t.tags, 4));
   return `<div class="todo-item${t.done ? ' done' : ''}${t.important ? ' important' : ''}" data-id="${esc(t.id)}"${opts.drag ? ' draggable="true"' : ''} tabindex="0">
     <button class="todo-check" data-act="check" title="${t.done ? 'Marcar como pendiente' : 'Completar'}">✓</button>
     <div class="todo-main" data-act="open"><div class="todo-text">${tagHighlight(esc(t.text))}</div>${meta.length ? `<div class="todo-meta">${meta.join('')}</div>` : ''}</div>
@@ -176,7 +177,9 @@ function renderTodos() {
   const info = todoViewInfo();
   renderTodoSide();
   $('#todoTitle').textContent = info.title;
-  const items = S.todos.filter(t => todoMatchesView(t, todoView));
+  renderTagFilter('todos');
+  const tf = tagFilters.todos, tok = t => !tf || tagMatch(todoTags(t), tf);
+  const items = S.todos.filter(t => todoMatchesView(t, todoView) && tok(t));
   $('#todoSub').textContent = todoView === 'done' ? `${items.length} completadas` : `${items.length} pendiente${items.length === 1 ? '' : 's'} · ${info.sub}`;
   $('#todoInput').parentElement.hidden = todoView === 'done';
   const k = todayKey();
@@ -185,7 +188,7 @@ function renderTodos() {
   if (todoView === 'today') {
     html += group('Vencidas', items.filter(t => t.due < k).sort(byDue), { showList: true }, 'danger');
     html += group('Hoy', items.filter(t => t.due === k).sort(byDue), { showList: true });
-    const doneToday = S.todos.filter(t => t.done && t.doneAt && dayKey(new Date(t.doneAt)) === k);
+    const doneToday = S.todos.filter(t => t.done && t.doneAt && dayKey(new Date(t.doneAt)) === k && tok(t));
     if (doneToday.length) html += doneSection('today', 'Completadas hoy', doneToday, true);
   } else if (todoView === 'next7') {
     html += group('Vencidas', items.filter(t => t.due < k).sort(byDue), { showList: true }, 'danger');
@@ -201,10 +204,10 @@ function renderTodos() {
     html += items.sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 300).map(t => todoItemHtml(t, { showList: true })).join('');
   } else {
     html += items.sort(byOrder).map(t => todoItemHtml(t, { drag: true })).join('');
-    const done = S.todos.filter(t => t.done && t.listId === info.list.id);
+    const done = S.todos.filter(t => t.done && t.listId === info.list.id && tok(t));
     if (done.length) html += doneSection(todoView, 'Completadas', done.sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)));
   }
-  $('#todoItems').innerHTML = html || `<div class="empty-state" style="padding:40px 10px"><div style="font-size:2.2rem">${todoView === 'done' ? '📭' : '🎉'}</div><div class="muted">${todoView === 'done' ? 'Aún no has completado ninguna tarea.' : todoView === 'today' ? 'Nada pendiente para hoy. ¡Bien hecho!' : 'No hay tareas aquí. Escribe arriba para añadir una.'}</div></div>`;
+  $('#todoItems').innerHTML = html || `<div class="empty-state" style="padding:40px 10px"><div style="font-size:2.2rem">${todoView === 'done' ? '📭' : '🎉'}</div><div class="muted">${tf ? 'Ninguna tarea aquí' + tagFilterEmpty('todos') + '.' : todoView === 'done' ? 'Aún no has completado ninguna tarea.' : todoView === 'today' ? 'Nada pendiente para hoy. ¡Bien hecho!' : 'No hay tareas aquí. Escribe arriba para añadir una.'}</div></div>`;
   $('#todoMenuBtn').hidden = false;
 }
 function doneSection(key, title, list) {
@@ -254,7 +257,7 @@ function deleteTodo(id) {
 }
 function todoToKanban(id) {
   const t = getTodo(id); if (!t) return;
-  S.tasks.push({ id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: [], subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() });
+  S.tasks.push({ id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() });
   S.todos = S.todos.filter(x => x.id !== id);
   save.tasks(); save.todos(); renderBoard(); refreshTodoViews();
   toast('Tarea pasada al Kanban', 'success', 5000, { label: 'Ver', fn: () => showTab('kanban') });
@@ -274,6 +277,7 @@ async function openTodo(id) {
       <button type="button" class="btn sm" data-q="0">Hoy</button><button type="button" class="btn sm" data-q="1">Mañana</button><button type="button" class="btn sm" data-q="week">Próx. lunes</button><button type="button" class="btn sm ghost" data-q="none">Sin fecha</button>
       <label class="check-row" style="margin-left:auto"><input type="checkbox" class="check" name="important"${draft.important ? ' checked' : ''}> ⭐ Importante</label>
     </div>
+    ${tagFieldHtml('tags', draft.tags || [], { src: 'text,notes' })}
     <div><label class="lbl">Pasos <span id="stProg"></span></label>
       <div id="stList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="stNew" placeholder="Nuevo paso y Enter" data-noenter><button type="button" class="btn" id="stAdd">Añadir</button></div>
@@ -310,6 +314,7 @@ async function openTodo(id) {
       list.addEventListener('click', e => { const b = e.target.closest('[data-act="del"]'); if (b) { draft.steps.splice(+b.closest('.subtask-row').dataset.i, 1); render(); } });
       render();
       wlAttachField(form, 'notes', { kind: 'Tareas', titleField: 'text' });
+      tagFieldInit(form);
     }
   });
   if (!r) return;
@@ -317,8 +322,10 @@ async function openTodo(id) {
   const d = r.data;
   Object.assign(t, {
     text: d.text.trim(), listId: d.list, due: d.due || '', repeat: d.repeat || '', important: !!d.important,
-    notes: (d.notes || '').trim(), steps: draft.steps.map(s => ({ ...s, text: s.text.trim() })).filter(s => s.text)
+    notes: (d.notes || '').trim(), steps: draft.steps.map(s => ({ ...s, text: s.text.trim() })).filter(s => s.text),
+    tags: tagsFromField(d.tags)
   });
+  if (!t.tags.length) delete t.tags;
   if (t.repeat && !t.due) t.due = todayKey();
   save.todos();
   if (r.action === 'kanban') { todoToKanban(id); return; }
@@ -383,7 +390,9 @@ $('#todoNewList').addEventListener('click', newTodoList);
 $('#todoNewListMobile').addEventListener('click', newTodoList);
 $('#todoMenuBtn').addEventListener('click', e => {
   const info = todoViewInfo();
-  const items = S.todos.filter(t => todoMatchesView(t, todoView));
+  renderTagFilter('todos');
+  const tf = tagFilters.todos, tok = t => !tf || tagMatch(todoTags(t), tf);
+  const items = S.todos.filter(t => todoMatchesView(t, todoView) && tok(t));
   const menu = [];
   if (info.list) {
     const l = info.list;

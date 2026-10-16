@@ -2,7 +2,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/Qq4QXPNzA50hzOhwsy9Q1dby4zc+OSF4fg2T949qZs='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-l10X2O9tayaOnau3Sbqx91SbcMsyEepKf2++hjc8VR8='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -725,19 +725,19 @@ details.bl-row summary.bl-h{cursor:pointer}
 .ls-out textarea{margin-top:6px}
 @media (max-width:900px){.ls-top,.ls-grid2,.ls-grid3{grid-template-columns:1fr}}
 /* ---- Etiquetas ---- */
-.editor .tg{color:var(--accent);background:var(--accent-soft);border-radius:5px;padding:0 3px;font-weight:600}
-.tg-mini{color:var(--accent);font-weight:600;cursor:pointer;border-radius:4px}
+.editor .tg{color:var(--tg-fg);background:var(--tg-bg);border-radius:5px;padding:0 3px;font-weight:600}
+.tg-mini{color:var(--tg-fg);font-weight:600;cursor:pointer;border-radius:4px}
 .tg-mini:hover{text-decoration:underline}
 .badge.tg-mini{cursor:pointer}
-.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;border:1px solid transparent;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:.8rem;cursor:pointer}
-.tag-chip:hover{border-color:var(--accent)}
+.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;border:1px solid transparent;background:var(--tg-bg);color:var(--tg-fg);font-weight:600;font-size:.8rem;cursor:pointer}
+.tag-chip:hover{border-color:var(--tg-fg)}
 .tags-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:16px;align-items:start}
 .tag-cloud{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;line-height:1.5}
-.cloud-tag{border:0;background:none;cursor:pointer;color:var(--accent);opacity:var(--w,1);font-weight:650;padding:2px 4px;border-radius:7px;font-family:inherit}
+.cloud-tag{border:0;background:none;cursor:pointer;color:var(--tg-fg);opacity:var(--w,1);font-weight:650;padding:2px 4px;border-radius:7px;font-family:inherit}
 .cloud-tag sup{font-size:.55em;color:var(--muted);margin-left:2px;font-weight:500}
-.cloud-tag:hover{opacity:1;background:var(--accent-soft)}
-.cloud-tag.on{opacity:1;background:var(--accent);color:#fff}
-.cloud-tag.on sup{color:#fff}
+.cloud-tag:hover{opacity:1;background:var(--tg-bg)}
+.cloud-tag.on{opacity:1;background:var(--tg-fg);color:var(--bg)}
+.cloud-tag.on sup{color:var(--bg)}
 .tg-title{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
 .tg-title .crumb{border:0;background:none;color:var(--muted);cursor:pointer;font:inherit;padding:0}
 .tg-group{margin-top:14px}
@@ -747,6 +747,61 @@ details.bl-row summary.bl-h{cursor:pointer}
 #tgDetail .bl-row{margin-top:8px}
 .lg-tri{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #e36bd0;display:inline-block}
 @media (max-width:900px){.tags-layout{grid-template-columns:1fr}}
+
+/* ===== Etiquetas: colores, selector, campo y filtros ===== */
+:root{--tgL:72%;--tgA:.17}
+[data-theme="light"]{--tgL:37%;--tgA:.13}
+.editor .tg,.tg-mini,.tag-chip,.cloud-tag,.tf-chip,.tp-name,.tp-dot,.tp-sw,.tp-newname{--tg-fg:hsl(var(--h,250) var(--s,80%) var(--tgL));--tg-bg:hsl(var(--h,250) var(--s,80%) 55% / var(--tgA))}
+.tg-line{display:inline-flex;flex-wrap:wrap;gap:4px;margin-left:6px;vertical-align:middle}
+.tg-pill{background:var(--tg-bg);padding:0 6px;border-radius:999px;font-size:.72rem;line-height:1.5;white-space:nowrap}
+.tg-pill:hover{text-decoration:none;box-shadow:inset 0 0 0 1px var(--tg-fg)}
+.badge.tg-mini{background:var(--tg-bg);color:var(--tg-fg);border-color:transparent}
+.note-item .d{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
+.bm-card .tg-line{display:flex;margin:3px 0 0}
+.todo-meta .tg-line{margin-left:0}
+/* chips del campo y de la barra de la nota */
+.note-tagbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0 10px;min-height:28px}
+.tf-ico{font-size:.95rem;opacity:.75}
+.tf-chip{display:inline-flex;align-items:center;border-radius:999px;background:var(--tg-bg);color:var(--tg-fg);font-weight:600;font-size:.8rem;border:1px solid transparent;padding:2px 4px 2px 10px;line-height:1.4;max-width:100%}
+.tf-chip:not(:has(.tf-x)){padding-right:10px}
+.tf-chip.inline{background:transparent;border:1px dashed var(--tg-fg)}
+.tf-chip .tf-go{border:0;background:none;color:inherit;font:inherit;cursor:pointer;padding:0;display:inline-flex;gap:5px;align-items:center}
+.tf-chip .tf-go:hover{text-decoration:underline}
+.tf-chip .tf-n{font-size:.7rem;opacity:.7;font-weight:500}
+.tf-x{border:0;background:none;color:inherit;cursor:pointer;font-size:1rem;line-height:1;width:20px;height:20px;border-radius:50%;margin-left:2px;opacity:.65;display:grid;place-items:center;padding:0}
+.tf-x:hover{opacity:1;background:var(--tg-bg)}
+.tag-field .tf-box{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-2);min-height:40px}
+.tagf{display:inline-flex}
+.notes-side .tagf{display:flex}
+.tagf .tf-chip{padding-top:3px;padding-bottom:3px}
+.wk-row.wk-ctx{opacity:.5}
+/* selector */
+.tag-picker{z-index:130;width:300px;max-width:calc(100vw - 20px);padding:0;overflow:hidden}
+.tag-picker .tp-head{padding:8px;border-bottom:1px solid var(--border)}
+.tag-picker .tp-q{width:100%}
+.tp-list{max-height:300px;overflow:auto;padding:4px}
+.tp-row{display:flex;align-items:center;gap:8px;padding:5px 8px;padding-left:calc(8px + var(--d,0) * 16px);border-radius:8px;cursor:pointer;user-select:none}
+.tp-row:hover{background:var(--hover)}
+.tp-row.act{background:var(--hover);box-shadow:inset 0 0 0 1px var(--border)}
+.tp-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);display:grid;place-items:center;font-size:.75rem;color:transparent;flex-shrink:0}
+.tp-row.on .tp-check{background:var(--accent);border-color:var(--accent);color:#fff}
+.tp-row.locked .tp-check{background:transparent;border-style:dashed;border-color:var(--muted);color:var(--muted)}
+.tp-new .tp-check{border:0;color:var(--accent);font-size:1rem}
+.tp-dot{width:13px;height:13px;border-radius:50%;border:0;background:var(--tg-fg);cursor:pointer;flex-shrink:0;padding:0}
+.tp-dot:hover{box-shadow:0 0 0 3px var(--tg-bg)}
+.tp-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tg-fg);font-weight:600}
+.tp-newname{color:var(--tg-fg)}
+.tp-n{font-size:.75rem;color:var(--muted)}
+.tp-pre{opacity:.55;font-weight:500}
+.tp-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-top:1px solid var(--border)}
+.tp-palrow{padding:4px 8px 8px calc(34px + var(--d,0) * 16px)}
+.tp-pal{display:inline-flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tp-sw{width:20px;height:20px;border-radius:50%;border:2px solid transparent;background:hsl(var(--h) var(--s) var(--tgL));cursor:pointer;padding:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.tp-pal.small .tp-sw{width:17px;height:17px}
+.tp-sw.on{border-color:var(--text)}
+.tp-sw.auto{background:var(--surface-2);color:var(--muted);font-size:.62rem;font-weight:700;display:grid;place-items:center;border:1px dashed var(--muted)}
+.tp-sw.auto.on{border:2px solid var(--text);color:var(--text)}
+.tg-colrow{align-items:center}
 
 </style>
 </head>
@@ -848,6 +903,7 @@ details.bl-row summary.bl-h{cursor:pointer}
           <div class="card-h" style="margin-bottom:10px">
             <div style="min-width:0"><h2 id="todoTitle" style="font-size:1.25rem"></h2><div class="muted small" id="todoSub"></div></div>
             <div class="row">
+              <span class="tagf" data-tagf="todos"></span>
               <button class="btn sm" id="todoNewListMobile" title="Nueva lista">＋ Lista</button>
               <button class="btn icon ghost" id="todoMenuBtn" title="Opciones">⋯</button>
             </div>
@@ -868,6 +924,7 @@ details.bl-row summary.bl-h{cursor:pointer}
           <option value="media">Prioridad media</option>
           <option value="baja">Prioridad baja</option>
         </select>
+        <span class="tagf" data-tagf="kanban"></span>
         <button class="btn primary" id="kbNewBtn">＋ Nueva tarea</button>
       </div>
       <div class="kb-board" id="kbBoard"></div>
@@ -914,6 +971,7 @@ details.bl-row summary.bl-h{cursor:pointer}
           <div class="seg seg-full" id="notesMode" title="Ver las notas como lista o como árbol (wiki)">
             <button data-nm2="list" class="on">📄 Lista</button><button data-nm2="tree">🌳 Wiki</button>
           </div>
+          <div class="tagf" data-tagf="notes"></div>
           <div class="row">
             <button class="btn sm" id="importNoteBtn" title="Importar archivos .md o .txt como notas, o un .ctd de CherryTree como rama de la wiki">⬆️ Importar .md / .txt / .ctd</button>
             <input type="file" id="importNoteFile" accept=".md,.markdown,.txt,.ctd,.ctb,.ctz,.ctx,text/plain,text/markdown" multiple hidden>
@@ -938,6 +996,7 @@ details.bl-row summary.bl-h{cursor:pointer}
             <button class="btn icon ghost" id="pinNoteBtn" title="Fijar arriba">📌</button>
             <button class="btn icon ghost" id="noteMenuBtn" title="Exportar y más opciones">⋯</button>
           </div>
+          <div class="note-tagbar" id="noteTags" hidden></div>
           <div class="toolbar" id="toolbar">
             <select class="tb-select" id="blockSelect" title="Estilo de párrafo">
               <option value="div">Texto normal</option>
@@ -981,7 +1040,6 @@ details.bl-row summary.bl-h{cursor:pointer}
           </div>
           <div class="editor" id="editor" contenteditable="true" spellcheck="true" data-placeholder="Empieza a escribir…"></div>
           <div class="status"><span id="noteCount"></span><span id="noteSaved"></span></div>
-          <div class="subpages bl-row" id="noteTags" hidden></div>
           <div class="subpages bl-row" id="subpages" hidden></div>
           <div class="backlinks" id="backlinks"></div>
         </div>
@@ -1095,7 +1153,7 @@ details.bl-row summary.bl-h{cursor:pointer}
           </div>
           <input class="field" id="tgSearch" placeholder="🔍 Buscar etiqueta…" style="margin-bottom:10px">
           <div class="tag-cloud" id="tgCloud"></div>
-          <p class="hint">Escribe <b>#etiqueta</b> en cualquier nota, tarea, tarjeta, evento, marcador o idea de un mapa (al teclear <kbd>#</kbd> te sugiere las que ya usas). Con <b>/</b> puedes crear niveles: <code>#proyecto/portal</code> también aparece en <code>#proyecto</code>. Mayúsculas y tildes no cuentan: <code>#Reunión</code> = <code>#reunion</code>.</p>
+          <p class="hint">Pon etiquetas con el botón <b>＋ Etiqueta</b> de cada nota, tarea, tarjeta, evento o marcador (un desplegable con todas las tuyas), o escribe <b>#etiqueta</b> en el texto (al teclear <kbd>#</kbd> te sugiere las que ya usas). Cada etiqueta tiene su color: cámbialo aquí al elegirla o con el punto de color del desplegable. Con <b>/</b> puedes crear niveles: <code>#proyecto/portal</code> también aparece en <code>#proyecto</code>. Mayúsculas y tildes no cuentan: <code>#Reunión</code> = <code>#reunion</code>.</p>
         </div>
         <div class="card" id="tgDetail"></div>
       </div>
@@ -1111,6 +1169,7 @@ details.bl-row summary.bl-h{cursor:pointer}
             <option value="new">Más recientes</option>
             <option value="az">A → Z</option>
           </select>
+          <span class="tagf" data-tagf="bookmarks"></span>
           <button class="btn primary" id="bmNew">＋ Marcador</button>
           <button class="btn icon" id="bmMenuBtn" title="Importar / exportar">⋯</button>
           <input type="file" id="bmImportFile" accept=".html,.htm,text/html" hidden>
@@ -2420,6 +2479,7 @@ function loadState() {
   S.bookmarks = store.get('bookmarks', []) || [];
   S.templates = store.get('templates', []) || [];
   S.mindmaps = (store.get('mindmaps', []) || []).filter(m => m && m.root);
+  S.tagColors = store.get('tagColors', {}) || {};
   S.prefs = Object.assign({ start: 'last', backupDays: 14 }, store.get('prefs', {}));
 }
 const save = {
@@ -2439,6 +2499,7 @@ const save = {
   bookmarks: () => store.set('bookmarks', S.bookmarks),
   templates: () => store.set('templates', S.templates),
   mindmaps: () => store.set('mindmaps', S.mindmaps),
+  tagColors: () => store.set('tagColors', S.tagColors),
   prefs: () => store.set('prefs', S.prefs)
 };
 /* =====================================================================
@@ -2973,6 +3034,7 @@ function todoItemHtml(t, opts = {}) {
   if (t.steps && t.steps.length) meta.push(`<span>☑ ${t.steps.filter(s => s.done).length}/${t.steps.length}</span>`);
   if (t.notes) { const ln = wlTextTitles(t.notes); meta.push(ln.length ? `<span title="Notas enlazadas: ${esc(ln.join(', '))}">🔗 ${ln.length} nota${ln.length === 1 ? '' : 's'}</span>` : '<span title="Tiene notas">📝</span>'); }
   if (t.done && t.doneAt) meta.push(`<span>✓ ${esc(relTime(t.doneAt))}</span>`);
+  if (t.tags && t.tags.length) meta.push(tagPills(t.tags, 4));
   return `<div class="todo-item${t.done ? ' done' : ''}${t.important ? ' important' : ''}" data-id="${esc(t.id)}"${opts.drag ? ' draggable="true"' : ''} tabindex="0">
     <button class="todo-check" data-act="check" title="${t.done ? 'Marcar como pendiente' : 'Completar'}">✓</button>
     <div class="todo-main" data-act="open"><div class="todo-text">${tagHighlight(esc(t.text))}</div>${meta.length ? `<div class="todo-meta">${meta.join('')}</div>` : ''}</div>
@@ -2993,7 +3055,9 @@ function renderTodos() {
   const info = todoViewInfo();
   renderTodoSide();
   $('#todoTitle').textContent = info.title;
-  const items = S.todos.filter(t => todoMatchesView(t, todoView));
+  renderTagFilter('todos');
+  const tf = tagFilters.todos, tok = t => !tf || tagMatch(todoTags(t), tf);
+  const items = S.todos.filter(t => todoMatchesView(t, todoView) && tok(t));
   $('#todoSub').textContent = todoView === 'done' ? `${items.length} completadas` : `${items.length} pendiente${items.length === 1 ? '' : 's'} · ${info.sub}`;
   $('#todoInput').parentElement.hidden = todoView === 'done';
   const k = todayKey();
@@ -3002,7 +3066,7 @@ function renderTodos() {
   if (todoView === 'today') {
     html += group('Vencidas', items.filter(t => t.due < k).sort(byDue), { showList: true }, 'danger');
     html += group('Hoy', items.filter(t => t.due === k).sort(byDue), { showList: true });
-    const doneToday = S.todos.filter(t => t.done && t.doneAt && dayKey(new Date(t.doneAt)) === k);
+    const doneToday = S.todos.filter(t => t.done && t.doneAt && dayKey(new Date(t.doneAt)) === k && tok(t));
     if (doneToday.length) html += doneSection('today', 'Completadas hoy', doneToday, true);
   } else if (todoView === 'next7') {
     html += group('Vencidas', items.filter(t => t.due < k).sort(byDue), { showList: true }, 'danger');
@@ -3018,10 +3082,10 @@ function renderTodos() {
     html += items.sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 300).map(t => todoItemHtml(t, { showList: true })).join('');
   } else {
     html += items.sort(byOrder).map(t => todoItemHtml(t, { drag: true })).join('');
-    const done = S.todos.filter(t => t.done && t.listId === info.list.id);
+    const done = S.todos.filter(t => t.done && t.listId === info.list.id && tok(t));
     if (done.length) html += doneSection(todoView, 'Completadas', done.sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)));
   }
-  $('#todoItems').innerHTML = html || `<div class="empty-state" style="padding:40px 10px"><div style="font-size:2.2rem">${todoView === 'done' ? '📭' : '🎉'}</div><div class="muted">${todoView === 'done' ? 'Aún no has completado ninguna tarea.' : todoView === 'today' ? 'Nada pendiente para hoy. ¡Bien hecho!' : 'No hay tareas aquí. Escribe arriba para añadir una.'}</div></div>`;
+  $('#todoItems').innerHTML = html || `<div class="empty-state" style="padding:40px 10px"><div style="font-size:2.2rem">${todoView === 'done' ? '📭' : '🎉'}</div><div class="muted">${tf ? 'Ninguna tarea aquí' + tagFilterEmpty('todos') + '.' : todoView === 'done' ? 'Aún no has completado ninguna tarea.' : todoView === 'today' ? 'Nada pendiente para hoy. ¡Bien hecho!' : 'No hay tareas aquí. Escribe arriba para añadir una.'}</div></div>`;
   $('#todoMenuBtn').hidden = false;
 }
 function doneSection(key, title, list) {
@@ -3071,7 +3135,7 @@ function deleteTodo(id) {
 }
 function todoToKanban(id) {
   const t = getTodo(id); if (!t) return;
-  S.tasks.push({ id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: [], subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() });
+  S.tasks.push({ id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() });
   S.todos = S.todos.filter(x => x.id !== id);
   save.tasks(); save.todos(); renderBoard(); refreshTodoViews();
   toast('Tarea pasada al Kanban', 'success', 5000, { label: 'Ver', fn: () => showTab('kanban') });
@@ -3091,6 +3155,7 @@ async function openTodo(id) {
       <button type="button" class="btn sm" data-q="0">Hoy</button><button type="button" class="btn sm" data-q="1">Mañana</button><button type="button" class="btn sm" data-q="week">Próx. lunes</button><button type="button" class="btn sm ghost" data-q="none">Sin fecha</button>
       <label class="check-row" style="margin-left:auto"><input type="checkbox" class="check" name="important"${draft.important ? ' checked' : ''}> ⭐ Importante</label>
     </div>
+    ${tagFieldHtml('tags', draft.tags || [], { src: 'text,notes' })}
     <div><label class="lbl">Pasos <span id="stProg"></span></label>
       <div id="stList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="stNew" placeholder="Nuevo paso y Enter" data-noenter><button type="button" class="btn" id="stAdd">Añadir</button></div>
@@ -3127,6 +3192,7 @@ async function openTodo(id) {
       list.addEventListener('click', e => { const b = e.target.closest('[data-act="del"]'); if (b) { draft.steps.splice(+b.closest('.subtask-row').dataset.i, 1); render(); } });
       render();
       wlAttachField(form, 'notes', { kind: 'Tareas', titleField: 'text' });
+      tagFieldInit(form);
     }
   });
   if (!r) return;
@@ -3134,8 +3200,10 @@ async function openTodo(id) {
   const d = r.data;
   Object.assign(t, {
     text: d.text.trim(), listId: d.list, due: d.due || '', repeat: d.repeat || '', important: !!d.important,
-    notes: (d.notes || '').trim(), steps: draft.steps.map(s => ({ ...s, text: s.text.trim() })).filter(s => s.text)
+    notes: (d.notes || '').trim(), steps: draft.steps.map(s => ({ ...s, text: s.text.trim() })).filter(s => s.text),
+    tags: tagsFromField(d.tags)
   });
+  if (!t.tags.length) delete t.tags;
   if (t.repeat && !t.due) t.due = todayKey();
   save.todos();
   if (r.action === 'kanban') { todoToKanban(id); return; }
@@ -3200,7 +3268,9 @@ $('#todoNewList').addEventListener('click', newTodoList);
 $('#todoNewListMobile').addEventListener('click', newTodoList);
 $('#todoMenuBtn').addEventListener('click', e => {
   const info = todoViewInfo();
-  const items = S.todos.filter(t => todoMatchesView(t, todoView));
+  renderTagFilter('todos');
+  const tf = tagFilters.todos, tok = t => !tf || tagMatch(todoTags(t), tf);
+  const items = S.todos.filter(t => todoMatchesView(t, todoView) && tok(t));
   const menu = [];
   if (info.list) {
     const l = info.list;
@@ -3317,7 +3387,7 @@ function cardHtml(t) {
       ${di ? `<span class="badge ${di.cls}">${di.label}</span>` : ''}
       ${subs.length ? `<span class="badge${doneN === subs.length ? ' success' : ''}">☑ ${doneN}/${subs.length}</span>` : ''}
       ${t.pomodoros ? `<span class="badge" title="Pomodoros dedicados">🍅 ${t.pomodoros}</span>` : ''}
-      ${(t.tags || []).map(g => `<span class="badge accent tg-mini" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
+      ${tagUniq(t.tags || []).map(g => `<span class="badge tg-mini tg-pill" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
     </div>
     ${subs.length ? `<div class="progress"><span style="width:${Math.round(doneN / subs.length * 100)}%"></span></div>
     <details class="subs"${openSubs.has(t.id) ? ' open' : ''}><summary>Subtareas</summary>${subs.map(s => `<label class="check-row"><input type="checkbox" class="check" data-sub="${esc(s.id)}"${s.done ? ' checked' : ''}><span class="${s.done ? 'muted strike' : ''}">${esc(s.text)}</span></label>`).join('')}</details>` : ''}
@@ -3333,7 +3403,9 @@ function cardHtml(t) {
 function renderBoard() {
   const q = $('#kbSearch').value.trim().toLowerCase().replace(/^#/, '');
   const pf = $('#kbPriority').value;
-  const match = t => (!pf || t.priority === pf) && (!q
+  renderTagFilter('kanban');
+  const tf = tagFilters.kanban;
+  const match = t => (!pf || t.priority === pf) && (!tf || tagMatch(taskTags(t), tf)) && (!q
     || t.title.toLowerCase().includes(q)
     || (t.desc || '').toLowerCase().includes(q)
     || (t.tags || []).some(g => g.toLowerCase().includes(q))
@@ -3347,7 +3419,7 @@ function renderBoard() {
           ${c.id === 'done' && all.length ? '<button class="btn icon sm ghost" data-kb="cleardone" title="Eliminar todas las completadas">🧹</button>' : ''}
           <button class="btn icon sm ghost" data-kb="add" data-col="${c.id}" title="Añadir tarea aquí">＋</button>
         </span></div>
-      <div class="kb-list" data-col="${c.id}">${items.map(cardHtml).join('') || `<div class="empty small">${q || pf ? 'Sin coincidencias' : 'Arrastra tareas aquí'}</div>`}</div>
+      <div class="kb-list" data-col="${c.id}">${items.map(cardHtml).join('') || `<div class="empty small">${q || pf || tf ? 'Sin coincidencias' : 'Arrastra tareas aquí'}</div>`}</div>
     </div>`;
   }).join('');
 }
@@ -3392,7 +3464,7 @@ async function openTask(id, col = 'todo') {
       <div><label class="lbl">Prioridad</label><select class="field" name="priority">${Object.entries(PRIO).map(([k, p]) => `<option value="${k}"${k === draft.priority ? ' selected' : ''}>${p.label}</option>`).join('')}</select></div>
       <div><label class="lbl">Fecha límite</label><input type="date" class="field" name="due" value="${esc(draft.due)}"></div>
     </div>
-    <div><label class="lbl">Etiquetas (separadas por comas; también vale escribir #etiqueta en el título o la descripción)</label><input class="field" type="text" name="tags" value="${esc((draft.tags || []).join(', '))}" placeholder="trabajo, casa, urgente…"></div>
+    ${tagFieldHtml('tags', draft.tags || [], { src: 'title,desc' })}
     <div><label class="lbl">Subtareas <span id="subProg"></span></label>
       <div id="subList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="subNew" placeholder="Nueva subtarea y Enter" data-noenter><button type="button" class="btn" id="subAdd">Añadir</button></div>
@@ -3419,6 +3491,7 @@ async function openTask(id, col = 'todo') {
       list.addEventListener('click', e => { const b = e.target.closest('[data-act="del"]'); if (b) { draft.subtasks.splice(+b.closest('.subtask-row').dataset.i, 1); render(); } });
       render();
       wlAttachField(form, 'desc', { kind: 'Kanban', titleField: 'title' });
+      tagFieldInit(form);
     }
   });
   if (!r) return;
@@ -3426,7 +3499,7 @@ async function openTask(id, col = 'todo') {
   const d = r.data;
   Object.assign(draft, {
     title: d.title.trim(), desc: (d.desc || '').trim(), priority: d.priority, due: d.due || '',
-    tags: (d.tags || '').split(',').map(s => s.trim().replace(/^#/, '')).filter(Boolean).slice(0, 8)
+    tags: tagsFromField(d.tags)
   });
   draft.subtasks = draft.subtasks.map(s => ({ ...s, text: s.text.trim() })).filter(s => s.text);
   if (existing) {
@@ -3611,6 +3684,7 @@ async function openEvent(id, date) {
     </div>
     <div><label class="lbl">Color</label>${swatchesHtml('color', safeColor(d.color))}</div>
     <div><label class="lbl">Notas</label><textarea class="field" name="notes" rows="3">${esc(d.notes || '')}</textarea></div>
+    ${tagFieldHtml('tags', d.tags || [], { src: 'title,notes' })}
     ${ex && ex.repeat ? '<p class="hint">Es un evento periódico: los cambios se aplican a toda la serie.</p>' : ''}`;
   const r = await modal({
     title: ex ? '✏️ Editar evento' : '＋ Nuevo evento', wide: true, body,
@@ -3627,6 +3701,7 @@ async function openEvent(id, date) {
     onOpen: form => {
       const sync = () => { const on = form.elements.namedItem('allDay').checked; ['start', 'end'].forEach(n => form.elements.namedItem(n).disabled = on); };
       form.elements.namedItem('allDay').addEventListener('change', sync); sync();
+      tagFieldInit(form);
     }
   });
   if (!r) return;
@@ -3636,7 +3711,8 @@ async function openEvent(id, date) {
     return;
   }
   const f = r.data;
-  Object.assign(d, { title: f.title.trim(), date: f.date, allDay: !!f.allDay, start: f.start || d.start, end: f.end || d.end, repeat: f.repeat || '', until: f.until || '', color: safeColor(f.color), notes: (f.notes || '').trim() });
+  Object.assign(d, { title: f.title.trim(), date: f.date, allDay: !!f.allDay, start: f.start || d.start, end: f.end || d.end, repeat: f.repeat || '', until: f.until || '', color: safeColor(f.color), notes: (f.notes || '').trim(), tags: tagsFromField(f.tags) });
+  if (!d.tags.length) delete d.tags;
   if (ex) Object.assign(ex, d); else S.events.push(d);
   save.events(); calGoto(d.date);
   if (!ex) toast('Evento creado', 'success', 1500);
@@ -3812,18 +3888,20 @@ function initNotes() {
 function renderNoteList() {
   if (notesMode === 'tree') { wikiRenderTree(); return; }
   const q = $('#noteSearch').value.trim().toLowerCase();
-  let list = sortedNotes().filter(n => !q || n.title.toLowerCase().includes(q) || (n.text || '').toLowerCase().includes(q));
+  renderTagFilter('notes');
+  const tf = tagFilters.notes, tok = n => !tf || tagMatch(allNoteTags(n), tf);
+  let list = sortedNotes().filter(n => tok(n) && (!q || n.title.toLowerCase().includes(q) || (n.text || '').toLowerCase().includes(q)));
   let fuzzy = false;
   if (q.length >= 3 && list.length < 3) {
     const nq = norm(q), seen = new Set(list.map(n => n.id));
-    const extra = S.notes.filter(n => !seen.has(n.id)).map(n => ({ n, s: fuzzyScore(nq, n.title) * 2 + fuzzyScore(nq, n.text || '') })).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 10).map(x => x.n);
+    const extra = S.notes.filter(n => !seen.has(n.id) && tok(n)).map(n => ({ n, s: fuzzyScore(nq, n.title) * 2 + fuzzyScore(nq, n.text || '') })).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 10).map(x => x.n);
     if (extra.length) { fuzzy = true; list = list.concat(extra); }
   }
   $('#notesList').innerHTML = list.length ? list.map(n => `<div class="note-item${n.id === currentNoteId ? ' active' : ''}" data-id="${esc(n.id)}" tabindex="0">
       <div class="t">${n.pinned ? '📌' : ''}<span class="ellipsis">${esc(n.title)}</span></div>${wkParent(n) ? `<div class="p ellipsis">📚 ${esc(wkPath(n))}</div>` : ''}
       <div class="s">${esc((n.text || '').slice(0, 90)) || '<i>Vacía</i>'}</div>
-      <div class="d">${relTime(n.updated)}</div></div>`).join('')
-    : `<div class="empty">${q ? 'Sin resultados' : 'No hay notas todavía'}</div>`;
+      <div class="d">${relTime(n.updated)}${tagPills(allNoteTags(n), 3)}</div></div>`).join('')
+    : `<div class="empty">${q || tf ? 'Sin resultados' + tagFilterEmpty('notes') : 'No hay notas todavía'}</div>`;
   if (fuzzy) $('#notesList').insertAdjacentHTML('beforeend', '<div class="muted small" style="padding:4px 8px">≈ Incluye resultados parecidos (erratas o abreviaturas)</div>');
   $('#notesTotal').textContent = `${S.notes.length} nota${S.notes.length === 1 ? '' : 's'}`;
 }
@@ -4206,7 +4284,7 @@ function mdToHtml(md) {
   closeList();
   return html;
 }
-const noteToMd = n => `# ${n.title}\n\n` + htmlToMd(parseHtml(sanitize(n.html)));
+const noteToMd = n => mdFrontFor(n) + `# ${n.title}\n\n` + htmlToMd(parseHtml(sanitize(n.html)));
 const noteToHtmlDoc = n => `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(n.title)}</title><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;line-height:1.6;color:#222}a.wl{color:#6c5ce7;font-weight:600;text-decoration:none}a.wl::before{content:"[["}a.wl::after{content:"]]"}blockquote{border-left:3px solid #6c5ce7;margin:0;padding:4px 12px;color:#555}pre{background:#f4f4f8;padding:10px;border-radius:6px;white-space:pre-wrap}code{background:#f4f4f8;padding:1px 4px;border-radius:4px}${CODE_CSS_EXPORT}</style></head><body><h1>${esc(n.title)}</h1>${sanitize(n.html)}</body></html>`;
 
 /* ---------- Menú de nota ---------- */
@@ -4251,14 +4329,17 @@ $('#importNoteFile').addEventListener('change', async e => {
   for (const f of files) {
     if (/\.ct[bdzx]$/i.test(f.name)) { const r = await importWikiFile(f); if (r) wikiRoot = r; continue; }
     try {
-      const text = await f.text();
+      let text = await f.text();
       const isMd = /\.(md|markdown)$/i.test(f.name);
+      let front = [];
+      if (isMd) { const fm = mdFrontTags(text); front = fm.tags; text = fm.body.replace(/^\s*\n/, ''); }
       let title = f.name.replace(/\.[^.]+$/, '');
       let body = text;
       const h = text.match(/^#\s+(.+)\n/);
       if (isMd && h) { title = h[1].trim(); body = text.slice(h[0].length).replace(/^\n+/, ''); }
       const html = isMd ? mdToHtml(body) : body.split(/\r?\n/).map(l => l.trim() ? `<div>${esc(l)}</div>` : '<div><br></div>').join('');
       last = createNote(title, html, false);
+      if (front.length) { last.tags = front; save.notes(); }
     } catch { toast(`No se pudo leer ${f.name}`, 'danger'); }
   }
   if (wikiRoot) { setNotesMode('tree'); currentNoteId = wikiRoot.id; renderNotesView(); }
@@ -4329,7 +4410,7 @@ function bmCardHtml(b) {
   const letter = (b.title || dom || '?').replace(/^[^\p{L}\p{N}]+/u, '').charAt(0) || '🔖';
   return `<a class="bm-card" href="${esc(b.url)}" target="_blank" rel="noopener noreferrer" data-id="${esc(b.id)}" title="${esc(b.url)}${b.notes ? '\n' + esc(b.notes) : ''}">
     <span class="bm-avatar" style="background:${hashColor(dom)}">${esc(letter)}</span>
-    <span class="grow" style="min-width:0"><span class="ellipsis" style="display:block;font-weight:650">${esc(b.title)}</span><span class="muted small ellipsis" style="display:block">${esc(dom)}${b.visits ? ` · ${b.visits} ${b.visits === 1 ? 'visita' : 'visitas'}` : ''}</span></span>
+    <span class="grow" style="min-width:0"><span class="ellipsis" style="display:block;font-weight:650">${esc(b.title)}</span><span class="muted small ellipsis" style="display:block">${esc(dom)}${b.visits ? ` · ${b.visits} ${b.visits === 1 ? 'visita' : 'visitas'}` : ''}</span>${tagPills(b.tags || [], 3)}</span>
     <span class="acts"><button class="btn icon sm ghost" data-bm="edit" title="Editar">✏️</button><button class="btn icon sm ghost" data-bm="del" title="Eliminar">🗑️</button></span>
   </a>`;
 }
@@ -4339,13 +4420,15 @@ function renderBookmarks() {
   const cats = [...new Set(S.bookmarks.map(bmCatOf))].sort((a, b) => a.localeCompare(b, 'es'));
   if (bmCat && !cats.includes(bmCat)) bmCat = '';
   $('#bmCats').innerHTML = S.bookmarks.length ? [`<span class="chip${!bmCat ? ' on' : ''}" data-cat="">Todas · ${S.bookmarks.length}</span>`].concat(cats.map(c => `<span class="chip${bmCat === c ? ' on' : ''}" data-cat="${esc(c)}">${esc(c)} · ${S.bookmarks.filter(b => bmCatOf(b) === c).length}</span>`)).join('') : '';
-  const list = S.bookmarks.filter(b => (!bmCat || bmCatOf(b) === bmCat) && (!q || norm(`${b.title} ${b.url} ${b.category || ''} ${b.notes || ''}`).includes(q)));
+  renderTagFilter('bookmarks');
+  const tf = tagFilters.bookmarks;
+  const list = S.bookmarks.filter(b => (!bmCat || bmCatOf(b) === bmCat) && (!tf || tagMatch(bmTags(b), tf)) && (!q || norm(`${b.title} ${b.url} ${b.category || ''} ${b.notes || ''}`).includes(q)));
   if (!S.bookmarks.length) {
     $('#bmList').innerHTML = '<div class="card empty-state"><div style="font-size:2.4rem">🔖</div><h3>Aún no tienes marcadores</h3><p class="muted">Guarda tus webs frecuentes o importa los marcadores de tu navegador (menú ⋯ → Importar).</p><button class="btn primary" id="bmEmptyNew">＋ Añadir marcador</button></div>';
     $('#bmEmptyNew').onclick = () => openBookmark(null);
     return;
   }
-  if (!list.length) { $('#bmList').innerHTML = '<div class="card empty">Sin resultados</div>'; return; }
+  if (!list.length) { $('#bmList').innerHTML = `<div class="card empty">Sin resultados${tagFilterEmpty('bookmarks')}</div>`; return; }
   let html = '';
   if (sort === 'cat') {
     cats.filter(c => list.some(b => bmCatOf(b) === c)).forEach(c => {
@@ -4369,7 +4452,9 @@ async function openBookmark(id, preset = {}) {
     body: `<div><label class="lbl">Dirección (URL)</label><input class="field" type="text" name="url" value="${esc(b.url)}" placeholder="https://…"></div>
       <div><label class="lbl">Nombre</label><input class="field" type="text" name="title" value="${esc(b.title)}" placeholder="Si lo dejas vacío, se usa el dominio" maxlength="120"></div>
       <div><label class="lbl">Categoría</label><input class="field" type="text" name="category" value="${esc(b.category || '')}" list="bmCatList" placeholder="Trabajo, Herramientas, Lectura…" maxlength="40"><datalist id="bmCatList">${cats.map(c => `<option value="${esc(c)}">`).join('')}</datalist></div>
-      <div><label class="lbl">Notas</label><input class="field" type="text" name="notes" value="${esc(b.notes || '')}" maxlength="300"></div>`,
+      <div><label class="lbl">Notas</label><input class="field" type="text" name="notes" value="${esc(b.notes || '')}" maxlength="300"></div>
+      ${tagFieldHtml('tags', b.tags || [], { src: 'title,notes' })}`,
+    onOpen: form => tagFieldInit(form),
     actions: [
       ...(ex ? [{ label: '🗑️ Eliminar', value: 'delete', cls: 'danger left' }] : []),
       { label: 'Cancelar', value: null, cls: 'ghost' },
@@ -4379,7 +4464,8 @@ async function openBookmark(id, preset = {}) {
   if (!r) return;
   if (r.action === 'delete') { deleteBookmark(ex.id); return; }
   const url = normalizeUrl(r.data.url);
-  Object.assign(b, { url, title: r.data.title.trim() || bmDomain(url), category: r.data.category.trim(), notes: r.data.notes.trim() });
+  Object.assign(b, { url, title: r.data.title.trim() || bmDomain(url), category: r.data.category.trim(), notes: r.data.notes.trim(), tags: tagsFromField(r.data.tags) });
+  if (!b.tags.length) delete b.tags;
   if (ex) Object.assign(ex, b); else S.bookmarks.push(b);
   save.bookmarks(); renderBookmarks();
 }
@@ -6008,7 +6094,7 @@ function grDraw(forExport = false) {
     n._sx = x; n._sy = y; n._r = r;
     const dim = (hi && !hi.has(n.id)) || (match && !match.has(n.id));
     ctx.globalAlpha = dim ? 0.15 : n.done ? 0.55 : 1;
-    const col = n.kind === 'note' ? (n.pinned ? C.warning : n.deg ? C.accent : C.muted) : n.kind === 'map' ? C.info : n.kind === 'tag' ? '#e36bd0' : C.success;
+    const col = n.kind === 'note' ? (n.pinned ? C.warning : n.deg ? C.accent : C.muted) : n.kind === 'map' ? C.info : n.kind === 'tag' ? tagColorCss(n.ref) : C.success;
     ctx.fillStyle = col;
     ctx.beginPath();
     if (n.kind === 'note') ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -6229,11 +6315,12 @@ function wkNormalize(list) { list.forEach((n, i) => { n.order = i; }); }
 
 /* ---------- Árbol lateral ---------- */
 function wikiRenderTree() {
-  const q = norm($('#noteSearch').value.trim());
-  let visible = null;
+  renderTagFilter('notes');
+  const q0 = norm($('#noteSearch').value.trim()), tf = tagFilters.notes, q = q0 || tf;
+  let visible = null, hits = null;
   if (q) {
-    visible = new Set();
-    S.notes.filter(n => norm(n.title).includes(q) || norm(n.text || '').includes(q)).forEach(n => { visible.add(n.id); wkAncestors(n).forEach(a => visible.add(a.id)); });
+    visible = new Set(); hits = new Set();
+    S.notes.filter(n => (!tf || tagMatch(allNoteTags(n), tf)) && (!q0 || norm(n.title).includes(q0) || norm(n.text || '').includes(q0))).forEach(n => { visible.add(n.id); hits.add(n.id); wkAncestors(n).forEach(a => visible.add(a.id)); });
   }
   const cur = getNote(currentNoteId);
   if (cur) wkAncestors(cur).forEach(a => wkOpen.add(a.id));
@@ -6241,14 +6328,14 @@ function wikiRenderTree() {
   const rec = (pid, d) => wkKids(pid).forEach(n => {
     if (visible && !visible.has(n.id)) return;
     const kids = wkKids(n.id), open = q ? true : wkOpen.has(n.id);
-    rows.push(`<div class="wk-row${n.id === currentNoteId ? ' active' : ''}" data-id="${esc(n.id)}" draggable="true" tabindex="0" style="--d:${d}">
+    rows.push(`<div class="wk-row${n.id === currentNoteId ? ' active' : ''}${hits && !hits.has(n.id) ? ' wk-ctx' : ''}" data-id="${esc(n.id)}" draggable="true" tabindex="0" style="--d:${d}">
       ${kids.length ? `<button type="button" class="wk-tg" data-tg title="${open ? 'Plegar' : 'Desplegar'}">${open ? '▾' : '▸'}</button>` : '<span class="wk-tg wk-leaf">•</span>'}
       <span class="wk-t ellipsis">${n.pinned ? '📌 ' : ''}${esc(n.title)}</span>${kids.length ? `<span class="wk-n">${kids.length}</span>` : ''}
       <button type="button" class="wk-add" data-add title="Añadir subpágina">＋</button></div>`);
     if (open) rec(n.id, d + 1);
   });
   rec(null, 0);
-  $('#notesList').innerHTML = (rows.join('') || `<div class="empty">${q ? 'Sin resultados' : 'No hay páginas todavía'}</div>`)
+  $('#notesList').innerHTML = (rows.join('') || `<div class="empty">${q ? 'Sin resultados' + tagFilterEmpty('notes') : 'No hay páginas todavía'}</div>`)
     + `<div class="wk-foot"><button type="button" class="btn sm ghost" data-wkroot>＋ Página en la raíz</button>${S.notes.some(n => wkKids(n.id).length) ? '<button type="button" class="btn sm ghost" data-wkall title="Desplegar o plegar todo">⇕</button>' : ''}</div>`;
   $('#notesTotal').textContent = `${S.notes.length} página${S.notes.length === 1 ? '' : 's'}`;
 }
@@ -7359,11 +7446,11 @@ function noteTags(n) {
 function taggedItems() {
   const out = [];
   const listName = id => (S.todoLists.find(l => l.id === id) || {}).name || '';
-  S.notes.forEach(n => { const t = noteTags(n); if (t.length) out.push({ kind: 'note', id: n.id, label: n.title, sub: wkParent(n) ? '📚 ' + wkPath(n) : '', tags: t }); });
-  S.todos.forEach(t => { const tg = tagsIn([t.text, t.notes || '', ...(t.steps || []).map(s => s.text)].join('\n')); if (tg.length) out.push({ kind: 'todo', id: t.id, label: t.text, sub: [listName(t.listId), t.due ? fmtDayLabel(t.due) : ''].filter(Boolean).join(' · '), done: !!t.done, tags: tg }); });
-  S.tasks.forEach(t => { const tg = (t.tags || []).concat(tagsIn([t.title, t.desc || '', ...(t.subtasks || []).map(s => s.text)].join('\n'))); if (tg.length) out.push({ kind: 'kanban', id: t.id, label: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', done: t.col === 'done', tags: tg }); });
-  S.events.forEach(ev => { const tg = tagsIn(ev.title + '\n' + (ev.notes || '')); if (tg.length) out.push({ kind: 'event', id: ev.id, label: ev.title, sub: fmtDayLabel(ev.date), tags: tg }); });
-  S.bookmarks.forEach(b => { const tg = tagsIn(b.title + '\n' + (b.notes || '')); if (tg.length) out.push({ kind: 'bookmark', id: b.id, label: b.title, sub: b.url, tags: tg }); });
+  S.notes.forEach(n => { const t = allNoteTags(n); if (t.length) out.push({ kind: 'note', id: n.id, label: n.title, sub: wkParent(n) ? '📚 ' + wkPath(n) : '', tags: t }); });
+  S.todos.forEach(t => { const tg = todoTags(t); if (tg.length) out.push({ kind: 'todo', id: t.id, label: t.text, sub: [listName(t.listId), t.due ? fmtDayLabel(t.due) : ''].filter(Boolean).join(' · '), done: !!t.done, tags: tg }); });
+  S.tasks.forEach(t => { const tg = taskTags(t); if (tg.length) out.push({ kind: 'kanban', id: t.id, label: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', done: t.col === 'done', tags: tg }); });
+  S.events.forEach(ev => { const tg = eventTags(ev); if (tg.length) out.push({ kind: 'event', id: ev.id, label: ev.title, sub: fmtDayLabel(ev.date), tags: tg }); });
+  S.bookmarks.forEach(b => { const tg = bmTags(b); if (tg.length) out.push({ kind: 'bookmark', id: b.id, label: b.title, sub: b.url, tags: tg }); });
   S.mindmaps.forEach(m => { const tg = []; mmWalk(m.root, x => { tg.push(...tagsIn(x.text)); }); if (tg.length) out.push({ kind: 'map', id: m.id, label: m.title, sub: `${mmCount(m.root)} ideas`, tags: tg }); });
   return out;
 }
@@ -7386,6 +7473,7 @@ function tagIndex() {
   // padres implícitos (#proyecto para #proyecto/portal)
   [...map.keys()].forEach(k => tagParents(k).forEach(pk => { if (!map.has(pk)) map.set(pk, { key: pk, name: map.get(k).name.split('/').slice(0, pk.split('/').length).join('/'), items: [], count: 0, implicit: true }); }));
   tagIdxCache = { stamp, map };
+  try { tagStyleRefresh(); } catch {}
   return map;
 }
 /** Elementos de una etiqueta, incluidos los de sus subetiquetas. */
@@ -7435,7 +7523,7 @@ function tagAcChoose(i) {
     const sel = getSelection();
     const end = sel.rangeCount && sel.anchorNode === node ? sel.anchorOffset : a.start + 1 + a.q.length;
     const r = document.createRange(); r.setStart(node, a.start); r.setEnd(node, end); r.deleteContents();
-    const span = document.createElement('span'); span.className = 'tg'; span.textContent = '#' + word;
+    const span = document.createElement('span'); span.className = 'tg'; span.textContent = '#' + word; span.dataset.tk = tagKey(word);
     const sp = document.createTextNode(' ');
     r.insertNode(sp); r.insertNode(span);
     r.setStartAfter(sp); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); savedRange = r.cloneRange();
@@ -7479,11 +7567,15 @@ editor.addEventListener('input', () => {
     const start = off - 1 - t[2].length - 1;
     const r = document.createRange(); r.setStart(node, start); r.setEnd(node, off - 1);
     const span = document.createElement('span'); span.className = 'tg';
-    r.surroundContents(span);
+    r.surroundContents(span); span.dataset.tk = tagKey(span.textContent);
     const after = span.nextSibling;
     if (after && after.nodeType === 3) { const rr = document.createRange(); rr.setStart(after, Math.min(1, after.nodeValue.length)); rr.collapse(true); sel.removeAllRanges(); sel.addRange(rr); }
     markDirty();
   }
+});
+editor.addEventListener('input', () => {
+  const sel = getSelection(), a = sel.rangeCount && sel.anchorNode, sp = a && (a.nodeType === 3 ? a.parentElement : a).closest('span.tg');
+  if (sp && editor.contains(sp)) { const k = tagKey(sp.textContent); if (sp.dataset.tk !== k) { sp.dataset.tk = k; try { tagStyleRefresh([k]); } catch {} } }
 });
 editor.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== editor) tagAcClose(); }, 150));
 /** Marca visualmente las etiquetas del editor (al abrir una nota). */
@@ -7501,6 +7593,7 @@ function tagDecorateEditor() {
       node = rest;
     }
   });
+  editor.querySelectorAll('span.tg').forEach(s => { s.dataset.tk = tagKey(s.textContent); });
 }
 editor.addEventListener('click', e => {
   const t = e.target.closest('span.tg'); if (!t || !(e.ctrlKey || e.metaKey)) return;
@@ -7567,23 +7660,31 @@ function tagRename(key, newName) {
   flushNote();
   let total = 0;
   const fix = s => { const [o, n] = tagReplaceIn(s, key, newName); total += n; return o; };
+  const hit = k => k === key || k.startsWith(key + '/');
+  const fixArr = arr => { if (!arr || !arr.length) return arr; const seen = new Set(); return arr.map(g => { const k = tagKey(g); if (hit(k)) { total++; return newName + g.slice(g.split('/').slice(0, key.split('/').length).join('/').length); } return g; }).filter(g => { const k = tagKey(g); if (seen.has(k)) return false; seen.add(k); return true; }); };
   let notes = false;
   S.notes.forEach(n => {
-    if (!noteTags(n).some(t => { const k = tagKey(t); return k === key || k.startsWith(key + '/'); })) return;
+    if (n.tags && n.tags.some(t => hit(tagKey(t)))) { n.tags = fixArr(n.tags); notes = true; }
+    if (!noteTags(n).some(t => hit(tagKey(t)))) return;
     const body = parseHtml(n.html);
     const w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, { acceptNode: x => x.parentElement.closest('pre,code,a') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
     const nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
     nodes.forEach(t => { t.nodeValue = fix(t.nodeValue); });
     n.html = body.innerHTML; n.text = htmlText(n.html); notes = true;
   });
-  S.todos.forEach(t => { t.text = fix(t.text); t.notes = fix(t.notes); (t.steps || []).forEach(s => { s.text = fix(s.text); }); });
+  S.todos.forEach(t => { t.text = fix(t.text); t.notes = fix(t.notes); (t.steps || []).forEach(s => { s.text = fix(s.text); }); if (t.tags) t.tags = fixArr(t.tags); });
   S.tasks.forEach(t => {
     t.title = fix(t.title); t.desc = fix(t.desc); (t.subtasks || []).forEach(s => { s.text = fix(s.text); });
-    if (t.tags) { const seen = new Set(); t.tags = t.tags.map(g => { const k = tagKey(g); if (k === key || k.startsWith(key + '/')) { total++; return newName + g.slice(g.split('/').slice(0, key.split('/').length).join('/').length); } return g; }).filter(g => { const k = tagKey(g); if (seen.has(k)) return false; seen.add(k); return true; }); }
+    if (t.tags) t.tags = fixArr(t.tags);
   });
-  S.events.forEach(ev => { ev.title = fix(ev.title); ev.notes = fix(ev.notes); });
-  S.bookmarks.forEach(b => { b.title = fix(b.title); b.notes = fix(b.notes); });
+  S.events.forEach(ev => { ev.title = fix(ev.title); ev.notes = fix(ev.notes); if (ev.tags) ev.tags = fixArr(ev.tags); });
+  S.bookmarks.forEach(b => { b.title = fix(b.title); b.notes = fix(b.notes); if (b.tags) b.tags = fixArr(b.tags); });
   S.mindmaps.forEach(m => mmWalk(m.root, x => { x.text = fix(x.text); }));
+  // colores: pasan al nuevo nombre (si el destino ya tenía color propio, se conserva el suyo)
+  const C = S.tagColors || {}, nk = tagKey(newName); let colors = false;
+  Object.keys(C).forEach(k => { if (!hit(k)) return; const to = nk + k.slice(key.length); if (to !== k) { if (!C[to]) C[to] = C[k]; delete C[k]; colors = true; } });
+  if (colors) save.tagColors();
+  Object.keys(tagFilters).forEach(sc => { const f = tagFilters[sc]; if (f && hit(f)) tagFilters[sc] = nk + f.slice(key.length); });
   if (notes) save.notes();
   save.todos(); save.tasks(); save.events(); save.bookmarks(); save.mindmaps();
   tagIdxCache = null;
@@ -7633,6 +7734,7 @@ function renderTagView() {
   const groups = Object.keys(TAG_KIND).map(kind => [kind, items.filter(it => it.kind === kind)]).filter(([, l]) => l.length);
   box.innerHTML = `<div class="card-h"><h3 class="tg-title">${parents.map(p => `<button type="button" class="crumb" data-tag="${esc(p.key)}">#${esc(p.name.split('/').pop())}</button><span class="muted"> / </span>`).join('')}#${esc(e.name.split('/').pop())} <span class="badge accent">${items.length}</span></h3>
       <div class="row" style="gap:4px"><button class="btn sm" data-tga="rename" title="Renombrar o fusionar con otra etiqueta">✏️ Renombrar / fusionar</button><button class="btn sm ghost" data-tga="graph" title="Ver en el grafo de conexiones">🕸️</button><button class="btn sm icon ghost" data-tga="close" title="Cerrar">✕</button></div></div>
+    <div class="bl-row tg-colrow"><span class="bl-h" title="El color se usa en etiquetas, nube, filtros y grafo. Las subetiquetas lo heredan si no tienen uno propio.">Color</span>${tagPaletteHtml(tagSel)}<span class="muted small">${(() => { const src = tagColorSrc(tagSel); return src.own ? '' : src.from ? 'heredado de #' + esc((idx.get(src.from) || { name: src.from }).name) : 'automático'; })()}</span></div>
     ${children.length ? `<div class="bl-row"><span class="bl-h">Subetiquetas</span><div class="chips">${children.map(c => tagChip(c.name.split('/').slice(tagSel.split('/').length).join('/') ? c.name : c.name, ` <span class="muted">${tagItemsOf(c.key).length}</span>`)).join('')}</div></div>` : ''}
     ${related.length ? `<div class="bl-row"><span class="bl-h" title="Etiquetas que aparecen en los mismos elementos">Suelen ir con</span><div class="chips">${related.join('')}</div></div>` : ''}
     ${groups.map(([kind, list]) => `<div class="tg-group"><h4>${TAG_KIND[kind][0]} ${TAG_KIND[kind][1]} <span class="muted small">${list.length}</span></h4><div class="list">${list.map(it => `<div class="list-item${it.done ? ' done' : ''}" data-open="${kind}:${esc(it.id)}" tabindex="0"><span class="grow" style="min-width:0"><span class="ellipsis" style="display:block">${it.done ? '✓ ' : ''}${tagHighlight(esc(it.label))}</span>${it.sub ? `<span class="muted small ellipsis" style="display:block">${esc(it.sub)}</span>` : ''}</span><span class="tg-its">${[...new Set(it.tags)].filter(t => tagKey(t) !== tagSel).slice(0, 3).map(t => `<span class="tg-mini" data-tag="${esc(tagKey(t))}">#${esc(t)}</span>`).join('')}</span></div>`).join('')}</div></div>`).join('')}`;
@@ -7646,6 +7748,8 @@ function tagOpenItem(kind, id) {
   else if (kind === 'map') { mmOpenMap(id, false); mapsMode = 'mind'; store.set('mapsMode', 'mind'); showTab('maps'); }
 }
 $('#tgDetail').addEventListener('click', e => {
+  const sw = e.target.closest('[data-col]');
+  if (sw && sw.closest('[data-palkey]')) { tagSetColor(sw.closest('[data-palkey]').dataset.palkey, sw.dataset.col); return; }
   const a = e.target.closest('[data-tga]');
   if (a) {
     if (a.dataset.tga === 'close') { tagSel = null; renderTagView(); }
@@ -7660,15 +7764,6 @@ $('#tgSearch').addEventListener('input', debounce(renderTagView, 120));
 $('#tgSort').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (!b) return; tagSort = b.dataset.s; $$('#tgSort button').forEach(x => x.classList.toggle('on', x === b)); renderTagView(); });
 onShow.tags = renderTagView;
 
-/* ---------- Etiquetas de la nota abierta ---------- */
-function renderNoteTags() {
-  const box = $('#noteTags'); if (!box) return;
-  const n = getNote(currentNoteId);
-  const tags = n ? [...new Map(noteTags(n).map(t => [tagKey(t), t])).values()] : [];
-  box.hidden = !tags.length;
-  box.innerHTML = tags.length ? `<span class="bl-h">🏷️ Etiquetas</span><div class="chips">${tags.map(t => tagChip(t, ` <span class="muted">${tagItemsOf(tagKey(t)).length}</span>`)).join('')}</div>` : '';
-}
-
 /* ---------- Mini nube en Inicio ---------- */
 function renderDashTags() {
   const box = $('#dashTags'); if (!box) return;
@@ -7676,6 +7771,323 @@ function renderDashTags() {
   const entries = [...idx.values()].filter(e => !e.implicit).sort((a, b) => b.count - a.count).slice(0, 24);
   box.innerHTML = entries.length ? `<div class="tag-cloud small">${tagCloudHtml(entries, { small: true })}</div>` : '<div class="empty small">Escribe <b>#etiqueta</b> en notas o tareas para agruparlas por tema.</div>';
 }
+/* =====================================================================
+   ETIQUETAS: COLORES · SELECTOR VISUAL · CAMPO DE ETIQUETAS · FILTROS
+   ===================================================================== */
+/*
+  Además de escribir #etiqueta en el texto, cada nota, tarea, tarjeta, evento y marcador
+  tiene un campo «tags» (lista de nombres) que se rellena con el selector visual.
+  Las dos fuentes se suman: el selector no toca el texto y el texto no toca el campo.
+  Colores: S.tagColors = { clave: idPaleta }. Sin color propio, una subetiqueta hereda el
+  de su padre y, si nadie lo tiene, se asigna un tono fijo calculado a partir del nombre.
+*/
+const TAG_PALETTE = [
+  { id: 'rojo', name: 'Rojo', h: 356, s: '78%' },
+  { id: 'naranja', name: 'Naranja', h: 22, s: '88%' },
+  { id: 'ambar', name: 'Ámbar', h: 42, s: '92%' },
+  { id: 'lima', name: 'Lima', h: 82, s: '62%' },
+  { id: 'verde', name: 'Verde', h: 145, s: '58%' },
+  { id: 'turquesa', name: 'Turquesa', h: 172, s: '64%' },
+  { id: 'cian', name: 'Cian', h: 194, s: '80%' },
+  { id: 'azul', name: 'Azul', h: 216, s: '84%' },
+  { id: 'indigo', name: 'Índigo', h: 242, s: '74%' },
+  { id: 'violeta', name: 'Violeta', h: 270, s: '72%' },
+  { id: 'rosa', name: 'Rosa', h: 322, s: '72%' },
+  { id: 'gris', name: 'Gris', h: 220, s: '9%' }
+];
+const tagHash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+/** Color elegido para la etiqueta o heredado de un nivel superior; null = automático. */
+function tagColorId(key) {
+  const C = S.tagColors || {};
+  if (C[key]) return C[key];
+  const ps = tagParents(key).reverse();
+  for (const p of ps) if (C[p]) return C[p];
+  return null;
+}
+function tagColorSrc(key) {
+  const C = S.tagColors || {};
+  if (C[key]) return { own: true };
+  const p = tagParents(key).reverse().find(x => C[x]);
+  return p ? { from: p } : { auto: true };
+}
+function tagPal(key) {
+  const id = tagColorId(key);
+  return (id && TAG_PALETTE.find(p => p.id === id)) || TAG_PALETTE[tagHash(String(key).split('/')[0]) % (TAG_PALETTE.length - 1)];
+}
+/** Color CSS para el lienzo del grafo (según el tema). */
+function tagColorCss(key) {
+  const p = tagPal(key), light = document.documentElement.dataset.theme === 'light';
+  return `hsl(${p.h} ${p.s} ${light ? 44 : 66}%)`;
+}
+const tagStyleEl = document.createElement('style');
+tagStyleEl.id = 'tagColorCss';
+document.head.append(tagStyleEl);
+let tagStyleSig = '';
+/** Regenera las reglas [data-tag="clave"]{--h;--s} para todas las etiquetas conocidas. */
+function tagStyleRefresh(extra = []) {
+  const keys = new Set([...(tagIdxCache ? tagIdxCache.map.keys() : []), ...Object.keys(S.tagColors || {}), ...Object.values(tagFilters).filter(Boolean), ...extra]);
+  const q = k => String(k).replace(/["\\]/g, '\\$&');
+  const css = [...keys].map(k => { const p = tagPal(k); return `[data-tag="${q(k)}"],[data-tk="${q(k)}"]{--h:${p.h};--s:${p.s}}`; }).join('\n');
+  if (css !== tagStyleSig) { tagStyleSig = css; tagStyleEl.textContent = css; }
+}
+function tagSetColor(key, id) {
+  S.tagColors = S.tagColors || {};
+  if (!id || id === 'auto') delete S.tagColors[key]; else S.tagColors[key] = id;
+  save.tagColors();
+  tagStyleRefresh();
+  if (tpState) tpRender();
+  if (currentTab === 'tags') renderTagView();
+  if (currentTab === 'maps' && typeof grDraw === 'function' && $('#grCanvas') && !$('#grCanvas').closest('[hidden]')) try { grDraw(); } catch {}
+}
+function tagPaletteHtml(key, { small = false } = {}) {
+  const cur = (S.tagColors || {})[key] || 'auto', src = tagColorSrc(key);
+  return `<div class="tp-pal${small ? ' small' : ''}" data-palkey="${esc(key)}">`
+    + `<button type="button" class="tp-sw auto${cur === 'auto' ? ' on' : ''}" data-col="auto" data-tk="${esc(key)}" title="${src.from ? 'Heredar el color de #' + esc((tagIndex().get(src.from) || { name: src.from }).name) : 'Automático (un tono fijo según el nombre)'}">A</button>`
+    + TAG_PALETTE.map(p => `<button type="button" class="tp-sw${cur === p.id ? ' on' : ''}" data-col="${p.id}" style="--h:${p.h};--s:${p.s}" title="${p.name}"></button>`).join('')
+    + `</div>`;
+}
+
+/* ---------- Etiquetas de cada elemento (campo + texto) ---------- */
+const tagUniq = names => { const m = new Map(); (names || []).forEach(n => { const k = tagKey(n); if (k && !m.has(k)) m.set(k, String(n).replace(/^#/, '')); }); return [...m.values()]; };
+const allNoteTags = n => (n.tags || []).concat(noteTags(n));
+const todoTags = t => (t.tags || []).concat(tagsIn([t.text, t.notes || '', ...(t.steps || []).map(s => s.text)].join('\n')));
+const taskTags = t => (t.tags || []).concat(tagsIn([t.title, t.desc || '', ...(t.subtasks || []).map(s => s.text)].join('\n')));
+const eventTags = ev => (ev.tags || []).concat(tagsIn(ev.title + '\n' + (ev.notes || '')));
+const bmTags = b => (b.tags || []).concat(tagsIn(b.title + '\n' + (b.notes || '')));
+/** ¿Alguna de estas etiquetas es «key» o una subetiqueta suya? */
+const tagMatch = (names, key) => !key || (names || []).some(n => { const k = tagKey(n); return k === key || k.startsWith(key + '/'); });
+const tagsFromField = v => tagUniq(String(v || '').split(',').map(s => s.trim().replace(/^#/, '')).filter(Boolean));
+const TAG_NAME_OK = /^[\p{L}_][\p{L}\p{N}_-]*(?:\/[\p{L}\p{N}_-]+)*$/u;
+const tagCleanName = s => String(s || '').trim().replace(/^#+/, '').replace(/\s+/g, '-').replace(/[^\p{L}\p{N}_\-/]/gu, '').replace(/\/{2,}/g, '/').replace(/^\/|\/$/g, '');
+/** Etiquetas pequeñas de color (para listas y tarjetas). */
+const tagPills = (names, max = 4) => {
+  const u = tagUniq(names); if (!u.length) return '';
+  return `<span class="tg-line">${u.slice(0, max).map(n => `<span class="tg-mini tg-pill" data-tag="${esc(tagKey(n))}" title="Ver #${esc(n)}">#${esc(n)}</span>`).join('')}${u.length > max ? `<span class="muted small">+${u.length - max}</span>` : ''}</span>`;
+};
+
+/* ---------- Selector visual (desplegable) ---------- */
+const tagPick = document.createElement('div');
+tagPick.className = 'popover tag-picker'; tagPick.id = 'tagPicker';
+document.body.append(tagPick);
+let tpState = null;
+/*
+  tpOpen(anchor, opts)
+   · modo 'multi': opts.selected (nombres), opts.locked (nombres escritos en el texto), opts.onChange(nombres)
+   · modo 'filter': opts.current (clave o null), opts.onChange(clave|null) y se cierra
+*/
+function tpOpen(anchor, opts) {
+  tpClose();
+  tpState = { anchor, mode: opts.mode || 'multi', sel: tagUniq(opts.selected || []), locked: new Set((opts.locked || []).map(tagKey)), lockedNames: tagUniq(opts.locked || []), current: opts.current || null, onChange: opts.onChange || (() => {}), onClose: opts.onClose, title: opts.title, q: '', idx: 0, palette: null, order: [] };
+  tagPick.innerHTML = `<div class="tp-head"><input class="field tp-q" type="text" placeholder="${tpState.mode === 'filter' ? 'Buscar etiqueta…' : 'Buscar o crear etiqueta…'}" spellcheck="false" autocomplete="off"></div><div class="tp-list" role="listbox"></div>
+    <div class="tp-foot"><span class="muted small">${tpState.mode === 'filter' ? 'Incluye sus subetiquetas' : '<kbd>Enter</kbd> marcar'}</span><button type="button" class="btn sm ghost" data-tpa="manage" title="Abrir la sección Etiquetas (nube, renombrar, colores)">🏷️ Gestionar</button></div>`;
+  tagPick.classList.add('open');
+  tpOrder(); tpRender(); tpPlace();
+  const q = $('.tp-q', tagPick);
+  q.addEventListener('input', () => { tpState.q = q.value; tpState.idx = 0; tpState.palette = null; tpOrder(); tpRender(); });
+  setTimeout(() => q.focus(), 0);
+}
+function tpPlace() {
+  if (!tpState) return;
+  const r = tpState.anchor.getBoundingClientRect(), w = tagPick.offsetWidth, h = tagPick.offsetHeight;
+  let top = r.bottom + 6; if (top + h > innerHeight - 10) top = Math.max(10, r.top - h - 6);
+  tagPick.style.left = Math.max(10, Math.min(r.left, innerWidth - w - 12)) + 'px';
+  tagPick.style.top = top + 'px';
+}
+function tpClose() {
+  if (!tpState) return;
+  const s = tpState; tpState = null;
+  tagPick.classList.remove('open');
+  if (s.onClose) s.onClose();
+  try { if (s.anchor.isConnected) s.anchor.focus({ preventScroll: true }); } catch {}
+}
+/** Calcula el orden de las filas (se mantiene estable al marcar/desmarcar). */
+function tpOrder() {
+  const s = tpState, idx = tagIndex(), nq = norm(s.q.trim().replace(/^#/, ''));
+  const entries = new Map();
+  idx.forEach((e, k) => entries.set(k, { key: k, name: e.name, count: tagItemsOf(k).length }));
+  s.sel.concat(s.lockedNames).forEach(n => { const k = tagKey(n); if (!entries.has(k)) entries.set(k, { key: k, name: n, count: 0 }); });
+  let list = [...entries.values()];
+  if (nq) {
+    let hit = list.filter(e => e.key.includes(nq));
+    if (!hit.length && nq.length >= 2) hit = list.map(e => ({ e, sc: fuzzyScore(nq, e.key) })).filter(x => x.sc > 0).sort((a, b) => b.sc - a.sc).map(x => x.e);
+    list = hit.sort((a, b) => (b.key.startsWith(nq) - a.key.startsWith(nq)) || (b.key.split('/').pop().startsWith(nq) - a.key.split('/').pop().startsWith(nq)) || a.key.localeCompare(b.key, 'es'));
+  } else {
+    const on = new Set(s.mode === 'filter' ? [s.current] : s.sel.map(tagKey).concat([...s.locked]));
+    list.sort((a, b) => (on.has(b.key) - on.has(a.key)) || a.key.localeCompare(b.key, 'es'));
+  }
+  const rows = list.map(e => ({ type: 'tag', ...e }));
+  if (s.mode === 'filter' && !nq) rows.unshift({ type: 'all' });
+  const fresh = tagCleanName(s.q);
+  if (s.mode === 'multi' && fresh && TAG_NAME_OK.test(fresh) && !entries.has(tagKey(fresh))) rows.push({ type: 'new', name: fresh });
+  s.order = rows;
+}
+function tpRender() {
+  const s = tpState; if (!s) return;
+  const selK = new Set(s.sel.map(tagKey));
+  const list = $('.tp-list', tagPick);
+  if (!s.order.length) { list.innerHTML = `<div class="muted small" style="padding:10px">${s.q.trim() ? 'Escribe solo letras, números, «-», «_» o «/»' : 'Todavía no hay etiquetas. Escribe una para crearla.'}</div>`; return; }
+  s.idx = Math.max(0, Math.min(s.idx, s.order.length - 1));
+  list.innerHTML = s.order.map((r, i) => {
+    const act = i === s.idx ? ' act' : '';
+    if (r.type === 'all') return `<div class="tp-row${act}${!s.current ? ' on' : ''}" data-i="${i}" role="option"><span class="tp-check">✓</span><span class="tp-name"><i>Todas (sin filtro)</i></span></div>`;
+    if (r.type === 'new') return `<div class="tp-row tp-new${act}" data-i="${i}" role="option"><span class="tp-check">＋</span><span class="tp-name">Crear <b data-tk="${esc(tagKey(r.name))}" class="tp-newname">#${esc(r.name)}</b></span></div>`;
+    const locked = s.locked.has(r.key) && !selK.has(r.key);
+    const on = s.mode === 'filter' ? s.current === r.key : selK.has(r.key) || s.locked.has(r.key);
+    const parts = r.name.split('/'), depth = s.q.trim() ? 0 : parts.length - 1;
+    return `<div class="tp-row${act}${on ? ' on' : ''}${locked ? ' locked' : ''}" data-i="${i}" role="option" style="--d:${depth}" title="${locked ? 'Está escrita en el texto: para quitarla, bórrala del texto' : ''}">
+      <span class="tp-check">${locked ? '✎' : '✓'}</span><button type="button" class="tp-dot" data-tk="${esc(r.key)}" data-dot="${esc(r.key)}" title="Cambiar el color"></button>
+      <span class="tp-name" data-tk="${esc(r.key)}">${depth ? `<span class="tp-pre">#${esc(parts.slice(0, -1).join('/'))}/</span>${esc(parts[parts.length - 1])}` : '#' + esc(r.name)}</span><span class="tp-n">${r.count || ''}</span></div>`
+      + (s.palette === r.key ? `<div class="tp-palrow">${tagPaletteHtml(r.key, { small: true })}</div>` : '');
+  }).join('');
+  const a = $('.tp-row.act', list); if (a) a.scrollIntoView({ block: 'nearest' });
+}
+function tpActivate(i) {
+  const s = tpState; if (!s) return;
+  const r = s.order[i]; if (!r) return;
+  if (s.mode === 'filter') { const k = r.type === 'all' ? null : r.key; const cb = s.onChange; tpClose(); cb(k); return; }
+  if (r.type === 'new') {
+    s.sel.push(r.name); s.onChange(s.sel.slice());
+    s.q = ''; $('.tp-q', tagPick).value = ''; tpStyleFor(r.name); tpOrder(); s.idx = s.order.findIndex(x => x.key === tagKey(r.name)); tpRender(); return;
+  }
+  if (r.type !== 'tag') return;
+  const selK = s.sel.map(tagKey);
+  if (selK.includes(r.key)) s.sel.splice(selK.indexOf(r.key), 1);
+  else if (s.locked.has(r.key)) { toast('Esa etiqueta está escrita en el texto: para quitarla, bórrala del texto', 'info', 3500); return; }
+  else s.sel.push(r.name);
+  s.onChange(s.sel.slice());
+  s.idx = i; tpRender();
+}
+function tpStyleFor(name) { tagStyleRefresh([tagKey(name)]); }
+tagPick.addEventListener('mousedown', e => { if (!e.target.closest('input')) e.preventDefault(); });
+tagPick.addEventListener('click', e => {
+  if (!tpState) return;
+  const sw = e.target.closest('[data-col]');
+  if (sw) { const k = sw.closest('[data-palkey]').dataset.palkey; tagSetColor(k, sw.dataset.col); return; }
+  const dot = e.target.closest('[data-dot]');
+  if (dot) { tpState.palette = tpState.palette === dot.dataset.dot ? null : dot.dataset.dot; tpRender(); tpPlace(); return; }
+  if (e.target.closest('[data-tpa="manage"]')) { tpClose(); if ($('#modalBack').classList.contains('open')) { const b = $('#modal .modal-foot .btn.primary'); if (b) b.click(); } setTimeout(() => openTagView(null), 30); return; }
+  const row = e.target.closest('.tp-row'); if (row) tpActivate(+row.dataset.i);
+});
+window.addEventListener('keydown', e => {
+  if (!tpState) return;
+  const n = tpState.order.length;
+  if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); tpClose(); return; }
+  if (!tagPick.contains(e.target)) return;
+  if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && n) { e.preventDefault(); e.stopPropagation(); tpState.idx = (tpState.idx + (e.key === 'ArrowDown' ? 1 : -1) + n) % n; tpRender(); }
+  else if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); if (n) tpActivate(tpState.idx); }
+  else if (e.key === 'Tab') { tpClose(); }
+}, true);
+document.addEventListener('mousedown', e => { if (tpState && !tagPick.contains(e.target) && !tpState.anchor.contains(e.target)) tpClose(); }, true);
+window.addEventListener('resize', () => tpPlace());
+
+/* ---------- Campo de etiquetas para formularios (tarea, tarjeta, evento, marcador) ---------- */
+/** src: nombres de campos del formulario cuyo texto también aporta #etiquetas. */
+function tagFieldHtml(name, tags, { label = 'Etiquetas', src = '' } = {}) {
+  return `<div class="tag-field" data-name="${esc(name)}" data-src="${esc(src)}"><label class="lbl">${esc(label)}</label>
+    <div class="tf-box"><input type="hidden" name="${esc(name)}" value="${esc(tagUniq(tags).join(','))}"><span class="tf-chips"></span><button type="button" class="btn sm ghost tf-add" title="Elegir etiquetas de una lista o crear una nueva">＋ Etiqueta</button></div></div>`;
+}
+function tfInline(tf) {
+  const form = tf.closest('form'); if (!form) return [];
+  return tagsIn(tf.dataset.src.split(',').filter(Boolean).map(n => { const el = form.elements.namedItem(n); return el ? el.value : ''; }).join('\n'));
+}
+function tfRender(tf) {
+  const hid = $('input[type=hidden]', tf), sel = tagsFromField(hid.value), selK = new Set(sel.map(tagKey));
+  const inl = tagUniq(tfInline(tf)).filter(n => !selK.has(tagKey(n)));
+  tagStyleRefresh(sel.concat(inl).map(tagKey));
+  $('.tf-chips', tf).innerHTML = sel.map(n => `<span class="tf-chip" data-tk="${esc(tagKey(n))}">#${esc(n)}<button type="button" class="tf-x" data-x="${esc(n)}" title="Quitar #${esc(n)}">×</button></span>`).join('')
+    + inl.map(n => `<span class="tf-chip inline" data-tk="${esc(tagKey(n))}" title="Escrita en el texto (se quita borrándola del texto)">#${esc(n)}</span>`).join('')
+    || '<span class="muted small">Sin etiquetas</span>';
+}
+function tfSet(tf, names) { $('input[type=hidden]', tf).value = tagUniq(names).join(','); tfRender(tf); }
+function tagFieldInit(form) {
+  $$('.tag-field', form).forEach(tf => {
+    tfRender(tf);
+    const upd = debounce(() => tfRender(tf), 250);
+    tf.dataset.src.split(',').filter(Boolean).forEach(n => { const el = form.elements.namedItem(n); if (el) el.addEventListener('input', upd); });
+  });
+}
+document.addEventListener('click', e => {
+  const tf = e.target.closest('.tag-field'); if (!tf) return;
+  const x = e.target.closest('.tf-x');
+  if (x) { const k = tagKey(x.dataset.x); tfSet(tf, tagsFromField($('input[type=hidden]', tf).value).filter(n => tagKey(n) !== k)); return; }
+  const add = e.target.closest('.tf-add');
+  if (add) {
+    if (tpState && tpState.anchor === add) { tpClose(); return; }
+    tpOpen(add, { selected: tagsFromField($('input[type=hidden]', tf).value), locked: tfInline(tf), onChange: names => tfSet(tf, names) });
+  }
+});
+
+/* ---------- Barra de etiquetas de la nota abierta ---------- */
+function renderNoteTags() {
+  const box = $('#noteTags'); if (!box) return;
+  const n = getNote(currentNoteId);
+  if (!n) { box.hidden = true; return; }
+  box.hidden = false;
+  const own = tagUniq(n.tags || []), ownK = new Set(own.map(tagKey));
+  const inl = tagUniq(noteTags(n)).filter(t => !ownK.has(tagKey(t)));
+  tagStyleRefresh(own.concat(inl).map(tagKey));
+  const cnt = t => { const c = tagItemsOf(tagKey(t)).length; return c > 1 ? ` <span class="tf-n">${c}</span>` : ''; };
+  box.innerHTML = `<span class="tf-ico" title="Etiquetas de la nota">🏷️</span>`
+    + own.map(t => `<span class="tf-chip" data-tk="${esc(tagKey(t))}"><button type="button" class="tf-go" data-tag="${esc(tagKey(t))}" title="Ver todo lo etiquetado con #${esc(t)}">#${esc(t)}${cnt(t)}</button><button type="button" class="tf-x" data-x="${esc(t)}" title="Quitar #${esc(t)} de esta nota">×</button></span>`).join('')
+    + inl.map(t => `<span class="tf-chip inline" data-tk="${esc(tagKey(t))}" title="Escrita en el texto de la nota"><button type="button" class="tf-go" data-tag="${esc(tagKey(t))}" title="Ver todo lo etiquetado con #${esc(t)} (escrita en el texto)">#${esc(t)}${cnt(t)}</button></span>`).join('')
+    + `<button type="button" class="btn sm ghost tf-add" id="noteTagAdd" title="Añadir o quitar etiquetas (también puedes escribir #etiqueta en el texto)">${own.length || inl.length ? '＋' : '＋ Añadir etiqueta'}</button>`;
+}
+function setNoteTags(id, names) {
+  const n = getNote(id); if (!n) return;
+  n.tags = tagUniq(names);
+  if (!n.tags.length) delete n.tags;
+  n.updated = Date.now();
+  save.notes();
+  renderNoteTags(); renderNoteList();
+}
+$('#noteTags').addEventListener('click', e => {
+  const n = getNote(currentNoteId); if (!n) return;
+  const x = e.target.closest('.tf-x');
+  if (x) { const k = tagKey(x.dataset.x); setNoteTags(n.id, (n.tags || []).filter(t => tagKey(t) !== k)); return; }
+  const add = e.target.closest('.tf-add');
+  if (add) {
+    if (tpState && tpState.anchor === add) { tpClose(); return; }
+    const id = n.id;
+    tpOpen(add, { selected: n.tags || [], locked: noteTags(n), onChange: names => { setNoteTags(id, names); const b = $('#noteTagAdd'); if (b && tpState) { tpState.anchor = b; tpPlace(); } } });
+  }
+});
+
+/* ---------- Filtros por etiqueta en Notas, Tareas, Kanban y Marcadores ---------- */
+const tagFilters = { notes: null, todos: null, kanban: null, bookmarks: null };
+const TAGF_RENDER = { notes: () => renderNoteList(), todos: () => renderTodos(), kanban: () => renderBoard(), bookmarks: () => renderBookmarks() };
+function renderTagFilter(scope) {
+  const box = $(`[data-tagf="${scope}"]`); if (!box) return;
+  const k = tagFilters[scope];
+  if (!k) { box.innerHTML = `<button type="button" class="btn sm ghost tagf-btn" data-tagf-open title="Mostrar solo lo que lleva una etiqueta (y sus subetiquetas)">🏷️ Etiqueta ▾</button>`; return; }
+  const e = tagIndex().get(k);
+  tagStyleRefresh([k]);
+  box.innerHTML = `<span class="tf-chip tagf-on" data-tk="${esc(k)}"><button type="button" class="tf-go" data-tagf-open title="Cambiar la etiqueta del filtro">🏷️ #${esc(e ? e.name : k)} ▾</button><button type="button" class="tf-x" data-tagf-clear title="Quitar el filtro">×</button></span>`;
+}
+function setTagFilter(scope, key) {
+  tagFilters[scope] = key || null;
+  renderTagFilter(scope);
+  TAGF_RENDER[scope]();
+}
+document.addEventListener('click', e => {
+  const box = e.target.closest('[data-tagf]'); if (!box) return;
+  const scope = box.dataset.tagf;
+  if (e.target.closest('[data-tagf-clear]')) { setTagFilter(scope, null); return; }
+  const b = e.target.closest('[data-tagf-open]');
+  if (b) { if (tpState && tpState.anchor === b) { tpClose(); return; } tpOpen(b, { mode: 'filter', current: tagFilters[scope], onChange: k => setTagFilter(scope, k) }); }
+});
+const tagFilterEmpty = scope => tagFilters[scope] ? ` con #${esc((tagIndex().get(tagFilters[scope]) || { name: tagFilters[scope] }).name)}` : '';
+
+/* ---------- Markdown: etiquetas del campo como «tags:» en el frontmatter (compatible con Obsidian) ---------- */
+function mdFrontTags(text) {
+  const m = /^\uFEFF?---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(text);
+  if (!m) return { tags: [], body: text };
+  const y = m[1], out = [];
+  const inline = /^tags:[ \t]*\[?([^\]\n]*)\]?[ \t]*$/m.exec(y);
+  if (inline && inline[1].trim()) out.push(...inline[1].split(/[,\s]+/));
+  else { const blk = /^tags:\s*\n((?:[ \t]*-[ \t]*.+\n?)+)/m.exec(y); if (blk) out.push(...blk[1].split('\n').map(l => l.replace(/^[ \t]*-[ \t]*/, ''))); }
+  return { tags: tagUniq(out.map(s => tagCleanName(s.replace(/^["']|["']$/g, ''))).filter(s => TAG_NAME_OK.test(s))), body: text.slice(m[0].length) };
+}
+const mdFrontFor = n => (n.tags && n.tags.length) ? `---\ntags: [${tagUniq(n.tags).join(', ')}]\n---\n` : '';
 let calcExpr = '', calcJust = false;
 let lastAns = '';
 function initCalc() { lastAns = S.calcHist.length ? S.calcHist[S.calcHist.length - 1].result : ''; }
@@ -10057,7 +10469,7 @@ $('#fsBtns').addEventListener('click', e => {
 });
 
 /* ---------- Datos ---------- */
-const KEY_LABELS = { notes: '📝 Notas', tasks: '📋 Kanban', todos: '☑️ Tareas', events: '📅 Calendario', timeEntries: '⏱️ Horas', vault: '📦 Almacén cifrado', calcHistory: '🧮 Historial de la calculadora', bookmarks: '🔖 Marcadores', habits: '🔁 Hábitos', focusLog: '🍅 Pomodoro', templates: '📄 Plantillas', mindmaps: '🧠 Mapas mentales', holidays: '🎉 Festivos', projects: '🗂️ Proyectos' };
+const KEY_LABELS = { notes: '📝 Notas', tasks: '📋 Kanban', todos: '☑️ Tareas', events: '📅 Calendario', timeEntries: '⏱️ Horas', vault: '📦 Almacén cifrado', calcHistory: '🧮 Historial de la calculadora', bookmarks: '🔖 Marcadores', habits: '🔁 Hábitos', focusLog: '🍅 Pomodoro', templates: '📄 Plantillas', mindmaps: '🧠 Mapas mentales', tagColors: '🏷️ Colores de etiquetas', holidays: '🎉 Festivos', projects: '🗂️ Proyectos' };
 let storageQuota = null;
 const fmtSize = n => n >= 1073741824 ? (n / 1073741824).toFixed(1) + ' GB' : n >= 1048576 ? Math.round(n / 1048576) + ' MB' : Math.round(n / 1024) + ' KB';
 function renderDataUsage() {

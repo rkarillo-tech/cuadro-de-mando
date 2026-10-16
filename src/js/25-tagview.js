@@ -41,6 +41,7 @@ function renderTagView() {
   const groups = Object.keys(TAG_KIND).map(kind => [kind, items.filter(it => it.kind === kind)]).filter(([, l]) => l.length);
   box.innerHTML = `<div class="card-h"><h3 class="tg-title">${parents.map(p => `<button type="button" class="crumb" data-tag="${esc(p.key)}">#${esc(p.name.split('/').pop())}</button><span class="muted"> / </span>`).join('')}#${esc(e.name.split('/').pop())} <span class="badge accent">${items.length}</span></h3>
       <div class="row" style="gap:4px"><button class="btn sm" data-tga="rename" title="Renombrar o fusionar con otra etiqueta">✏️ Renombrar / fusionar</button><button class="btn sm ghost" data-tga="graph" title="Ver en el grafo de conexiones">🕸️</button><button class="btn sm icon ghost" data-tga="close" title="Cerrar">✕</button></div></div>
+    <div class="bl-row tg-colrow"><span class="bl-h" title="El color se usa en etiquetas, nube, filtros y grafo. Las subetiquetas lo heredan si no tienen uno propio.">Color</span>${tagPaletteHtml(tagSel)}<span class="muted small">${(() => { const src = tagColorSrc(tagSel); return src.own ? '' : src.from ? 'heredado de #' + esc((idx.get(src.from) || { name: src.from }).name) : 'automático'; })()}</span></div>
     ${children.length ? `<div class="bl-row"><span class="bl-h">Subetiquetas</span><div class="chips">${children.map(c => tagChip(c.name.split('/').slice(tagSel.split('/').length).join('/') ? c.name : c.name, ` <span class="muted">${tagItemsOf(c.key).length}</span>`)).join('')}</div></div>` : ''}
     ${related.length ? `<div class="bl-row"><span class="bl-h" title="Etiquetas que aparecen en los mismos elementos">Suelen ir con</span><div class="chips">${related.join('')}</div></div>` : ''}
     ${groups.map(([kind, list]) => `<div class="tg-group"><h4>${TAG_KIND[kind][0]} ${TAG_KIND[kind][1]} <span class="muted small">${list.length}</span></h4><div class="list">${list.map(it => `<div class="list-item${it.done ? ' done' : ''}" data-open="${kind}:${esc(it.id)}" tabindex="0"><span class="grow" style="min-width:0"><span class="ellipsis" style="display:block">${it.done ? '✓ ' : ''}${tagHighlight(esc(it.label))}</span>${it.sub ? `<span class="muted small ellipsis" style="display:block">${esc(it.sub)}</span>` : ''}</span><span class="tg-its">${[...new Set(it.tags)].filter(t => tagKey(t) !== tagSel).slice(0, 3).map(t => `<span class="tg-mini" data-tag="${esc(tagKey(t))}">#${esc(t)}</span>`).join('')}</span></div>`).join('')}</div></div>`).join('')}`;
@@ -54,6 +55,8 @@ function tagOpenItem(kind, id) {
   else if (kind === 'map') { mmOpenMap(id, false); mapsMode = 'mind'; store.set('mapsMode', 'mind'); showTab('maps'); }
 }
 $('#tgDetail').addEventListener('click', e => {
+  const sw = e.target.closest('[data-col]');
+  if (sw && sw.closest('[data-palkey]')) { tagSetColor(sw.closest('[data-palkey]').dataset.palkey, sw.dataset.col); return; }
   const a = e.target.closest('[data-tga]');
   if (a) {
     if (a.dataset.tga === 'close') { tagSel = null; renderTagView(); }
@@ -67,15 +70,6 @@ $('#tgDetail').addEventListener('keydown', e => { if (e.key === 'Enter') { const
 $('#tgSearch').addEventListener('input', debounce(renderTagView, 120));
 $('#tgSort').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (!b) return; tagSort = b.dataset.s; $$('#tgSort button').forEach(x => x.classList.toggle('on', x === b)); renderTagView(); });
 onShow.tags = renderTagView;
-
-/* ---------- Etiquetas de la nota abierta ---------- */
-function renderNoteTags() {
-  const box = $('#noteTags'); if (!box) return;
-  const n = getNote(currentNoteId);
-  const tags = n ? [...new Map(noteTags(n).map(t => [tagKey(t), t])).values()] : [];
-  box.hidden = !tags.length;
-  box.innerHTML = tags.length ? `<span class="bl-h">🏷️ Etiquetas</span><div class="chips">${tags.map(t => tagChip(t, ` <span class="muted">${tagItemsOf(tagKey(t)).length}</span>`)).join('')}</div>` : '';
-}
 
 /* ---------- Mini nube en Inicio ---------- */
 function renderDashTags() {

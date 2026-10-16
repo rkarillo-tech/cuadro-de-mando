@@ -98,6 +98,7 @@ async function openEvent(id, date) {
     </div>
     <div><label class="lbl">Color</label>${swatchesHtml('color', safeColor(d.color))}</div>
     <div><label class="lbl">Notas</label><textarea class="field" name="notes" rows="3">${esc(d.notes || '')}</textarea></div>
+    ${tagFieldHtml('tags', d.tags || [], { src: 'title,notes' })}
     ${ex && ex.repeat ? '<p class="hint">Es un evento periódico: los cambios se aplican a toda la serie.</p>' : ''}`;
   const r = await modal({
     title: ex ? '✏️ Editar evento' : '＋ Nuevo evento', wide: true, body,
@@ -114,6 +115,7 @@ async function openEvent(id, date) {
     onOpen: form => {
       const sync = () => { const on = form.elements.namedItem('allDay').checked; ['start', 'end'].forEach(n => form.elements.namedItem(n).disabled = on); };
       form.elements.namedItem('allDay').addEventListener('change', sync); sync();
+      tagFieldInit(form);
     }
   });
   if (!r) return;
@@ -123,7 +125,8 @@ async function openEvent(id, date) {
     return;
   }
   const f = r.data;
-  Object.assign(d, { title: f.title.trim(), date: f.date, allDay: !!f.allDay, start: f.start || d.start, end: f.end || d.end, repeat: f.repeat || '', until: f.until || '', color: safeColor(f.color), notes: (f.notes || '').trim() });
+  Object.assign(d, { title: f.title.trim(), date: f.date, allDay: !!f.allDay, start: f.start || d.start, end: f.end || d.end, repeat: f.repeat || '', until: f.until || '', color: safeColor(f.color), notes: (f.notes || '').trim(), tags: tagsFromField(f.tags) });
+  if (!d.tags.length) delete d.tags;
   if (ex) Object.assign(ex, d); else S.events.push(d);
   save.events(); calGoto(d.date);
   if (!ex) toast('Evento creado', 'success', 1500);

@@ -35,7 +35,7 @@ function cardHtml(t) {
       ${di ? `<span class="badge ${di.cls}">${di.label}</span>` : ''}
       ${subs.length ? `<span class="badge${doneN === subs.length ? ' success' : ''}">☑ ${doneN}/${subs.length}</span>` : ''}
       ${t.pomodoros ? `<span class="badge" title="Pomodoros dedicados">🍅 ${t.pomodoros}</span>` : ''}
-      ${(t.tags || []).map(g => `<span class="badge accent tg-mini" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
+      ${tagUniq(t.tags || []).map(g => `<span class="badge tg-mini tg-pill" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
     </div>
     ${subs.length ? `<div class="progress"><span style="width:${Math.round(doneN / subs.length * 100)}%"></span></div>
     <details class="subs"${openSubs.has(t.id) ? ' open' : ''}><summary>Subtareas</summary>${subs.map(s => `<label class="check-row"><input type="checkbox" class="check" data-sub="${esc(s.id)}"${s.done ? ' checked' : ''}><span class="${s.done ? 'muted strike' : ''}">${esc(s.text)}</span></label>`).join('')}</details>` : ''}
@@ -51,7 +51,9 @@ function cardHtml(t) {
 function renderBoard() {
   const q = $('#kbSearch').value.trim().toLowerCase().replace(/^#/, '');
   const pf = $('#kbPriority').value;
-  const match = t => (!pf || t.priority === pf) && (!q
+  renderTagFilter('kanban');
+  const tf = tagFilters.kanban;
+  const match = t => (!pf || t.priority === pf) && (!tf || tagMatch(taskTags(t), tf)) && (!q
     || t.title.toLowerCase().includes(q)
     || (t.desc || '').toLowerCase().includes(q)
     || (t.tags || []).some(g => g.toLowerCase().includes(q))
@@ -65,7 +67,7 @@ function renderBoard() {
           ${c.id === 'done' && all.length ? '<button class="btn icon sm ghost" data-kb="cleardone" title="Eliminar todas las completadas">🧹</button>' : ''}
           <button class="btn icon sm ghost" data-kb="add" data-col="${c.id}" title="Añadir tarea aquí">＋</button>
         </span></div>
-      <div class="kb-list" data-col="${c.id}">${items.map(cardHtml).join('') || `<div class="empty small">${q || pf ? 'Sin coincidencias' : 'Arrastra tareas aquí'}</div>`}</div>
+      <div class="kb-list" data-col="${c.id}">${items.map(cardHtml).join('') || `<div class="empty small">${q || pf || tf ? 'Sin coincidencias' : 'Arrastra tareas aquí'}</div>`}</div>
     </div>`;
   }).join('');
 }
@@ -110,7 +112,7 @@ async function openTask(id, col = 'todo') {
       <div><label class="lbl">Prioridad</label><select class="field" name="priority">${Object.entries(PRIO).map(([k, p]) => `<option value="${k}"${k === draft.priority ? ' selected' : ''}>${p.label}</option>`).join('')}</select></div>
       <div><label class="lbl">Fecha límite</label><input type="date" class="field" name="due" value="${esc(draft.due)}"></div>
     </div>
-    <div><label class="lbl">Etiquetas (separadas por comas; también vale escribir #etiqueta en el título o la descripción)</label><input class="field" type="text" name="tags" value="${esc((draft.tags || []).join(', '))}" placeholder="trabajo, casa, urgente…"></div>
+    ${tagFieldHtml('tags', draft.tags || [], { src: 'title,desc' })}
     <div><label class="lbl">Subtareas <span id="subProg"></span></label>
       <div id="subList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="subNew" placeholder="Nueva subtarea y Enter" data-noenter><button type="button" class="btn" id="subAdd">Añadir</button></div>
@@ -137,6 +139,7 @@ async function openTask(id, col = 'todo') {
       list.addEventListener('click', e => { const b = e.target.closest('[data-act="del"]'); if (b) { draft.subtasks.splice(+b.closest('.subtask-row').dataset.i, 1); render(); } });
       render();
       wlAttachField(form, 'desc', { kind: 'Kanban', titleField: 'title' });
+      tagFieldInit(form);
     }
   });
   if (!r) return;
@@ -144,7 +147,7 @@ async function openTask(id, col = 'todo') {
   const d = r.data;
   Object.assign(draft, {
     title: d.title.trim(), desc: (d.desc || '').trim(), priority: d.priority, due: d.due || '',
-    tags: (d.tags || '').split(',').map(s => s.trim().replace(/^#/, '')).filter(Boolean).slice(0, 8)
+    tags: tagsFromField(d.tags)
   });
   draft.subtasks = draft.subtasks.map(s => ({ ...s, text: s.text.trim() })).filter(s => s.text);
   if (existing) {

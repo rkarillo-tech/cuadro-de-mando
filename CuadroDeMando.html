@@ -1,14 +1,36 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando v1.0.0 (2026-10-16)
+  Cuadro de Mando 1.0.1 (2026-10-16) · productividad personal 100 % local, sin servidor
+  https://github.com/rkarillo-tech/cuadro-de-mando
+
+  MIT License
+
   Copyright (c) 2026 Rafael Karino Arillo (rkarillo-tech)
-  Licencia MIT: https://github.com/rkarillo-tech/cuadro-de-mando/blob/main/LICENSE
-  Código fuente y descargas: https://github.com/rkarillo-tech/cuadro-de-mando
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+  Sin componentes de terceros: todo el código es propio y usa las fuentes del sistema.
 -->
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Xt6wFp+GB11qgG+JPpvnVaEgo2pcR/1HoV8Dy/hjDrs='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-CisgMNLMFQeh0o2JNskmSLjCWJ9SrTwgYKIAv/oOV3Q='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -839,6 +861,12 @@ details.bl-row summary.bl-h{cursor:pointer}
 .tg-tools .seg button{white-space:nowrap}
 @media (max-width:600px){.tgl-kinds{display:none}.tg-tools .field{flex-basis:100%}.tg-tools .seg{flex:1}.tg-tools .seg button{flex:1}}
 
+/* ===== Licencia ===== */
+.sidebar-foot .credits{margin-top:4px;font-size:.7rem;opacity:.8;line-height:1.4}
+.link-inline{border:0;background:none;padding:0;font:inherit;color:var(--info);cursor:pointer;text-decoration:underline}
+.lic-det summary{cursor:pointer;color:var(--accent);font-size:.85rem;margin:6px 0}
+.lic-text{white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:.74rem;line-height:1.55;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);padding:12px 14px;border-radius:var(--radius-sm);max-height:260px;overflow:auto;margin:6px 0}
+
 </style>
 </head>
 <body class="booting">
@@ -861,7 +889,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot" title="Cuadro de Mando v1.0.0 · Licencia MIT · github.com/rkarillo-tech/cuadro-de-mando">🔒 100 % local · sin servidor · v1.0.0</div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.0.1 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -1903,6 +1931,22 @@ details.bl-row summary.bl-h{cursor:pointer}
           <hr class="sep">
           <div class="row"><button class="btn danger" id="wipeAll">🗑️ Borrar todos los datos</button></div>
           <p class="hint">Los datos se guardan en <b>IndexedDB</b>, la base de datos interna del navegador: sin el límite de 5 MB de localStorage y sin bloquear la pantalla al guardar. Si un navegador no la permite, la app usa localStorage automáticamente. Al ser solo texto, ocupan muy poco.</p>
+        </div>
+
+        <div class="card" id="licCard">
+          <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
+          <p>Cuadro de Mando 1.0.1 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
+          <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
+
+Copyright (c) 2026 Rafael Karino Arillo (rkarillo-tech)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre></details>
+          <p class="hint">Sin componentes de terceros: todo el código es propio, no depende de ninguna librería y usa las fuentes del sistema.</p>
         </div>
       </div>
     </section>
@@ -10873,6 +10917,13 @@ $('#setTheme').addEventListener('change', e => setThemePref(e.target.value));
 $('#setStart').addEventListener('change', e => { S.prefs.start = e.target.value; save.prefs(); });
 $('#setShortcuts').addEventListener('click', showShortcuts);
 $('#wipeAll').addEventListener('click', wipeDialog);
+
+/* ---------- Licencia y créditos ---------- */
+$('#licLink').addEventListener('click', () => {
+  showTab('settings');
+  const d = $('#licDetails'); if (d) d.open = true;
+  setTimeout(() => { const c = $('#licCard'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+});
 /* =====================================================================
    HISTORIAL DE VERSIONES (instantáneas locales en IndexedDB)
    ===================================================================== */

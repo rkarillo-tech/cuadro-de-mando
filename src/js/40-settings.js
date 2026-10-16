@@ -421,3 +421,10 @@ $('#setTheme').addEventListener('change', e => setThemePref(e.target.value));
 $('#setStart').addEventListener('change', e => { S.prefs.start = e.target.value; save.prefs(); });
 $('#setShortcuts').addEventListener('click', showShortcuts);
 $('#wipeAll').addEventListener('click', wipeDialog);
+
+/* ---------- Licencia y créditos ---------- */
+$('#licLink').addEventListener('click', () => {
+  showTab('settings');
+  const d = $('#licDetails'); if (d) d.open = true;
+  setTimeout(() => { const c = $('#licCard'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+});

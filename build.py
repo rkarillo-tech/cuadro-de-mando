@@ -29,12 +29,18 @@ html = html.replace('<!--CSP-->', '<meta http-equiv="Content-Security-Policy" co
 # Versión y aviso de licencia (fuera del <script>, no afecta a la huella de la CSP)
 import datetime
 version = open(os.path.join(ROOT, 'VERSION'), encoding='utf-8').read().strip()
-html = html.replace('{{VERSION}}', version)
-notice = ('<!--\n  Cuadro de Mando v%s (%s)\n  Copyright (c) 2026 Rafael Karino Arillo (rkarillo-tech)\n'
-          '  Licencia MIT: https://github.com/rkarillo-tech/cuadro-de-mando/blob/main/LICENSE\n'
-          '  Código fuente y descargas: https://github.com/rkarillo-tech/cuadro-de-mando\n-->\n') % (version, datetime.date.today().isoformat())
+license_txt = open(os.path.join(ROOT, 'LICENSE'), encoding='utf-8').read().strip()
+import html as _h
+license_view = re.sub(r'(?<!\n)\n(?!\n)', ' ', license_txt)   # párrafos sin cortes de línea, para leerlo en la app
+html = html.replace('{{VERSION}}', version).replace('{{LICENSE_MIT}}', _h.escape(license_view))
+notice = ('<!--\n  Cuadro de Mando %s (%s) · productividad personal 100 %% local, sin servidor\n'
+          '  https://github.com/rkarillo-tech/cuadro-de-mando\n\n%s\n\n'
+          '  Sin componentes de terceros: todo el código es propio y usa las fuentes del sistema.\n-->\n') % (
+          version, datetime.date.today().isoformat(), '\n'.join(('  ' + l).rstrip() for l in license_txt.split('\n')))
+assert '--' not in license_txt
 assert html.startswith('<!DOCTYPE html>\n')
 html = html.replace('<!DOCTYPE html>\n', '<!DOCTYPE html>\n' + notice, 1)
+assert '{{' not in html.split('<script>')[0], 'Marcador sin sustituir'
 
 open(out_path, 'w', encoding='utf-8').write(html)
 print(f'{out_path}: {len(html.encode("utf-8")) / 1024:.0f} KB, {html.count(chr(10))} líneas, {len(js_files)} módulos JS')

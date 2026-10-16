@@ -1,0 +1,24 @@
+# Al subir una etiqueta vX.Y.Z, construye CuadroDeMando.html y lo publica como Release descargable.
+name: Publicar versión
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comprobar que la etiqueta coincide con VERSION
+        run: test "v$(cat VERSION)" = "$GITHUB_REF_NAME"
+      - name: Construir el HTML
+        run: python3 build.py
+      - name: Crear la Release con el archivo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES="notas/${GITHUB_REF_NAME}.md"
+          [ -f "$NOTES" ] || NOTES=/dev/null
+          gh release create "$GITHUB_REF_NAME" CuadroDeMando.html \
+            --title "Cuadro de Mando ${GITHUB_REF_NAME#v}" --notes-file "$NOTES" --latest

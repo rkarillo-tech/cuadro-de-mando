@@ -5,7 +5,7 @@
   Además de escribir #etiqueta en el texto, cada nota, tarea, tarjeta, evento y marcador
   tiene un campo «tags» (lista de nombres) que se rellena con el selector visual.
   Las dos fuentes se suman: el selector no toca el texto y el texto no toca el campo.
-  Colores: S.tagColors = { clave: idPaleta }. Sin color propio, una subetiqueta hereda el
+  Colores: S.tagMeta[clave].color = idPaleta. Sin color propio, una subetiqueta hereda el
   de su padre y, si nadie lo tiene, se asigna un tono fijo calculado a partir del nombre.
 */
 const TAG_PALETTE = [
@@ -23,19 +23,28 @@ const TAG_PALETTE = [
   { id: 'gris', name: 'Gris', h: 220, s: '9%' }
 ];
 const tagHash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+/* Metadatos de etiqueta: S.tagMeta = { clave: { name?, color?, desc?, created? } } */
+const tagMetaOf = k => (S.tagMeta || {})[k] || null;
+const tagOwnColor = k => { const m = tagMetaOf(k); return m && m.color ? m.color : null; };
 /** Color elegido para la etiqueta o heredado de un nivel superior; null = automático. */
 function tagColorId(key) {
-  const C = S.tagColors || {};
-  if (C[key]) return C[key];
+  if (tagOwnColor(key)) return tagOwnColor(key);
   const ps = tagParents(key).reverse();
-  for (const p of ps) if (C[p]) return C[p];
+  for (const p of ps) if (tagOwnColor(p)) return tagOwnColor(p);
   return null;
 }
 function tagColorSrc(key) {
-  const C = S.tagColors || {};
-  if (C[key]) return { own: true };
-  const p = tagParents(key).reverse().find(x => C[x]);
+  if (tagOwnColor(key)) return { own: true };
+  const p = tagParents(key).reverse().find(x => tagOwnColor(x));
   return p ? { from: p } : { auto: true };
+}
+/** Cambia (o borra, si v es vacío) un dato de la etiqueta. Una etiqueta creada a mano (name) se conserva aunque no tenga uso. */
+function tagMetaSet(key, field, v) {
+  S.tagMeta = S.tagMeta || {};
+  const m = Object.assign({}, S.tagMeta[key]);
+  if (v == null || v === '' || v === 'auto') delete m[field]; else m[field] = v;
+  if (Object.keys(m).filter(f => f !== 'created').length) S.tagMeta[key] = m; else delete S.tagMeta[key];
+  save.tagMeta();
 }
 function tagPal(key) {
   const id = tagColorId(key);
@@ -52,22 +61,20 @@ document.head.append(tagStyleEl);
 let tagStyleSig = '';
 /** Regenera las reglas [data-tag="clave"]{--h;--s} para todas las etiquetas conocidas. */
 function tagStyleRefresh(extra = []) {
-  const keys = new Set([...(tagIdxCache ? tagIdxCache.map.keys() : []), ...Object.keys(S.tagColors || {}), ...Object.values(tagFilters).filter(Boolean), ...extra]);
+  const keys = new Set([...(tagIdxCache ? tagIdxCache.map.keys() : []), ...Object.keys(S.tagMeta || {}), ...Object.values(tagFilters).filter(Boolean), ...extra]);
   const q = k => String(k).replace(/["\\]/g, '\\$&');
   const css = [...keys].map(k => { const p = tagPal(k); return `[data-tag="${q(k)}"],[data-tk="${q(k)}"]{--h:${p.h};--s:${p.s}}`; }).join('\n');
   if (css !== tagStyleSig) { tagStyleSig = css; tagStyleEl.textContent = css; }
 }
 function tagSetColor(key, id) {
-  S.tagColors = S.tagColors || {};
-  if (!id || id === 'auto') delete S.tagColors[key]; else S.tagColors[key] = id;
-  save.tagColors();
+  tagMetaSet(key, 'color', id);
   tagStyleRefresh();
   if (tpState) tpRender();
   if (currentTab === 'tags') renderTagView();
   if (currentTab === 'maps' && typeof grDraw === 'function' && $('#grCanvas') && !$('#grCanvas').closest('[hidden]')) try { grDraw(); } catch {}
 }
 function tagPaletteHtml(key, { small = false } = {}) {
-  const cur = (S.tagColors || {})[key] || 'auto', src = tagColorSrc(key);
+  const cur = tagOwnColor(key) || 'auto', src = tagColorSrc(key);
   return `<div class="tp-pal${small ? ' small' : ''}" data-palkey="${esc(key)}">`
     + `<button type="button" class="tp-sw auto${cur === 'auto' ? ' on' : ''}" data-col="auto" data-tk="${esc(key)}" title="${src.from ? 'Heredar el color de #' + esc((tagIndex().get(src.from) || { name: src.from }).name) : 'Automático (un tono fijo según el nombre)'}">A</button>`
     + TAG_PALETTE.map(p => `<button type="button" class="tp-sw${cur === p.id ? ' on' : ''}" data-col="${p.id}" style="--h:${p.h};--s:${p.s}" title="${p.name}"></button>`).join('')

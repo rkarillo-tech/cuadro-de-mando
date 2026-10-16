@@ -1,13 +1,19 @@
     <!-- ===================== ETIQUETAS ===================== -->
     <section class="view" id="view-tags">
       <div class="tags-layout">
-        <div class="card">
-          <div class="card-h"><h3>☁️ Nube de etiquetas</h3>
+        <div class="card tg-side">
+          <div class="card-h"><h3>🏷️ Tus etiquetas <span class="badge" id="tgTotal"></span></h3>
+            <button class="btn sm primary" id="tgNew" title="Crear una etiqueta nueva (con color y descripción)">＋ Nueva</button>
+          </div>
+          <div class="row tg-tools">
+            <input class="field" id="tgSearch" placeholder="🔍 Buscar etiqueta…">
+            <div class="seg" id="tgMode" title="Ver como nube o como lista"><button data-m="cloud" class="on" title="Nube">☁️ Nube</button><button data-m="list" title="Lista con selección para acciones en bloque">☰ Lista</button></div>
             <div class="seg" id="tgSort"><button data-s="count" class="on">Más usadas</button><button data-s="az">A → Z</button></div>
           </div>
-          <input class="field" id="tgSearch" placeholder="🔍 Buscar etiqueta…" style="margin-bottom:10px">
+          <div class="tg-bulk" id="tgBulk" hidden></div>
           <div class="tag-cloud" id="tgCloud"></div>
-          <p class="hint">Pon etiquetas con el botón <b>＋ Etiqueta</b> de cada nota, tarea, tarjeta, evento o marcador (un desplegable con todas las tuyas), o escribe <b>#etiqueta</b> en el texto (al teclear <kbd>#</kbd> te sugiere las que ya usas). Cada etiqueta tiene su color: cámbialo aquí al elegirla o con el punto de color del desplegable. Con <b>/</b> puedes crear niveles: <code>#proyecto/portal</code> también aparece en <code>#proyecto</code>. Mayúsculas y tildes no cuentan: <code>#Reunión</code> = <code>#reunion</code>.</p>
+          <div class="tg-list" id="tgList" hidden></div>
+          <p class="hint">Pon etiquetas con el botón <b>＋ Etiqueta</b> de cada nota, tarea, tarjeta, evento o marcador, o escribe <b>#etiqueta</b> en el texto. Aquí puedes crearlas, darles color y descripción, ponerlas a muchos elementos a la vez, renombrarlas, fusionarlas o eliminarlas (en <b>☰ Lista</b>, varias a la vez). Con <b>/</b> creas niveles: <code>#proyecto/portal</code> también aparece en <code>#proyecto</code>. Mayúsculas y tildes no cuentan: <code>#Reunión</code> = <code>#reunion</code>.</p>
         </div>
         <div class="card" id="tgDetail"></div>
       </div>

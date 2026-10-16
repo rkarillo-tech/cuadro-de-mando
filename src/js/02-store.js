@@ -337,7 +337,13 @@ function loadState() {
   S.bookmarks = store.get('bookmarks', []) || [];
   S.templates = store.get('templates', []) || [];
   S.mindmaps = (store.get('mindmaps', []) || []).filter(m => m && m.root);
-  S.tagColors = store.get('tagColors', {}) || {};
+  S.tagMeta = store.get('tagMeta', null) || {};
+  const oldCol = store.get('tagColors', null);   // versión anterior: solo colores
+  if (oldCol && typeof oldCol === 'object') {
+    Object.entries(oldCol).forEach(([k, c]) => { if (c) S.tagMeta[k] = Object.assign({}, S.tagMeta[k], { color: c }); });
+    delete MEM.tagColors; try { ls.del('tagColors'); } catch {}
+    store.set('tagMeta', S.tagMeta);
+  }
   S.prefs = Object.assign({ start: 'last', backupDays: 14 }, store.get('prefs', {}));
 }
 const save = {
@@ -357,6 +363,6 @@ const save = {
   bookmarks: () => store.set('bookmarks', S.bookmarks),
   templates: () => store.set('templates', S.templates),
   mindmaps: () => store.set('mindmaps', S.mindmaps),
-  tagColors: () => store.set('tagColors', S.tagColors),
+  tagMeta: () => store.set('tagMeta', S.tagMeta),
   prefs: () => store.set('prefs', S.prefs)
 };

@@ -502,3 +502,33 @@ details.bl-row summary.bl-h{cursor:pointer}
 .tp-sw.auto{background:var(--surface-2);color:var(--muted);font-size:.62rem;font-weight:700;display:grid;place-items:center;border:1px dashed var(--muted)}
 .tp-sw.auto.on{border:2px solid var(--text);color:var(--text)}
 .tg-colrow{align-items:center}
+
+/* ===== Sección Etiquetas: gestión ===== */
+.tg-tools{gap:8px;margin-bottom:10px}
+.tg-tools .field{flex:1 1 160px;min-width:0}
+.cloud-tag.unused{opacity:.45;font-style:italic}
+.cloud-tag.unused sup{display:none}
+.tg-bulk{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;margin-bottom:8px;border-radius:var(--radius-sm);background:var(--accent-soft);font-size:.86rem}
+.tg-list{display:flex;flex-direction:column;gap:2px;max-height:62vh;overflow:auto;margin:0 -6px;padding:0 6px}
+.tgl-row{display:flex;align-items:center;gap:10px;padding:6px 8px;padding-left:calc(8px + var(--d,0) * 18px);border-radius:9px;cursor:pointer}
+.tgl-row:hover,.tgl-row:focus-visible{background:var(--hover);outline:none}
+.tgl-row.on{background:var(--accent-soft)}
+.tgl-row.unused .tgl-name{opacity:.6;font-style:italic}
+.tgl-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.tgl-name{color:var(--tg-fg);font-weight:650;--tg-fg:hsl(var(--h,250) var(--s,80%) var(--tgL));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tgl-desc{font-size:.75rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tgl-kinds{display:flex;gap:6px;font-size:.74rem;color:var(--muted);white-space:nowrap}
+.tgl-n{min-width:22px;text-align:right;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.tp-dot.lg{width:14px;height:14px;display:inline-block;margin-right:8px}
+.field.tg-desc{resize:none;min-height:38px;height:38px;padding-top:8px;padding-bottom:8px;line-height:1.35;margin:8px 0 4px;font-size:.88rem;overflow:hidden}
+.tg-acts{gap:6px;margin:8px 0 4px}
+.tg-group .list-item .tf-x{--tg-fg:var(--muted);color:var(--muted);flex-shrink:0}
+.tg-group .list-item .tf-x:hover{color:var(--danger);background:var(--hover)}
+.tg-inl{color:var(--muted);font-size:.8rem;width:20px;text-align:center;flex-shrink:0;cursor:help}
+.as-list{max-height:52vh;overflow:auto;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px}
+.as-row{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.as-row:hover{background:var(--hover)}
+.as-row.done .ellipsis{text-decoration:line-through;opacity:.65}
+.as-row.locked{opacity:.65;cursor:default}
+.tg-tools .seg button{white-space:nowrap}
+@media (max-width:600px){.tgl-kinds{display:none}.tg-tools .field{flex-basis:100%}.tg-tools .seg{flex:1}.tg-tools .seg button{flex:1}}

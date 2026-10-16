@@ -31,12 +31,12 @@ function noteTags(n) {
 function taggedItems() {
   const out = [];
   const listName = id => (S.todoLists.find(l => l.id === id) || {}).name || '';
-  S.notes.forEach(n => { const t = allNoteTags(n); if (t.length) out.push({ kind: 'note', id: n.id, label: n.title, sub: wkParent(n) ? '📚 ' + wkPath(n) : '', tags: t }); });
-  S.todos.forEach(t => { const tg = todoTags(t); if (tg.length) out.push({ kind: 'todo', id: t.id, label: t.text, sub: [listName(t.listId), t.due ? fmtDayLabel(t.due) : ''].filter(Boolean).join(' · '), done: !!t.done, tags: tg }); });
-  S.tasks.forEach(t => { const tg = taskTags(t); if (tg.length) out.push({ kind: 'kanban', id: t.id, label: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', done: t.col === 'done', tags: tg }); });
-  S.events.forEach(ev => { const tg = eventTags(ev); if (tg.length) out.push({ kind: 'event', id: ev.id, label: ev.title, sub: fmtDayLabel(ev.date), tags: tg }); });
-  S.bookmarks.forEach(b => { const tg = bmTags(b); if (tg.length) out.push({ kind: 'bookmark', id: b.id, label: b.title, sub: b.url, tags: tg }); });
-  S.mindmaps.forEach(m => { const tg = []; mmWalk(m.root, x => { tg.push(...tagsIn(x.text)); }); if (tg.length) out.push({ kind: 'map', id: m.id, label: m.title, sub: `${mmCount(m.root)} ideas`, tags: tg }); });
+  S.notes.forEach(n => { const t = allNoteTags(n); if (t.length) out.push({ kind: 'note', id: n.id, label: n.title, sub: wkParent(n) ? '📚 ' + wkPath(n) : '', tags: t, own: n.tags || [] }); });
+  S.todos.forEach(t => { const tg = todoTags(t); if (tg.length) out.push({ kind: 'todo', id: t.id, label: t.text, sub: [listName(t.listId), t.due ? fmtDayLabel(t.due) : ''].filter(Boolean).join(' · '), done: !!t.done, tags: tg, own: t.tags || [] }); });
+  S.tasks.forEach(t => { const tg = taskTags(t); if (tg.length) out.push({ kind: 'kanban', id: t.id, label: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', done: t.col === 'done', tags: tg, own: t.tags || [] }); });
+  S.events.forEach(ev => { const tg = eventTags(ev); if (tg.length) out.push({ kind: 'event', id: ev.id, label: ev.title, sub: fmtDayLabel(ev.date), tags: tg, own: ev.tags || [] }); });
+  S.bookmarks.forEach(b => { const tg = bmTags(b); if (tg.length) out.push({ kind: 'bookmark', id: b.id, label: b.title, sub: b.url, tags: tg, own: b.tags || [] }); });
+  S.mindmaps.forEach(m => { const tg = []; mmWalk(m.root, x => { tg.push(...tagsIn(x.text)); }); if (tg.length) out.push({ kind: 'map', id: m.id, label: m.title, sub: `${mmCount(m.root)} ideas`, tags: tg, own: [] }); });
   return out;
 }
 let tagIdxCache = null;
@@ -55,6 +55,8 @@ function tagIndex() {
     });
   });
   map.forEach((e, k) => { const nm = names.get(k); e.name = [...nm.entries()].sort((a, b) => b[1] - a[1])[0][0]; e.count = e.items.length; });
+  // etiquetas creadas a mano (aunque todavía no las use nada)
+  Object.entries(S.tagMeta || {}).forEach(([k, m]) => { if (m && m.name && !map.has(k)) map.set(k, { key: k, name: m.name, items: [], count: 0, defined: true }); });
   // padres implícitos (#proyecto para #proyecto/portal)
   [...map.keys()].forEach(k => tagParents(k).forEach(pk => { if (!map.has(pk)) map.set(pk, { key: pk, name: map.get(k).name.split('/').slice(0, pk.split('/').length).join('/'), items: [], count: 0, implicit: true }); }));
   tagIdxCache = { stamp, map };
@@ -241,38 +243,65 @@ async function tagRenameDialog(key) {
   toast(`#${e.name} → #${newName}: ${n} cambio${n === 1 ? '' : 's'}`, 'success', 4000);
   openTagView(tagKey(newName));
 }
-function tagRename(key, newName) {
+/**
+ * Recorre todos los textos y campos de etiquetas de la aplicación.
+ * textFix(texto) → texto nuevo; arrFix(lista) → lista nueva; wants(nombres) → ¿hay que tocar esta nota?
+ */
+function tagEditAll(textFix, arrFix, wants) {
   flushNote();
-  let total = 0;
-  const fix = s => { const [o, n] = tagReplaceIn(s, key, newName); total += n; return o; };
-  const hit = k => k === key || k.startsWith(key + '/');
-  const fixArr = arr => { if (!arr || !arr.length) return arr; const seen = new Set(); return arr.map(g => { const k = tagKey(g); if (hit(k)) { total++; return newName + g.slice(g.split('/').slice(0, key.split('/').length).join('/').length); } return g; }).filter(g => { const k = tagKey(g); if (seen.has(k)) return false; seen.add(k); return true; }); };
+  const arr = o => { if (o.tags && o.tags.length) { const a = arrFix(o.tags); if (a.length) o.tags = a; else delete o.tags; } };
   let notes = false;
   S.notes.forEach(n => {
-    if (n.tags && n.tags.some(t => hit(tagKey(t)))) { n.tags = fixArr(n.tags); notes = true; }
-    if (!noteTags(n).some(t => hit(tagKey(t)))) return;
+    const before = JSON.stringify(n.tags || []); arr(n); if (JSON.stringify(n.tags || []) !== before) notes = true;
+    if (!wants(noteTags(n))) return;
     const body = parseHtml(n.html);
     const w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, { acceptNode: x => x.parentElement.closest('pre,code,a') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
     const nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
-    nodes.forEach(t => { t.nodeValue = fix(t.nodeValue); });
+    nodes.forEach(t => { t.nodeValue = textFix(t.nodeValue); });
     n.html = body.innerHTML; n.text = htmlText(n.html); notes = true;
   });
-  S.todos.forEach(t => { t.text = fix(t.text); t.notes = fix(t.notes); (t.steps || []).forEach(s => { s.text = fix(s.text); }); if (t.tags) t.tags = fixArr(t.tags); });
-  S.tasks.forEach(t => {
-    t.title = fix(t.title); t.desc = fix(t.desc); (t.subtasks || []).forEach(s => { s.text = fix(s.text); });
-    if (t.tags) t.tags = fixArr(t.tags);
-  });
-  S.events.forEach(ev => { ev.title = fix(ev.title); ev.notes = fix(ev.notes); if (ev.tags) ev.tags = fixArr(ev.tags); });
-  S.bookmarks.forEach(b => { b.title = fix(b.title); b.notes = fix(b.notes); if (b.tags) b.tags = fixArr(b.tags); });
-  S.mindmaps.forEach(m => mmWalk(m.root, x => { x.text = fix(x.text); }));
-  // colores: pasan al nuevo nombre (si el destino ya tenía color propio, se conserva el suyo)
-  const C = S.tagColors || {}, nk = tagKey(newName); let colors = false;
-  Object.keys(C).forEach(k => { if (!hit(k)) return; const to = nk + k.slice(key.length); if (to !== k) { if (!C[to]) C[to] = C[k]; delete C[k]; colors = true; } });
-  if (colors) save.tagColors();
-  Object.keys(tagFilters).forEach(sc => { const f = tagFilters[sc]; if (f && hit(f)) tagFilters[sc] = nk + f.slice(key.length); });
+  S.todos.forEach(t => { t.text = textFix(t.text); t.notes = textFix(t.notes); (t.steps || []).forEach(x => { x.text = textFix(x.text); }); arr(t); });
+  S.tasks.forEach(t => { t.title = textFix(t.title); t.desc = textFix(t.desc); (t.subtasks || []).forEach(x => { x.text = textFix(x.text); }); if (t.tags) { t.tags = arrFix(t.tags); } });
+  S.events.forEach(ev => { ev.title = textFix(ev.title); ev.notes = textFix(ev.notes); arr(ev); });
+  S.bookmarks.forEach(b => { b.title = textFix(b.title); b.notes = textFix(b.notes); arr(b); });
+  S.mindmaps.forEach(m => mmWalk(m.root, x => { x.text = textFix(x.text); }));
   if (notes) save.notes();
   save.todos(); save.tasks(); save.events(); save.bookmarks(); save.mindmaps();
   tagIdxCache = null;
   if (currentNoteId && getNote(currentNoteId)) renderNotesView();
+}
+const tagHitFn = (key, subs = true) => k => k === key || (subs && k.startsWith(key + '/'));
+function tagRename(key, newName) {
+  let total = 0;
+  const hit = tagHitFn(key);
+  const fix = s => { const [o, n] = tagReplaceIn(s, key, newName); total += n; return o; };
+  const fixArr = arr => { const seen = new Set(); return arr.map(g => { const k = tagKey(g); if (hit(k)) { total++; return newName + g.slice(g.split('/').slice(0, key.split('/').length).join('/').length); } return g; }).filter(g => { const k = tagKey(g); if (seen.has(k)) return false; seen.add(k); return true; }); };
+  tagEditAll(fix, fixArr, names => names.some(t => hit(tagKey(t))));
+  // color, descripción y nombre pasan al nuevo nombre (si el destino ya tenía los suyos, se conservan)
+  const M = S.tagMeta || {}, nk = tagKey(newName); let meta = false;
+  Object.keys(M).forEach(k => {
+    if (!hit(k)) return;
+    const to = nk + k.slice(key.length); if (to === k && !M[k].name) return;
+    const m = Object.assign({}, M[k]);
+    if (m.name) m.name = newName + m.name.slice(m.name.split('/').slice(0, key.split('/').length).join('/').length);
+    delete M[k]; M[to] = Object.assign(m, M[to] || {}); meta = true;
+  });
+  if (meta) save.tagMeta();
+  Object.keys(tagFilters).forEach(sc => { const f = tagFilters[sc]; if (f && hit(f)) tagFilters[sc] = nk + f.slice(key.length); });
+  tagIdxCache = null;
+  return total;
+}
+/** Elimina una etiqueta (y, si subs, sus subetiquetas): la quita de los campos y en los textos deja la palabra sin «#». */
+function tagDelete(key, subs = true) {
+  let total = 0;
+  const hit = tagHitFn(key, subs);
+  const fix = s => String(s || '').replace(TAG_RX, (m, pre, name) => { if (hit(tagKey(name))) { total++; return pre + name; } return m; });
+  const fixArr = arr => arr.filter(g => { if (hit(tagKey(g))) { total++; return false; } return true; });
+  tagEditAll(fix, fixArr, names => names.some(t => hit(tagKey(t))));
+  const M = S.tagMeta || {}; let meta = false;
+  Object.keys(M).forEach(k => { if (hit(k)) { delete M[k]; meta = true; } });
+  if (meta) save.tagMeta();
+  Object.keys(tagFilters).forEach(sc => { if (tagFilters[sc] && hit(tagFilters[sc])) tagFilters[sc] = null; });
+  tagIdxCache = null;
   return total;
 }

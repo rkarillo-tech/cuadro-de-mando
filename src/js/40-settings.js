@@ -345,7 +345,7 @@ $('#fsBtns').addEventListener('click', e => {
 });
 
 /* ---------- Datos ---------- */
-const KEY_LABELS = { notes: '📝 Notas', tasks: '📋 Kanban', todos: '☑️ Tareas', events: '📅 Calendario', timeEntries: '⏱️ Horas', vault: '📦 Almacén cifrado', calcHistory: '🧮 Historial de la calculadora', bookmarks: '🔖 Marcadores', habits: '🔁 Hábitos', focusLog: '🍅 Pomodoro', templates: '📄 Plantillas', mindmaps: '🧠 Mapas mentales', tagColors: '🏷️ Colores de etiquetas', holidays: '🎉 Festivos', projects: '🗂️ Proyectos' };
+const KEY_LABELS = { notes: '📝 Notas', tasks: '📋 Kanban', todos: '☑️ Tareas', events: '📅 Calendario', timeEntries: '⏱️ Horas', vault: '📦 Almacén cifrado', calcHistory: '🧮 Historial de la calculadora', bookmarks: '🔖 Marcadores', habits: '🔁 Hábitos', focusLog: '🍅 Pomodoro', templates: '📄 Plantillas', mindmaps: '🧠 Mapas mentales', tagMeta: '🏷️ Etiquetas (colores y descripciones)', holidays: '🎉 Festivos', projects: '🗂️ Proyectos' };
 let storageQuota = null;
 const fmtSize = n => n >= 1073741824 ? (n / 1073741824).toFixed(1) + ' GB' : n >= 1048576 ? Math.round(n / 1048576) + ' MB' : Math.round(n / 1024) + ' KB';
 function renderDataUsage() {

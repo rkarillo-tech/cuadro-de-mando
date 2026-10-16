@@ -51,7 +51,7 @@ with sync_playwright() as p:
     pg.evaluate("tagSetColor('comite-direccion','verde')"); pg.wait_for_timeout(150)
     c2=pg.evaluate("getComputedStyle(document.querySelector('#noteTags .tf-chip:not(.inline)')).color")
     ok(c1!=c2,'cambiar el color repinta el chip: '+c1+' → '+c2)
-    ok(pg.evaluate("tagColorId('comite-direccion')")=='verde' and pg.evaluate("store.get('tagColors',{})['comite-direccion']")=='verde','el color se guarda')
+    ok(pg.evaluate("tagColorId('comite-direccion')")=='verde' and pg.evaluate("store.get('tagMeta',{})['comite-direccion'].color")=='verde','el color se guarda')
     pg.evaluate("tagSetColor('proyecto','rojo')")
     ok(pg.evaluate("tagColorId('proyecto/portal')")=='rojo' and pg.evaluate("tagColorSrc('proyecto/portal').from")=='proyecto','las subetiquetas heredan el color del padre')
     ok(pg.evaluate("tagPal('xyz').id")==pg.evaluate("tagPal('xyz').id") and pg.evaluate("tagColorId('xyz')") is None,'sin color propio: tono automático estable')

@@ -1,24 +1,23 @@
-# Al subir una etiqueta vX.Y.Z, construye CuadroDeMando.html y lo publica como Release descargable.
-name: Publicar versión
+# Al publicar una Release (p. ej. v1.0.0) desde la web de GitHub, construye CuadroDeMando.html
+# y lo adjunta a esa Release como archivo descargable.
+name: Adjuntar el HTML a la versión
 on:
-  push:
-    tags: ['v*']
+  release:
+    types: [published]
 permissions:
   contents: write
 jobs:
-  release:
+  html:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
       - name: Comprobar que la etiqueta coincide con VERSION
-        run: test "v$(cat VERSION)" = "$GITHUB_REF_NAME"
+        run: test "v$(cat VERSION)" = "${{ github.event.release.tag_name }}"
       - name: Construir el HTML
         run: python3 build.py
-      - name: Crear la Release con el archivo
+      - name: Adjuntar a la Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          NOTES="notas/${GITHUB_REF_NAME}.md"
-          [ -f "$NOTES" ] || NOTES=/dev/null
-          gh release create "$GITHUB_REF_NAME" CuadroDeMando.html \
-            --title "Cuadro de Mando ${GITHUB_REF_NAME#v}" --notes-file "$NOTES" --latest
+        run: gh release upload "${{ github.event.release.tag_name }}" CuadroDeMando.html --clobber

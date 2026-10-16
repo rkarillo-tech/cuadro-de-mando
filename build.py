@@ -26,5 +26,15 @@ csp = ("default-src 'none'; script-src 'sha256-%s'; style-src 'unsafe-inline'; i
        "worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'") % sha
 html = html.replace('<!--CSP-->', '<meta http-equiv="Content-Security-Policy" content="%s">' % csp)
 
+# Versión y aviso de licencia (fuera del <script>, no afecta a la huella de la CSP)
+import datetime
+version = open(os.path.join(ROOT, 'VERSION'), encoding='utf-8').read().strip()
+html = html.replace('{{VERSION}}', version)
+notice = ('<!--\n  Cuadro de Mando v%s (%s)\n  Copyright (c) 2026 Rafael Karino Arillo (rkarillo-tech)\n'
+          '  Licencia MIT: https://github.com/rkarillo-tech/cuadro-de-mando/blob/main/LICENSE\n'
+          '  Código fuente y descargas: https://github.com/rkarillo-tech/cuadro-de-mando\n-->\n') % (version, datetime.date.today().isoformat())
+assert html.startswith('<!DOCTYPE html>\n')
+html = html.replace('<!DOCTYPE html>\n', '<!DOCTYPE html>\n' + notice, 1)
+
 open(out_path, 'w', encoding='utf-8').write(html)
 print(f'{out_path}: {len(html.encode("utf-8")) / 1024:.0f} KB, {html.count(chr(10))} líneas, {len(js_files)} módulos JS')

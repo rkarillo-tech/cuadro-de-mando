@@ -164,7 +164,7 @@ DEV_HELP.lists = {
   tip: 'Con «Ignorar mayúsculas y tildes», «Ávila», «AVILA» y «avila» cuentan como el mismo valor al quitar duplicados y al comparar.',
   examples: [
     { label: 'IN de SQL con duplicados', fn: () => { setVal('lsIn', '28001\n28002\n28005\n28001\n28013\n  28002 \n\n28045'); setVal('lsPreset', 'sqlin', 'change'); setVal('lsCol', 'COD_POSTAL'); $('#lsDedupe').checked = true; lsRender(); exampleLoaded('Mira el aviso de repetidos y el resultado SQL'); } },
-    { label: 'Columna de Excel → OR', fn: () => { setVal('lsIn', 'Madrid\nMóstoles\nAlcorcón\nFuenlabrada\nGetafe'); setVal('lsPreset', 'or', 'change'); setVal('lsQuote', '"', 'change'); lsRender(); exampleLoaded('Desmarca algún municipio y míralo en el grupo 2'); } },
+    { label: 'Columna de Excel → OR', fn: () => { setVal('lsIn', 'Madrid\nSevilla\nValencia\nBilbao\nZaragoza'); setVal('lsPreset', 'or', 'change'); setVal('lsQuote', '"', 'change'); lsRender(); exampleLoaded('Desmarca alguna ciudad y mírala en el grupo 2'); } },
     { label: 'Comparar dos listas', fn: () => { setVal('lsIn', 'EXP-001\nEXP-002\nEXP-003\nEXP-004'); $('#lsMode [data-m=cmp]').click(); setVal('lsInB', 'EXP-003, EXP-004, EXP-005'); setVal('lsPreset', 'lines', 'change'); lsRender(); exampleLoaded('Solo en A, solo en B y en las dos'); } }
   ]
 };

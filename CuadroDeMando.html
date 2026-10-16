@@ -1,8 +1,14 @@
 <!DOCTYPE html>
+<!--
+  Cuadro de Mando v1.0.0 (2026-10-16)
+  Copyright (c) 2026 Rafael Karino Arillo (rkarillo-tech)
+  Licencia MIT: https://github.com/rkarillo-tech/cuadro-de-mando/blob/main/LICENSE
+  Código fuente y descargas: https://github.com/rkarillo-tech/cuadro-de-mando
+-->
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GNkffO6GEUcJma8tiARixqSx09lKpJnP5a8Fi4wK2TM='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Xt6wFp+GB11qgG+JPpvnVaEgo2pcR/1HoV8Dy/hjDrs='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -855,7 +861,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor</div>
+    <div class="sidebar-foot" id="sidebarFoot" title="Cuadro de Mando v1.0.0 · Licencia MIT · github.com/rkarillo-tech/cuadro-de-mando">🔒 100 % local · sin servidor · v1.0.0</div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -9474,7 +9480,7 @@ DEV_HELP.lists = {
   tip: 'Con «Ignorar mayúsculas y tildes», «Ávila», «AVILA» y «avila» cuentan como el mismo valor al quitar duplicados y al comparar.',
   examples: [
     { label: 'IN de SQL con duplicados', fn: () => { setVal('lsIn', '28001\n28002\n28005\n28001\n28013\n  28002 \n\n28045'); setVal('lsPreset', 'sqlin', 'change'); setVal('lsCol', 'COD_POSTAL'); $('#lsDedupe').checked = true; lsRender(); exampleLoaded('Mira el aviso de repetidos y el resultado SQL'); } },
-    { label: 'Columna de Excel → OR', fn: () => { setVal('lsIn', 'Madrid\nMóstoles\nAlcorcón\nFuenlabrada\nGetafe'); setVal('lsPreset', 'or', 'change'); setVal('lsQuote', '"', 'change'); lsRender(); exampleLoaded('Desmarca algún municipio y míralo en el grupo 2'); } },
+    { label: 'Columna de Excel → OR', fn: () => { setVal('lsIn', 'Madrid\nSevilla\nValencia\nBilbao\nZaragoza'); setVal('lsPreset', 'or', 'change'); setVal('lsQuote', '"', 'change'); lsRender(); exampleLoaded('Desmarca alguna ciudad y mírala en el grupo 2'); } },
     { label: 'Comparar dos listas', fn: () => { setVal('lsIn', 'EXP-001\nEXP-002\nEXP-003\nEXP-004'); $('#lsMode [data-m=cmp]').click(); setVal('lsInB', 'EXP-003, EXP-004, EXP-005'); setVal('lsPreset', 'lines', 'change'); lsRender(); exampleLoaded('Solo en A, solo en B y en las dos'); } }
   ]
 };

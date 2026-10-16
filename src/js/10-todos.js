@@ -70,7 +70,9 @@ function parseTodoInput(raw, lists) {
     if (w === '!' || w === '!!') { r.important = true; used[i] = true; continue; }
     if (/^#\S+/.test(toks[i])) {
       const q = norm(toks[i].slice(1));
-      const l = lists.find(l => norm(l.name) === q) || lists.find(l => norm(l.name).replace(/\s+/g, '').startsWith(q));
+      // #Lista elige la lista; si no coincide con ninguna, es una etiqueta y se queda en el texto
+      const isTag = typeof tagIndex === 'function' && tagIndex().has(tagKey(toks[i]));
+      const l = lists.find(l => norm(l.name) === q || norm(l.name).replace(/\s+/g, '') === q) || (!isTag && q.length >= 3 ? lists.find(l => norm(l.name).replace(/\s+/g, '').startsWith(q)) : null);
       if (l) { r.listId = l.id; used[i] = true; }
       continue;
     }
@@ -156,7 +158,7 @@ function todoItemHtml(t, opts = {}) {
   if (t.done && t.doneAt) meta.push(`<span>✓ ${esc(relTime(t.doneAt))}</span>`);
   return `<div class="todo-item${t.done ? ' done' : ''}${t.important ? ' important' : ''}" data-id="${esc(t.id)}"${opts.drag ? ' draggable="true"' : ''} tabindex="0">
     <button class="todo-check" data-act="check" title="${t.done ? 'Marcar como pendiente' : 'Completar'}">✓</button>
-    <div class="todo-main" data-act="open"><div class="todo-text">${esc(t.text)}</div>${meta.length ? `<div class="todo-meta">${meta.join('')}</div>` : ''}</div>
+    <div class="todo-main" data-act="open"><div class="todo-text">${tagHighlight(esc(t.text))}</div>${meta.length ? `<div class="todo-meta">${meta.join('')}</div>` : ''}</div>
     <button class="todo-star${t.important ? ' on' : ''}" data-act="star" title="${t.important ? 'Quitar importante' : 'Marcar como importante'}">${t.important ? '★' : '☆'}</button>
   </div>`;
 }

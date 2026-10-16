@@ -8,6 +8,7 @@ const TABS = [
   { id: 'calendar', icon: '📅', label: 'Calendario', group: 'Organización', sub: 'Eventos, fechas límite y festivos' },
   { id: 'notes', icon: '📝', label: 'Notas', group: 'Organización', sub: 'Editor enriquecido con guardado automático · escribe [[ para enlazar notas' },
   { id: 'maps', icon: '🧠', label: 'Mapas', group: 'Organización', sub: 'Mapas mentales y conexiones entre tus notas' },
+  { id: 'tags', icon: '🏷️', label: 'Etiquetas', group: 'Organización', sub: 'Todo lo que comparte una #etiqueta, sea de la sección que sea' },
   { id: 'bookmarks', icon: '🔖', label: 'Marcadores', group: 'Organización', sub: 'Tus enlaces frecuentes, ordenados' },
   { id: 'timer', icon: '🍅', label: 'Pomodoro', group: 'Foco', sub: 'Concéntrate por bloques y registra tu tiempo' },
   { id: 'time', icon: '⏱️', label: 'Horas', group: 'Foco', sub: 'Registro de tiempo por proyecto' },
@@ -112,6 +113,7 @@ function showShortcuts() {
       <span><kbd>Ctrl</kbd> + <kbd>K</kbd> en una nota</span><span>Insertar enlace</span>
       <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd></span><span>Insertar casilla de tarea en una nota</span>
       <span><kbd>[[</kbd> en una nota</span><span>Enlazar con otra nota (aparece en 🧠 Mapas → Conexiones)</span>
+      <span><kbd>#</kbd> en notas, tareas…</span><span>Poner una etiqueta (te sugiere las que ya usas). <kbd>Ctrl</kbd>+clic en una etiqueta de una nota la abre</span>
       <span><kbd>Tab</kbd> / <kbd>Enter</kbd> en un mapa mental</span><span>Añadir idea hija / hermana (más en la ❔ Ayuda de Mapas)</span>
       <span><kbd>Enter</kbd> en una línea con casilla</span><span>Crea otra casilla (Enter en una vacía la quita)</span>
       <span><kbd>Espacio</kbd></span><span>Iniciar / pausar el Pomodoro (en su sección)</span>
@@ -157,6 +159,7 @@ function paletteData() {
   S.notes.forEach(n => out.push({ g: 'Notas', icon: n.pinned ? '📌' : '📄', title: n.title, sub: (wkParent(n) ? '📚 ' + wkPath(n) + ' · ' : '') + (n.text || '').slice(0, 90), hay: norm(n.title + ' ' + (n.text || '')), run: () => { showTab('notes'); openNote(n.id); } }));
   S.tasks.forEach(t => out.push({ g: 'Kanban', icon: '📋', title: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', hay: norm(t.title + ' ' + (t.desc || '') + ' ' + (t.tags || []).join(' ') + ' ' + (t.subtasks || []).map(s => s.text).join(' ')), rank: t.col === 'done' ? 1 : 0, run: () => { showTab('kanban'); openTask(t.id); } }));
   S.events.forEach(ev => out.push({ g: 'Calendario', icon: '📅', title: ev.title, sub: fmtDayLabel(ev.date) + (ev.allDay ? '' : ' · ' + ev.start) + (ev.repeat ? ' · se repite' : ''), hay: norm(ev.title + ' ' + (ev.notes || '')), run: () => { showTab('calendar'); calGoto(ev.date); openEvent(ev.id); } }));
+  tagIndex().forEach(e => out.push({ g: 'Etiquetas', icon: '🏷️', title: '#' + e.name, sub: `${tagItemsOf(e.key).length} elementos`, hay: norm('#' + e.name + ' ' + e.name), run: () => openTagView(e.key) }));
   S.mindmaps.forEach(m => {
     const open = id => () => { mmOpenMap(m.id, false); if (id) mmSelId = id; mapsMode = 'mind'; store.set('mapsMode', 'mind'); if (currentTab !== 'maps') showTab('maps'); else showMapsMode('mind'); if (id) setTimeout(() => mmEnsureVisible(id), 30); };
     out.push({ g: 'Mapas mentales', icon: '🧠', title: m.title, sub: `${mmCount(m.root)} ideas`, hay: norm(m.title), run: open(null) });
@@ -178,7 +181,7 @@ function openPalette() {
   $('#palInput').focus();
 }
 function closePalette() { $('#paletteBack').classList.remove('open'); }
-const GROUP_ORDER = ['Acciones', 'Ir a', 'Tareas', 'Notas', 'Mapas mentales', 'Kanban', 'Calendario', 'Marcadores', 'Hábitos', 'Proyectos', 'Almacén cifrado'];
+const GROUP_ORDER = ['Acciones', 'Ir a', 'Etiquetas', 'Tareas', 'Notas', 'Mapas mentales', 'Kanban', 'Calendario', 'Marcadores', 'Hábitos', 'Proyectos', 'Almacén cifrado'];
 function renderPalette() {
   const q = norm($('#palInput').value.trim());
   let res;

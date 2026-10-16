@@ -15,7 +15,7 @@ with sync_playwright() as p:
     U=_HTML
     pg.goto(U); pg.evaluate("localStorage.clear(); indexedDB.deleteDatabase('cdm-data'); 0"); pg.goto('about:blank'); pg.goto(U+'#devtools'); pg.wait_for_timeout(400)
     tools=pg.evaluate("Object.keys(DEV_HELP)")
-    ok(len(tools)==11 and pg.locator('details.tool-help').count()==11,'ayuda en las 11 herramientas')
+    ok(len(tools)==12 and pg.locator('details.tool-help').count()==12,'ayuda en las 12 herramientas')
     ok(pg.is_visible('.tool-pane[data-pane=json] .tool-help-body'),'ayuda abierta por defecto')
     def ex(tool, i=0):
         pg.click(f'#toolTabs [data-tool={tool}]'); pg.click(f'.tool-pane[data-pane={tool}] [data-example="{i}"]'); pg.wait_for_timeout(450)

@@ -28,14 +28,14 @@ function cardHtml(t) {
   const ci = COLS.findIndex(c => c.id === t.col);
   const p = PRIO[t.priority] || PRIO.media;
   return `<div class="kb-card p-${t.priority || 'media'}${t.col === 'done' ? ' done' : ''}" draggable="true" data-id="${esc(t.id)}" tabindex="0">
-    <div class="ttl">${esc(t.title)}</div>
-    ${t.desc ? `<div class="small muted desc">${esc(t.desc.slice(0, 160)).replace(/\[\[([^\[\]\n]+)\]\]/g, '<span class="wl-mini">$1</span>')}${t.desc.length > 160 ? '…' : ''}</div>` : ''}
+    <div class="ttl">${tagHighlight(esc(t.title))}</div>
+    ${t.desc ? `<div class="small muted desc">${tagHighlight(esc(t.desc.slice(0, 160))).replace(/\[\[([^\[\]\n]+)\]\]/g, '<span class="wl-mini">$1</span>')}${t.desc.length > 160 ? '…' : ''}</div>` : ''}
     <div class="kb-meta">
       <span class="badge ${p.cls}">${p.label}</span>
       ${di ? `<span class="badge ${di.cls}">${di.label}</span>` : ''}
       ${subs.length ? `<span class="badge${doneN === subs.length ? ' success' : ''}">☑ ${doneN}/${subs.length}</span>` : ''}
       ${t.pomodoros ? `<span class="badge" title="Pomodoros dedicados">🍅 ${t.pomodoros}</span>` : ''}
-      ${(t.tags || []).map(g => `<span class="badge accent">#${esc(g)}</span>`).join('')}
+      ${(t.tags || []).map(g => `<span class="badge accent tg-mini" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
     </div>
     ${subs.length ? `<div class="progress"><span style="width:${Math.round(doneN / subs.length * 100)}%"></span></div>
     <details class="subs"${openSubs.has(t.id) ? ' open' : ''}><summary>Subtareas</summary>${subs.map(s => `<label class="check-row"><input type="checkbox" class="check" data-sub="${esc(s.id)}"${s.done ? ' checked' : ''}><span class="${s.done ? 'muted strike' : ''}">${esc(s.text)}</span></label>`).join('')}</details>` : ''}
@@ -110,7 +110,7 @@ async function openTask(id, col = 'todo') {
       <div><label class="lbl">Prioridad</label><select class="field" name="priority">${Object.entries(PRIO).map(([k, p]) => `<option value="${k}"${k === draft.priority ? ' selected' : ''}>${p.label}</option>`).join('')}</select></div>
       <div><label class="lbl">Fecha límite</label><input type="date" class="field" name="due" value="${esc(draft.due)}"></div>
     </div>
-    <div><label class="lbl">Etiquetas (separadas por comas)</label><input class="field" type="text" name="tags" value="${esc((draft.tags || []).join(', '))}" placeholder="trabajo, casa, urgente…"></div>
+    <div><label class="lbl">Etiquetas (separadas por comas; también vale escribir #etiqueta en el título o la descripción)</label><input class="field" type="text" name="tags" value="${esc((draft.tags || []).join(', '))}" placeholder="trabajo, casa, urgente…"></div>
     <div><label class="lbl">Subtareas <span id="subProg"></span></label>
       <div id="subList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="subNew" placeholder="Nueva subtarea y Enter" data-noenter><button type="button" class="btn" id="subAdd">Añadir</button></div>

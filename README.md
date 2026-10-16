@@ -11,9 +11,9 @@ solo en el navegador (opcionalmente cifrados).
 | Área | Funciones |
 | --- | --- |
 | Organización | Tareas (lenguaje natural: «mañana», «el viernes», «cada lunes», `#lista`, `!`), Kanban, Calendario (.ics), Notas, Wiki (notas en árbol), Mapas mentales, Grafo de conexiones, Marcadores |
-| Conocimiento | Enlaces `[[Nota]]` con autocompletado, enlaces entrantes y menciones, bloques de código con resaltado, importación de Markdown/Obsidian y CherryTree (`.ctd`), exportación de ramas como manual HTML |
+| Conocimiento | Etiquetas `#tema` comunes a todas las secciones (con niveles y nube), enlaces `[[Nota]]` con autocompletado, enlaces entrantes y menciones, bloques de código con resaltado, importación de Markdown/Obsidian y CherryTree (`.ctd`), exportación de ramas como manual HTML |
 | Foco | Pomodoro, registro de horas por proyecto, hábitos |
-| Utilidades | Calculadora, plazos en días hábiles (festivos de España), herramientas para desarrolladores (JSON/XML, Base64, JWT, hash, Regex explicada, validadores NIF/CIF/IBAN…), encriptador AES-256-GCM, generador de contraseñas |
+| Utilidades | Calculadora, plazos en días hábiles (festivos de España), herramientas para desarrolladores (JSON/XML, Base64, JWT, hash, Regex explicada, validadores NIF/CIF/IBAN, Listas: separar, limpiar, unir en `OR` o `IN` de SQL y comparar…), encriptador AES-256-GCM, generador de contraseñas |
 | Datos | Bloqueo con contraseña (todo cifrado), historial de versiones, archivo de sincronización en disco, copias exportables cifradas |
 
 ## Principios de diseño

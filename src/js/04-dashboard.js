@@ -55,6 +55,7 @@ function renderDashboard() {
 
   // Notas recientes
   const notes = [...S.notes].sort((a, b) => b.updated - a.updated).slice(0, 6);
+  renderDashTags();
   $('#dashNotes').innerHTML = notes.length ? notes.map(n => `<div class="list-item" data-note="${esc(n.id)}"><span>${n.pinned ? '📌' : '📄'}</span><span class="grow ellipsis">${esc(n.title)}</span><span class="muted small">${relTime(n.updated)}</span></div>`).join('') : '<div class="empty">Aún no hay notas</div>';
 
   // Foco 7 días

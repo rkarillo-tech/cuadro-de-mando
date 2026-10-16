@@ -7,7 +7,7 @@ let grNodes = [], grEdges = [], grById = new Map(), grAdj = new Map();
 const grPos = new Map();          // posiciones recordadas entre redibujos
 let grViewS = null, grAlpha = 0, grAlphaTarget = 0, grRaf = 0, grHover = null, grSel = null, grFocus = null, grFocusDepth = 1, grDrag = null;
 const grPtr = new Map();
-const GR_KIND = { note: 'Nota', todo: 'Tarea', kanban: 'Tarjeta Kanban', map: 'Mapa mental' };
+const GR_KIND = { note: 'Nota', todo: 'Tarea', kanban: 'Tarjeta Kanban', map: 'Mapa mental', tag: 'Etiqueta' };
 
 const grPlain = s => String(s || '').replace(/\[\[([^\[\]\n]+)\]\]/g, (m, x) => wlCleanTitle(x));
 function grHash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; }
@@ -42,6 +42,20 @@ function grBuild() {
       refs.forEach(r => link('m:' + m.id, 'n:' + r));
     });
   }
+  if ($('#grTags').checked) {
+    const pre = { note: 'n:', todo: 't:', kanban: 'k:', map: 'm:' };
+    tagIndex().forEach(e => {
+      if (e.implicit) return;
+      const its = e.items.filter(it => pre[it.kind] && (it.kind === 'note' || (it.kind === 'map' ? $('#grMaps').checked : $('#grTasks').checked)));
+      if (!its.length) return;
+      add('g:' + e.key, { kind: 'tag', ref: e.key, label: '#' + e.name });
+      its.forEach(it => {
+        const id = pre[it.kind] + it.id;
+        if (!nodes.has(id)) add(id, { kind: it.kind, ref: it.id, label: it.kind === 'note' ? it.label : grPlain(it.label), done: !!it.done });
+        link(id, 'g:' + e.key);
+      });
+    });
+  }
   const E = [...edges.values()];
   E.forEach(e => { nodes.get(e.a).deg++; nodes.get(e.b).deg++; });
   let keep = new Set(nodes.keys());
@@ -69,7 +83,7 @@ function grBuild() {
   if (grSel && !grById.has(grSel)) grSel = null;
   grAlpha = placed === grNodes.length ? Math.max(grAlpha, 0.25) : 1;
 }
-const grRadius = n => n.kind === 'note' ? Math.min(20, 5 + Math.sqrt(n.deg) * 3.2) : n.kind === 'map' ? 8 : 6;
+const grRadius = n => n.kind === 'note' ? Math.min(20, 5 + Math.sqrt(n.deg) * 3.2) : n.kind === 'map' ? 8 : n.kind === 'tag' ? Math.min(14, 5 + Math.sqrt(n.deg) * 2) : 6;
 
 /* ---------- Simulación de fuerzas ---------- */
 /* Repulsión entre nodos: dos métodos y la app elige sola el más rápido.
@@ -215,10 +229,11 @@ function grDraw(forExport = false) {
     n._sx = x; n._sy = y; n._r = r;
     const dim = (hi && !hi.has(n.id)) || (match && !match.has(n.id));
     ctx.globalAlpha = dim ? 0.15 : n.done ? 0.55 : 1;
-    const col = n.kind === 'note' ? (n.pinned ? C.warning : n.deg ? C.accent : C.muted) : n.kind === 'map' ? C.info : C.success;
+    const col = n.kind === 'note' ? (n.pinned ? C.warning : n.deg ? C.accent : C.muted) : n.kind === 'map' ? C.info : n.kind === 'tag' ? '#e36bd0' : C.success;
     ctx.fillStyle = col;
     ctx.beginPath();
     if (n.kind === 'note') ctx.arc(x, y, r, 0, Math.PI * 2);
+    else if (n.kind === 'tag') { ctx.moveTo(x, y - r * 1.2); ctx.lineTo(x + r * 1.1, y + r * 0.8); ctx.lineTo(x - r * 1.1, y + r * 0.8); ctx.closePath(); }
     else if (n.kind === 'map') { ctx.moveTo(x, y - r * 1.25); ctx.lineTo(x + r * 1.25, y); ctx.lineTo(x, y + r * 1.25); ctx.lineTo(x - r * 1.25, y); ctx.closePath(); }
     else { const s = r * 1.7; ctx.roundRect ? ctx.roundRect(x - s / 2, y - s / 2, s, s, 3) : ctx.rect(x - s / 2, y - s / 2, s, s); }
     ctx.fill();
@@ -291,7 +306,7 @@ function grRenderInfo() {
     const inc = S.notes.filter(x => x.id !== n.ref && (x.html || '').includes(`data-note="${n.ref}"`)).length;
     extra = `<div class="muted small">➡️ enlaza a ${out} · ⬅️ enlazada desde ${inc}</div>`;
   }
-  const icon = { note: '📄', todo: '☑️', kanban: '📋', map: '🧠' };
+  const icon = { note: '📄', todo: '☑️', kanban: '📋', map: '🧠', tag: '🏷️' };
   box.innerHTML = `<div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div class="grow" style="min-width:0"><div class="muted small">${icon[n.kind]} ${GR_KIND[n.kind]}</div><b class="gr-title">${esc(n.label)}</b>${extra}</div><button class="btn icon sm ghost" data-gi="close" title="Cerrar">✕</button></div>
     <div class="row" style="margin:8px 0"><button class="btn sm primary" data-gi="open">Abrir</button>${grFocus === n.id ? '' : '<button class="btn sm" data-gi="focus" title="Mostrar solo este nodo y lo que está conectado a él">🎯 Centrar aquí</button>'}</div>
     ${nbs.length ? `<div class="muted small" style="margin-bottom:4px">Conectado con (${nbs.length})</div><div class="gr-nbs">${nbs.slice(0, 30).map(x => `<button class="chip" data-gsel="${esc(x.id)}">${icon[x.kind]} ${esc(x.label.slice(0, 40))}</button>`).join('')}</div>` : '<div class="muted small">Sin conexiones. Enlázala desde otra nota escribiendo [[…]].</div>'}`;
@@ -301,6 +316,7 @@ function grOpen(n) {
   if (n.kind === 'note') { showTab('notes'); openNote(n.ref); }
   else if (n.kind === 'todo') { showTab('todos'); openTodo(n.ref); }
   else if (n.kind === 'kanban') { showTab('kanban'); openTask(n.ref); }
+  else if (n.kind === 'tag') openTagView(n.ref);
   else if (n.kind === 'map') { mmOpenMap(n.ref, false); mapsMode = 'mind'; store.set('mapsMode', 'mind'); showMapsMode('mind'); }
 }
 function grSetFocus(id, depth) {
@@ -386,7 +402,7 @@ $('#grInfo').addEventListener('click', e => {
 });
 $('#grFocus').addEventListener('click', e => { if (e.target.closest('#grFocusClear')) { grFocus = null; grShow(true); } });
 $('#grFocus').addEventListener('change', e => { if (e.target.id === 'grDepth') { grFocusDepth = +e.target.value; grShow(true); } });
-['grOrphans', 'grTasks', 'grMaps', 'grTree'].forEach(id => $('#' + id).addEventListener('change', () => grShow(true)));
+['grOrphans', 'grTasks', 'grMaps', 'grTree', 'grTags'].forEach(id => $('#' + id).addEventListener('change', () => grShow(true)));
 $('#grSearch').addEventListener('input', debounce(() => { grDraw(); }, 120));
 $('#grSearch').addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;

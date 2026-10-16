@@ -2,7 +2,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1LRmGtnGWyxHX0Es2+mKI6CfibMo6OblfZfjSarYIoA='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/Qq4QXPNzA50hzOhwsy9Q1dby4zc+OSF4fg2T949qZs='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -708,6 +708,45 @@ details.bl-row summary.bl-h{cursor:pointer}
 #codeLangPop{min-width:180px;max-height:320px;overflow:auto}
 .c-com{color:#6a8a6a;font-style:italic}.c-str{color:#c2410c}.c-num{color:#0e7490}.c-kw{color:#7c3aed;font-weight:600}.c-fn{color:#2563eb}.c-var{color:#b45309}.c-key{color:#9333ea}.c-tag{color:#2563eb}.c-attr{color:#b45309}
 [data-theme="dark"] .c-com{color:#7f9f7f}[data-theme="dark"] .c-str{color:#f0a374}[data-theme="dark"] .c-num{color:#67d4e8}[data-theme="dark"] .c-kw{color:#b9a7ff}[data-theme="dark"] .c-fn{color:#7cb7ff}[data-theme="dark"] .c-var{color:#f5c76b}[data-theme="dark"] .c-key{color:#d8a7ff}[data-theme="dark"] .c-tag{color:#7cb7ff}[data-theme="dark"] .c-attr{color:#f5c76b}
+/* ---- Herramienta Listas ---- */
+.ls-top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;margin-bottom:10px}
+.ls-opts{display:grid;gap:10px;align-content:start}
+.ls-checks{display:flex;flex-wrap:wrap;gap:6px 14px}
+.ls-stats{margin:6px 0 10px}
+.ls-items{max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:10px;padding:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:2px 10px;background:var(--surface-2)}
+.ls-item{display:flex;gap:7px;align-items:center;padding:3px 6px;border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:.84rem;min-width:0}
+.ls-item:hover{background:var(--hover)}
+.ls-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ls-item:has(input:not(:checked)) span{opacity:.5}
+.ls-format{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 10px;align-items:end}
+.ls-format>div[hidden]{display:none}
+.ls-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ls-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ls-out textarea{margin-top:6px}
+@media (max-width:900px){.ls-top,.ls-grid2,.ls-grid3{grid-template-columns:1fr}}
+/* ---- Etiquetas ---- */
+.editor .tg{color:var(--accent);background:var(--accent-soft);border-radius:5px;padding:0 3px;font-weight:600}
+.tg-mini{color:var(--accent);font-weight:600;cursor:pointer;border-radius:4px}
+.tg-mini:hover{text-decoration:underline}
+.badge.tg-mini{cursor:pointer}
+.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;border:1px solid transparent;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:.8rem;cursor:pointer}
+.tag-chip:hover{border-color:var(--accent)}
+.tags-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:16px;align-items:start}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;line-height:1.5}
+.cloud-tag{border:0;background:none;cursor:pointer;color:var(--accent);opacity:var(--w,1);font-weight:650;padding:2px 4px;border-radius:7px;font-family:inherit}
+.cloud-tag sup{font-size:.55em;color:var(--muted);margin-left:2px;font-weight:500}
+.cloud-tag:hover{opacity:1;background:var(--accent-soft)}
+.cloud-tag.on{opacity:1;background:var(--accent);color:#fff}
+.cloud-tag.on sup{color:#fff}
+.tg-title{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.tg-title .crumb{border:0;background:none;color:var(--muted);cursor:pointer;font:inherit;padding:0}
+.tg-group{margin-top:14px}
+.tg-group h4{margin:0 0 6px;font-size:.9rem}
+.tg-its{display:flex;gap:6px;flex-shrink:0;font-size:.75rem}
+.list-item.done .ellipsis{text-decoration:line-through;opacity:.6}
+#tgDetail .bl-row{margin-top:8px}
+.lg-tri{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #e36bd0;display:inline-block}
+@media (max-width:900px){.tags-layout{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -785,6 +824,10 @@ details.bl-row summary.bl-h{cursor:pointer}
         <div class="card">
           <div class="card-h"><h3>📋 Kanban · próximas</h3><button class="btn sm ghost" data-goto="kanban">Ver tablero →</button></div>
           <div class="list" id="dashTasks"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>🏷️ Etiquetas</h3><button class="btn sm ghost" data-goto="tags">Ver todas →</button></div>
+          <div id="dashTags"></div>
         </div>
         <div class="card">
           <div class="card-h"><h3>📝 Notas recientes</h3><button class="btn sm ghost" data-goto="notes">Ver todas →</button></div>
@@ -938,6 +981,7 @@ details.bl-row summary.bl-h{cursor:pointer}
           </div>
           <div class="editor" id="editor" contenteditable="true" spellcheck="true" data-placeholder="Empieza a escribir…"></div>
           <div class="status"><span id="noteCount"></span><span id="noteSaved"></span></div>
+          <div class="subpages bl-row" id="noteTags" hidden></div>
           <div class="subpages bl-row" id="subpages" hidden></div>
           <div class="backlinks" id="backlinks"></div>
         </div>
@@ -1006,6 +1050,7 @@ details.bl-row summary.bl-h{cursor:pointer}
             <label class="check-row" title="Tareas y tarjetas Kanban que mencionan [[una nota]]"><input type="checkbox" class="check" id="grTasks" checked> Tareas</label>
             <label class="check-row" title="Mapas mentales con ideas enlazadas a notas"><input type="checkbox" class="check" id="grMaps" checked> Mapas</label>
             <label class="check-row" title="Relación página → subpágina de la wiki (línea discontinua)"><input type="checkbox" class="check" id="grTree" checked> Jerarquía wiki</label>
+            <label class="check-row" title="Muestra las #etiquetas como nodos unidos a lo que las lleva"><input type="checkbox" class="check" id="grTags"> Etiquetas</label>
             <span id="grFocus"></span>
             <div class="grow"></div>
             <div class="mm-zoom">
@@ -1034,10 +1079,25 @@ details.bl-row summary.bl-h{cursor:pointer}
             <span><i class="lg-sq" style="background:var(--success)"></i> Tarea / tarjeta</span>
             <span><i class="lg-dia" style="background:var(--info)"></i> Mapa mental</span>
             <span><i class="lg-dash"></i> Página → subpágina</span>
+            <span><i class="lg-tri"></i> Etiqueta</span>
             <span class="muted" id="grPerf" title="Con muchos nodos el grafo cambia solo a un cálculo aproximado mucho más rápido"></span>
             <span class="muted">Clic: detalles · doble clic: abrir · arrastra nodos o el fondo · rueda: zoom</span>
           </div>
         </div>
+      </div>
+    </section>
+    <!-- ===================== ETIQUETAS ===================== -->
+    <section class="view" id="view-tags">
+      <div class="tags-layout">
+        <div class="card">
+          <div class="card-h"><h3>☁️ Nube de etiquetas</h3>
+            <div class="seg" id="tgSort"><button data-s="count" class="on">Más usadas</button><button data-s="az">A → Z</button></div>
+          </div>
+          <input class="field" id="tgSearch" placeholder="🔍 Buscar etiqueta…" style="margin-bottom:10px">
+          <div class="tag-cloud" id="tgCloud"></div>
+          <p class="hint">Escribe <b>#etiqueta</b> en cualquier nota, tarea, tarjeta, evento, marcador o idea de un mapa (al teclear <kbd>#</kbd> te sugiere las que ya usas). Con <b>/</b> puedes crear niveles: <code>#proyecto/portal</code> también aparece en <code>#proyecto</code>. Mayúsculas y tildes no cuentan: <code>#Reunión</code> = <code>#reunion</code>.</p>
+        </div>
+        <div class="card" id="tgDetail"></div>
       </div>
     </section>
     <!-- ===================== MARCADORES ===================== -->
@@ -1251,6 +1311,7 @@ details.bl-row summary.bl-h{cursor:pointer}
         <button data-tool="time">Fechas / epoch</button>
         <button data-tool="valid">NIF · CIF · IBAN</button>
         <button data-tool="text">Texto</button>
+        <button data-tool="lists">Listas</button>
       </div>
 
       <div class="card tool-pane active" data-pane="json">
@@ -1453,6 +1514,67 @@ details.bl-row summary.bl-h{cursor:pointer}
         <input class="field mono" id="valIn" placeholder="12345678Z · X1234567L · B12345674 · ES91 2100 0418 4502 0005 1332" spellcheck="false" style="font-size:1.05rem">
         <div class="result-box" id="valOut"><span class="muted">Escribe un documento o una cuenta y se detecta el tipo automáticamente. Con 8 dígitos calcula la letra del DNI.</span></div>
         <p class="hint">Comprueba solo el dígito o letra de control: no confirma que el documento o la cuenta existan.</p>
+      </div>
+
+
+      <div class="card tool-pane" data-pane="lists">
+        <div class="ls-top">
+          <div class="ls-in">
+            <label class="lbl" for="lsIn">Lista <span id="lsLblA" hidden>A</span></label>
+            <textarea class="field code" id="lsIn" rows="9" spellcheck="false" placeholder="Pega aquí tus valores: uno por línea, separados por comas, una columna de Excel…"></textarea>
+          </div>
+          <div class="ls-opts">
+            <div><label class="lbl" for="lsSplit">Separar por</label>
+              <div class="row" style="flex-wrap:nowrap;gap:6px">
+                <select class="field" id="lsSplit"><option value="auto">✨ Detectar</option><option value="line">Saltos de línea</option><option value="comma">Comas</option><option value="semi">Punto y coma</option><option value="tab">Tabuladores</option><option value="space">Espacios</option><option value="pipe">Barra vertical |</option><option value="multi">Línea, coma, ; y tab</option><option value="custom">Otro…</option></select>
+                <input class="field" id="lsSplitCustom" placeholder="p. ej. -" hidden style="max-width:110px">
+              </div>
+              <div class="muted small" id="lsDetected" style="min-height:1.2em;margin-top:4px"></div>
+            </div>
+            <div class="ls-checks">
+              <label class="check-row"><input type="checkbox" class="check" id="lsTrim" checked> Quitar espacios</label>
+              <label class="check-row"><input type="checkbox" class="check" id="lsEmpty" checked> Quitar vacíos</label>
+              <label class="check-row"><input type="checkbox" class="check" id="lsUnquote"> Quitar comillas</label>
+              <label class="check-row"><input type="checkbox" class="check" id="lsDedupe"> Quitar duplicados</label>
+              <label class="check-row" title="Al quitar duplicados y al comparar, «Ávila» = «avila»"><input type="checkbox" class="check" id="lsLoose" checked> Ignorar mayúsculas y tildes</label>
+            </div>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div><label class="lbl" for="lsSort">Ordenar</label><select class="field" id="lsSort"><option value="">Como están</option><option value="az">A → Z</option><option value="za">Z → A</option><option value="nat">Natural (2 antes que 10)</option><option value="len">Por longitud</option><option value="rev">Invertir orden</option></select></div>
+              <div><label class="lbl" for="lsCase">Transformar</label><select class="field" id="lsCase"><option value="">Sin cambios</option><option value="up">MAYÚSCULAS</option><option value="low">minúsculas</option><option value="title">Primera Mayúscula</option><option value="noacc">Sin tildes</option></select></div>
+            </div>
+          </div>
+        </div>
+        <div class="status-line ls-stats" id="lsStats"></div>
+        <div class="seg" id="lsMode"><button data-m="pick" class="on">✅ Seleccionar y unir</button><button data-m="cmp">⚖️ Comparar con otra lista</button></div>
+
+        <div class="ls-pane" data-lm="pick">
+          <div class="row" style="margin:10px 0 6px">
+            <input class="field" id="lsFilter" placeholder="🔍 Filtrar…" style="max-width:220px">
+            <button class="btn sm" data-ls="all">Marcar todos</button><button class="btn sm" data-ls="none">Ninguno</button><button class="btn sm" data-ls="inv">Invertir</button><button class="btn sm" data-ls="matchOn" title="Marca los que coinciden con el filtro">Marcar filtrados</button><button class="btn sm" data-ls="matchOff" title="Desmarca los que coinciden con el filtro">Desmarcar filtrados</button>
+            <span class="muted small" id="lsPickInfo"></span>
+          </div>
+          <div class="ls-items" id="lsItems"></div>
+        </div>
+        <div class="ls-pane" data-lm="cmp" hidden>
+          <label class="lbl" for="lsInB" style="margin-top:10px">Lista B <span class="muted small">(se separa y limpia igual que la A)</span></label>
+          <textarea class="field code" id="lsInB" rows="7" spellcheck="false" placeholder="Pega aquí la segunda lista…"></textarea>
+        </div>
+
+        <div class="ls-format">
+          <div><label class="lbl" for="lsPreset">Formato de salida</label>
+            <select class="field" id="lsPreset">
+              <option value="or">valor OR valor</option><option value="and">valor AND valor</option><option value="cs">valor, valor</option><option value="c">valor,valor</option><option value="sc">valor;valor</option><option value="lines">Uno por línea</option><option value="tab">Separado por tabuladores</option>
+              <option value="sqlin">SQL: IN ('a', 'b')</option><option value="sqlnum">SQL: IN (1, 2) numérico</option><option value="json">JSON: ["a", "b"]</option><option value="csv">CSV entre comillas</option><option value="md">Lista Markdown</option><option value="rx">Regex: (?:a|b)</option><option value="custom">Personalizado…</option>
+            </select></div>
+          <div data-lsf="custom"><label class="lbl" for="lsSep">Separador</label><input class="field" id="lsSep" value=" | " spellcheck="false"></div>
+          <div data-lsf="wrap"><label class="lbl" for="lsQuote">Comillas</label><select class="field" id="lsQuote"><option value="">Ninguna</option><option value="'">'simples'</option><option value='"'>"dobles"</option><option value="`">`invertidas`</option></select></div>
+          <div data-lsf="wrap"><label class="lbl" for="lsPre">Prefijo</label><input class="field" id="lsPre" spellcheck="false"></div>
+          <div data-lsf="wrap"><label class="lbl" for="lsSuf">Sufijo</label><input class="field" id="lsSuf" spellcheck="false"></div>
+          <div data-lsf="sql"><label class="lbl" for="lsCol">Columna</label><input class="field" id="lsCol" placeholder="p. ej. ID_EXPEDIENTE" spellcheck="false"></div>
+          <div data-lsf="sql"><label class="lbl" for="lsChunk" title="Oracle admite como máximo 1000 valores en un IN">Máx. por IN</label><input class="field" type="number" id="lsChunk" value="1000" min="1" max="100000"></div>
+        </div>
+
+        <div class="ls-outs" id="lsOuts"></div>
       </div>
 
       <div class="card tool-pane" data-pane="text">
@@ -2232,7 +2354,7 @@ async function replaceAllData(data) {
 }
 
 /* ---------- Migración desde versiones anteriores ---------- */
-const WELCOME_HTML = '<h2>¡Bienvenido a tu Cuadro de Mando! 👋</h2><div>Todo lo que hagas aquí se guarda <b>solo en este navegador</b>. Algunas ideas para empezar:</div><div><input type="checkbox" class="chk">&nbsp;Pulsa <b>Ctrl + K</b> para buscar en todo o lanzar acciones</div><div><input type="checkbox" class="chk">&nbsp;Apunta tus pendientes en <b>Tareas</b>: entiende «mañana», «el viernes», «#lista» o «!»</div><div><input type="checkbox" class="chk">&nbsp;Organiza proyectos en el <b>Kanban</b> y registra tu tiempo en <b>Horas</b></div><div><input type="checkbox" class="chk">&nbsp;En <b>Ajustes</b>, activa el bloqueo con contraseña y vincula un archivo de copia</div><div><br></div><blockquote>Consejo: pulsa ⌨️ arriba a la derecha para ver todos los atajos de teclado.</blockquote>';
+const WELCOME_HTML = '<h2>¡Bienvenido a tu Cuadro de Mando! 👋</h2><div>Todo lo que hagas aquí se guarda <b>solo en este navegador</b>. Algunas ideas para empezar:</div><div><input type="checkbox" class="chk">&nbsp;Pulsa <b>Ctrl + K</b> para buscar en todo o lanzar acciones</div><div><input type="checkbox" class="chk">&nbsp;Apunta tus pendientes en <b>Tareas</b>: entiende «mañana», «el viernes», <code>#lista</code> o <code>!</code></div><div><input type="checkbox" class="chk">&nbsp;Organiza proyectos en el <b>Kanban</b> y registra tu tiempo en <b>Horas</b></div><div><input type="checkbox" class="chk">&nbsp;En <b>Ajustes</b>, activa el bloqueo con contraseña y vincula un archivo de copia</div><div><br></div><blockquote>Consejo: pulsa ⌨️ arriba a la derecha para ver todos los atajos de teclado.</blockquote>';
 
 function migrateLegacy() {
   if (ls.get('migrated', false)) return;
@@ -2329,6 +2451,7 @@ const TABS = [
   { id: 'calendar', icon: '📅', label: 'Calendario', group: 'Organización', sub: 'Eventos, fechas límite y festivos' },
   { id: 'notes', icon: '📝', label: 'Notas', group: 'Organización', sub: 'Editor enriquecido con guardado automático · escribe [[ para enlazar notas' },
   { id: 'maps', icon: '🧠', label: 'Mapas', group: 'Organización', sub: 'Mapas mentales y conexiones entre tus notas' },
+  { id: 'tags', icon: '🏷️', label: 'Etiquetas', group: 'Organización', sub: 'Todo lo que comparte una #etiqueta, sea de la sección que sea' },
   { id: 'bookmarks', icon: '🔖', label: 'Marcadores', group: 'Organización', sub: 'Tus enlaces frecuentes, ordenados' },
   { id: 'timer', icon: '🍅', label: 'Pomodoro', group: 'Foco', sub: 'Concéntrate por bloques y registra tu tiempo' },
   { id: 'time', icon: '⏱️', label: 'Horas', group: 'Foco', sub: 'Registro de tiempo por proyecto' },
@@ -2433,6 +2556,7 @@ function showShortcuts() {
       <span><kbd>Ctrl</kbd> + <kbd>K</kbd> en una nota</span><span>Insertar enlace</span>
       <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd></span><span>Insertar casilla de tarea en una nota</span>
       <span><kbd>[[</kbd> en una nota</span><span>Enlazar con otra nota (aparece en 🧠 Mapas → Conexiones)</span>
+      <span><kbd>#</kbd> en notas, tareas…</span><span>Poner una etiqueta (te sugiere las que ya usas). <kbd>Ctrl</kbd>+clic en una etiqueta de una nota la abre</span>
       <span><kbd>Tab</kbd> / <kbd>Enter</kbd> en un mapa mental</span><span>Añadir idea hija / hermana (más en la ❔ Ayuda de Mapas)</span>
       <span><kbd>Enter</kbd> en una línea con casilla</span><span>Crea otra casilla (Enter en una vacía la quita)</span>
       <span><kbd>Espacio</kbd></span><span>Iniciar / pausar el Pomodoro (en su sección)</span>
@@ -2478,6 +2602,7 @@ function paletteData() {
   S.notes.forEach(n => out.push({ g: 'Notas', icon: n.pinned ? '📌' : '📄', title: n.title, sub: (wkParent(n) ? '📚 ' + wkPath(n) + ' · ' : '') + (n.text || '').slice(0, 90), hay: norm(n.title + ' ' + (n.text || '')), run: () => { showTab('notes'); openNote(n.id); } }));
   S.tasks.forEach(t => out.push({ g: 'Kanban', icon: '📋', title: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', hay: norm(t.title + ' ' + (t.desc || '') + ' ' + (t.tags || []).join(' ') + ' ' + (t.subtasks || []).map(s => s.text).join(' ')), rank: t.col === 'done' ? 1 : 0, run: () => { showTab('kanban'); openTask(t.id); } }));
   S.events.forEach(ev => out.push({ g: 'Calendario', icon: '📅', title: ev.title, sub: fmtDayLabel(ev.date) + (ev.allDay ? '' : ' · ' + ev.start) + (ev.repeat ? ' · se repite' : ''), hay: norm(ev.title + ' ' + (ev.notes || '')), run: () => { showTab('calendar'); calGoto(ev.date); openEvent(ev.id); } }));
+  tagIndex().forEach(e => out.push({ g: 'Etiquetas', icon: '🏷️', title: '#' + e.name, sub: `${tagItemsOf(e.key).length} elementos`, hay: norm('#' + e.name + ' ' + e.name), run: () => openTagView(e.key) }));
   S.mindmaps.forEach(m => {
     const open = id => () => { mmOpenMap(m.id, false); if (id) mmSelId = id; mapsMode = 'mind'; store.set('mapsMode', 'mind'); if (currentTab !== 'maps') showTab('maps'); else showMapsMode('mind'); if (id) setTimeout(() => mmEnsureVisible(id), 30); };
     out.push({ g: 'Mapas mentales', icon: '🧠', title: m.title, sub: `${mmCount(m.root)} ideas`, hay: norm(m.title), run: open(null) });
@@ -2499,7 +2624,7 @@ function openPalette() {
   $('#palInput').focus();
 }
 function closePalette() { $('#paletteBack').classList.remove('open'); }
-const GROUP_ORDER = ['Acciones', 'Ir a', 'Tareas', 'Notas', 'Mapas mentales', 'Kanban', 'Calendario', 'Marcadores', 'Hábitos', 'Proyectos', 'Almacén cifrado'];
+const GROUP_ORDER = ['Acciones', 'Ir a', 'Etiquetas', 'Tareas', 'Notas', 'Mapas mentales', 'Kanban', 'Calendario', 'Marcadores', 'Hábitos', 'Proyectos', 'Almacén cifrado'];
 function renderPalette() {
   const q = norm($('#palInput').value.trim());
   let res;
@@ -2626,6 +2751,7 @@ function renderDashboard() {
 
   // Notas recientes
   const notes = [...S.notes].sort((a, b) => b.updated - a.updated).slice(0, 6);
+  renderDashTags();
   $('#dashNotes').innerHTML = notes.length ? notes.map(n => `<div class="list-item" data-note="${esc(n.id)}"><span>${n.pinned ? '📌' : '📄'}</span><span class="grow ellipsis">${esc(n.title)}</span><span class="muted small">${relTime(n.updated)}</span></div>`).join('') : '<div class="empty">Aún no hay notas</div>';
 
   // Foco 7 días
@@ -2761,7 +2887,9 @@ function parseTodoInput(raw, lists) {
     if (w === '!' || w === '!!') { r.important = true; used[i] = true; continue; }
     if (/^#\S+/.test(toks[i])) {
       const q = norm(toks[i].slice(1));
-      const l = lists.find(l => norm(l.name) === q) || lists.find(l => norm(l.name).replace(/\s+/g, '').startsWith(q));
+      // #Lista elige la lista; si no coincide con ninguna, es una etiqueta y se queda en el texto
+      const isTag = typeof tagIndex === 'function' && tagIndex().has(tagKey(toks[i]));
+      const l = lists.find(l => norm(l.name) === q || norm(l.name).replace(/\s+/g, '') === q) || (!isTag && q.length >= 3 ? lists.find(l => norm(l.name).replace(/\s+/g, '').startsWith(q)) : null);
       if (l) { r.listId = l.id; used[i] = true; }
       continue;
     }
@@ -2847,7 +2975,7 @@ function todoItemHtml(t, opts = {}) {
   if (t.done && t.doneAt) meta.push(`<span>✓ ${esc(relTime(t.doneAt))}</span>`);
   return `<div class="todo-item${t.done ? ' done' : ''}${t.important ? ' important' : ''}" data-id="${esc(t.id)}"${opts.drag ? ' draggable="true"' : ''} tabindex="0">
     <button class="todo-check" data-act="check" title="${t.done ? 'Marcar como pendiente' : 'Completar'}">✓</button>
-    <div class="todo-main" data-act="open"><div class="todo-text">${esc(t.text)}</div>${meta.length ? `<div class="todo-meta">${meta.join('')}</div>` : ''}</div>
+    <div class="todo-main" data-act="open"><div class="todo-text">${tagHighlight(esc(t.text))}</div>${meta.length ? `<div class="todo-meta">${meta.join('')}</div>` : ''}</div>
     <button class="todo-star${t.important ? ' on' : ''}" data-act="star" title="${t.important ? 'Quitar importante' : 'Marcar como importante'}">${t.important ? '★' : '☆'}</button>
   </div>`;
 }
@@ -3182,14 +3310,14 @@ function cardHtml(t) {
   const ci = COLS.findIndex(c => c.id === t.col);
   const p = PRIO[t.priority] || PRIO.media;
   return `<div class="kb-card p-${t.priority || 'media'}${t.col === 'done' ? ' done' : ''}" draggable="true" data-id="${esc(t.id)}" tabindex="0">
-    <div class="ttl">${esc(t.title)}</div>
-    ${t.desc ? `<div class="small muted desc">${esc(t.desc.slice(0, 160)).replace(/\[\[([^\[\]\n]+)\]\]/g, '<span class="wl-mini">$1</span>')}${t.desc.length > 160 ? '…' : ''}</div>` : ''}
+    <div class="ttl">${tagHighlight(esc(t.title))}</div>
+    ${t.desc ? `<div class="small muted desc">${tagHighlight(esc(t.desc.slice(0, 160))).replace(/\[\[([^\[\]\n]+)\]\]/g, '<span class="wl-mini">$1</span>')}${t.desc.length > 160 ? '…' : ''}</div>` : ''}
     <div class="kb-meta">
       <span class="badge ${p.cls}">${p.label}</span>
       ${di ? `<span class="badge ${di.cls}">${di.label}</span>` : ''}
       ${subs.length ? `<span class="badge${doneN === subs.length ? ' success' : ''}">☑ ${doneN}/${subs.length}</span>` : ''}
       ${t.pomodoros ? `<span class="badge" title="Pomodoros dedicados">🍅 ${t.pomodoros}</span>` : ''}
-      ${(t.tags || []).map(g => `<span class="badge accent">#${esc(g)}</span>`).join('')}
+      ${(t.tags || []).map(g => `<span class="badge accent tg-mini" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
     </div>
     ${subs.length ? `<div class="progress"><span style="width:${Math.round(doneN / subs.length * 100)}%"></span></div>
     <details class="subs"${openSubs.has(t.id) ? ' open' : ''}><summary>Subtareas</summary>${subs.map(s => `<label class="check-row"><input type="checkbox" class="check" data-sub="${esc(s.id)}"${s.done ? ' checked' : ''}><span class="${s.done ? 'muted strike' : ''}">${esc(s.text)}</span></label>`).join('')}</details>` : ''}
@@ -3264,7 +3392,7 @@ async function openTask(id, col = 'todo') {
       <div><label class="lbl">Prioridad</label><select class="field" name="priority">${Object.entries(PRIO).map(([k, p]) => `<option value="${k}"${k === draft.priority ? ' selected' : ''}>${p.label}</option>`).join('')}</select></div>
       <div><label class="lbl">Fecha límite</label><input type="date" class="field" name="due" value="${esc(draft.due)}"></div>
     </div>
-    <div><label class="lbl">Etiquetas (separadas por comas)</label><input class="field" type="text" name="tags" value="${esc((draft.tags || []).join(', '))}" placeholder="trabajo, casa, urgente…"></div>
+    <div><label class="lbl">Etiquetas (separadas por comas; también vale escribir #etiqueta en el título o la descripción)</label><input class="field" type="text" name="tags" value="${esc((draft.tags || []).join(', '))}" placeholder="trabajo, casa, urgente…"></div>
     <div><label class="lbl">Subtareas <span id="subProg"></span></label>
       <div id="subList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="subNew" placeholder="Nueva subtarea y Enter" data-noenter><button type="button" class="btn" id="subAdd">Añadir</button></div>
@@ -3711,12 +3839,12 @@ function renderNotesView() {
     $('#pinNoteBtn').title = n.pinned ? 'Desfijar' : 'Fijar arriba';
     $('#noteSaved').textContent = `Editada ${relTime(n.updated)}`;
     savedRange = null;
-    wlClose(); wlRefreshEditor(); highlightAllPre();
+    wlClose(); wlRefreshEditor(); highlightAllPre(); tagDecorateEditor();
     updateCount(); updateEmpty();
   }
   store.set('currentNote', currentNoteId);
   renderNoteList();
-  wkRenderCrumbs(); wkRenderSubpages();
+  wkRenderCrumbs(); wkRenderSubpages(); renderNoteTags();
   renderBacklinks();
 }
 function updateEmpty() { editor.classList.toggle('is-empty', !editor.textContent.trim() && !editor.querySelector('input,hr,li')); }
@@ -3737,7 +3865,7 @@ function flushNote(force = false) {
   save.notes();
   $('#noteSaved').textContent = '✓ Guardado a las ' + fmtTime(Date.now());
   renderNoteList();
-  renderBacklinks();
+  renderBacklinks(); renderNoteTags();
 }
 const saveNoteSoon = debounce(() => flushNote(), 600);
 function markDirty() { noteDirty = true; $('#noteSaved').textContent = 'Guardando…'; updateEmpty(); updateCount(); saveNoteSoon(); }
@@ -3940,6 +4068,7 @@ function firstMeaningful(el) {
 }
 editor.addEventListener('keydown', e => {
   if (wlKey(e)) return;
+  if (tagAcKey(e)) return;
   const k = e.key.toLowerCase();
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && k === 'k') { e.preventDefault(); insertLink(); return; }
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && k === 'x') { e.preventDefault(); insertChecklist(); return; }
@@ -5657,7 +5786,7 @@ let grNodes = [], grEdges = [], grById = new Map(), grAdj = new Map();
 const grPos = new Map();          // posiciones recordadas entre redibujos
 let grViewS = null, grAlpha = 0, grAlphaTarget = 0, grRaf = 0, grHover = null, grSel = null, grFocus = null, grFocusDepth = 1, grDrag = null;
 const grPtr = new Map();
-const GR_KIND = { note: 'Nota', todo: 'Tarea', kanban: 'Tarjeta Kanban', map: 'Mapa mental' };
+const GR_KIND = { note: 'Nota', todo: 'Tarea', kanban: 'Tarjeta Kanban', map: 'Mapa mental', tag: 'Etiqueta' };
 
 const grPlain = s => String(s || '').replace(/\[\[([^\[\]\n]+)\]\]/g, (m, x) => wlCleanTitle(x));
 function grHash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; }
@@ -5692,6 +5821,20 @@ function grBuild() {
       refs.forEach(r => link('m:' + m.id, 'n:' + r));
     });
   }
+  if ($('#grTags').checked) {
+    const pre = { note: 'n:', todo: 't:', kanban: 'k:', map: 'm:' };
+    tagIndex().forEach(e => {
+      if (e.implicit) return;
+      const its = e.items.filter(it => pre[it.kind] && (it.kind === 'note' || (it.kind === 'map' ? $('#grMaps').checked : $('#grTasks').checked)));
+      if (!its.length) return;
+      add('g:' + e.key, { kind: 'tag', ref: e.key, label: '#' + e.name });
+      its.forEach(it => {
+        const id = pre[it.kind] + it.id;
+        if (!nodes.has(id)) add(id, { kind: it.kind, ref: it.id, label: it.kind === 'note' ? it.label : grPlain(it.label), done: !!it.done });
+        link(id, 'g:' + e.key);
+      });
+    });
+  }
   const E = [...edges.values()];
   E.forEach(e => { nodes.get(e.a).deg++; nodes.get(e.b).deg++; });
   let keep = new Set(nodes.keys());
@@ -5719,7 +5862,7 @@ function grBuild() {
   if (grSel && !grById.has(grSel)) grSel = null;
   grAlpha = placed === grNodes.length ? Math.max(grAlpha, 0.25) : 1;
 }
-const grRadius = n => n.kind === 'note' ? Math.min(20, 5 + Math.sqrt(n.deg) * 3.2) : n.kind === 'map' ? 8 : 6;
+const grRadius = n => n.kind === 'note' ? Math.min(20, 5 + Math.sqrt(n.deg) * 3.2) : n.kind === 'map' ? 8 : n.kind === 'tag' ? Math.min(14, 5 + Math.sqrt(n.deg) * 2) : 6;
 
 /* ---------- Simulación de fuerzas ---------- */
 /* Repulsión entre nodos: dos métodos y la app elige sola el más rápido.
@@ -5865,10 +6008,11 @@ function grDraw(forExport = false) {
     n._sx = x; n._sy = y; n._r = r;
     const dim = (hi && !hi.has(n.id)) || (match && !match.has(n.id));
     ctx.globalAlpha = dim ? 0.15 : n.done ? 0.55 : 1;
-    const col = n.kind === 'note' ? (n.pinned ? C.warning : n.deg ? C.accent : C.muted) : n.kind === 'map' ? C.info : C.success;
+    const col = n.kind === 'note' ? (n.pinned ? C.warning : n.deg ? C.accent : C.muted) : n.kind === 'map' ? C.info : n.kind === 'tag' ? '#e36bd0' : C.success;
     ctx.fillStyle = col;
     ctx.beginPath();
     if (n.kind === 'note') ctx.arc(x, y, r, 0, Math.PI * 2);
+    else if (n.kind === 'tag') { ctx.moveTo(x, y - r * 1.2); ctx.lineTo(x + r * 1.1, y + r * 0.8); ctx.lineTo(x - r * 1.1, y + r * 0.8); ctx.closePath(); }
     else if (n.kind === 'map') { ctx.moveTo(x, y - r * 1.25); ctx.lineTo(x + r * 1.25, y); ctx.lineTo(x, y + r * 1.25); ctx.lineTo(x - r * 1.25, y); ctx.closePath(); }
     else { const s = r * 1.7; ctx.roundRect ? ctx.roundRect(x - s / 2, y - s / 2, s, s, 3) : ctx.rect(x - s / 2, y - s / 2, s, s); }
     ctx.fill();
@@ -5941,7 +6085,7 @@ function grRenderInfo() {
     const inc = S.notes.filter(x => x.id !== n.ref && (x.html || '').includes(`data-note="${n.ref}"`)).length;
     extra = `<div class="muted small">➡️ enlaza a ${out} · ⬅️ enlazada desde ${inc}</div>`;
   }
-  const icon = { note: '📄', todo: '☑️', kanban: '📋', map: '🧠' };
+  const icon = { note: '📄', todo: '☑️', kanban: '📋', map: '🧠', tag: '🏷️' };
   box.innerHTML = `<div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div class="grow" style="min-width:0"><div class="muted small">${icon[n.kind]} ${GR_KIND[n.kind]}</div><b class="gr-title">${esc(n.label)}</b>${extra}</div><button class="btn icon sm ghost" data-gi="close" title="Cerrar">✕</button></div>
     <div class="row" style="margin:8px 0"><button class="btn sm primary" data-gi="open">Abrir</button>${grFocus === n.id ? '' : '<button class="btn sm" data-gi="focus" title="Mostrar solo este nodo y lo que está conectado a él">🎯 Centrar aquí</button>'}</div>
     ${nbs.length ? `<div class="muted small" style="margin-bottom:4px">Conectado con (${nbs.length})</div><div class="gr-nbs">${nbs.slice(0, 30).map(x => `<button class="chip" data-gsel="${esc(x.id)}">${icon[x.kind]} ${esc(x.label.slice(0, 40))}</button>`).join('')}</div>` : '<div class="muted small">Sin conexiones. Enlázala desde otra nota escribiendo [[…]].</div>'}`;
@@ -5951,6 +6095,7 @@ function grOpen(n) {
   if (n.kind === 'note') { showTab('notes'); openNote(n.ref); }
   else if (n.kind === 'todo') { showTab('todos'); openTodo(n.ref); }
   else if (n.kind === 'kanban') { showTab('kanban'); openTask(n.ref); }
+  else if (n.kind === 'tag') openTagView(n.ref);
   else if (n.kind === 'map') { mmOpenMap(n.ref, false); mapsMode = 'mind'; store.set('mapsMode', 'mind'); showMapsMode('mind'); }
 }
 function grSetFocus(id, depth) {
@@ -6036,7 +6181,7 @@ $('#grInfo').addEventListener('click', e => {
 });
 $('#grFocus').addEventListener('click', e => { if (e.target.closest('#grFocusClear')) { grFocus = null; grShow(true); } });
 $('#grFocus').addEventListener('change', e => { if (e.target.id === 'grDepth') { grFocusDepth = +e.target.value; grShow(true); } });
-['grOrphans', 'grTasks', 'grMaps', 'grTree'].forEach(id => $('#' + id).addEventListener('change', () => grShow(true)));
+['grOrphans', 'grTasks', 'grMaps', 'grTree', 'grTags'].forEach(id => $('#' + id).addEventListener('change', () => grShow(true)));
 $('#grSearch').addEventListener('input', debounce(() => { grDraw(); }, 120));
 $('#grSearch').addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
@@ -7181,6 +7326,356 @@ $('#habList').addEventListener('toggle', e => {
   const id = d.closest('[data-id]').dataset.id;
   d.open ? habitOpen.add(id) : habitOpen.delete(id);
 }, true);
+/* =====================================================================
+   ETIQUETAS (#etiqueta) EN TODA LA APLICACIÓN
+   ===================================================================== */
+/*
+  Una etiqueta es «#» + letra + letras/números/_/- (p. ej. #portal-ciudadano, #reunión).
+  Admite niveles con «/»: #proyecto/portal también aparece al filtrar por #proyecto.
+  Mayúsculas y tildes no distinguen: #Reunión = #reunion (se muestra la forma más usada).
+  Se reconocen en: notas (salvo dentro de código y enlaces), tareas (texto, notas y pasos),
+  tarjetas Kanban (campo Etiquetas, título, descripción y subtareas), eventos, marcadores
+  y mapas mentales. En Tareas, «#Nombre» de una lista existente sigue eligiendo esa lista.
+*/
+const TAG_RX = /(^|[\s([{,;:¡¿"'«>])#([\p{L}_][\p{L}\p{N}_-]*(?:\/[\p{L}\p{N}_-]+)*)/gu;
+const tagKey = t => norm(String(t).replace(/^#/, '')).replace(/-+$/, '');
+const tagParents = k => { const out = []; const p = k.split('/'); for (let i = 1; i < p.length; i++) out.push(p.slice(0, i).join('/')); return out; };
+function tagsIn(text) {
+  const out = []; let m; TAG_RX.lastIndex = 0;
+  while ((m = TAG_RX.exec(text || ''))) out.push(m[2].replace(/-+$/, ''));
+  return out;
+}
+const noteTagCache = new Map();
+function noteTags(n) {
+  const sig = (n.updated || 0) + ':' + (n.html || '').length;
+  const c = noteTagCache.get(n.id);
+  if (c && c.sig === sig) return c.tags;
+  const html = String(n.html || '').replace(/<pre[\s\S]*?<\/pre>/gi, ' ').replace(/<code[\s\S]*?<\/code>/gi, ' ').replace(/<a\b[\s\S]*?<\/a>/gi, ' ');
+  const tags = tagsIn(htmlText(html.replace(/<(div|p|li|h\d|br|tr|td)\b/gi, ' <$1')));
+  noteTagCache.set(n.id, { sig, tags });
+  return tags;
+}
+/** Elementos etiquetados: { kind, id, label, sub, done, tags:[nombres] } */
+function taggedItems() {
+  const out = [];
+  const listName = id => (S.todoLists.find(l => l.id === id) || {}).name || '';
+  S.notes.forEach(n => { const t = noteTags(n); if (t.length) out.push({ kind: 'note', id: n.id, label: n.title, sub: wkParent(n) ? '📚 ' + wkPath(n) : '', tags: t }); });
+  S.todos.forEach(t => { const tg = tagsIn([t.text, t.notes || '', ...(t.steps || []).map(s => s.text)].join('\n')); if (tg.length) out.push({ kind: 'todo', id: t.id, label: t.text, sub: [listName(t.listId), t.due ? fmtDayLabel(t.due) : ''].filter(Boolean).join(' · '), done: !!t.done, tags: tg }); });
+  S.tasks.forEach(t => { const tg = (t.tags || []).concat(tagsIn([t.title, t.desc || '', ...(t.subtasks || []).map(s => s.text)].join('\n'))); if (tg.length) out.push({ kind: 'kanban', id: t.id, label: t.title, sub: (COLS.find(c => c.id === t.col) || {}).name || '', done: t.col === 'done', tags: tg }); });
+  S.events.forEach(ev => { const tg = tagsIn(ev.title + '\n' + (ev.notes || '')); if (tg.length) out.push({ kind: 'event', id: ev.id, label: ev.title, sub: fmtDayLabel(ev.date), tags: tg }); });
+  S.bookmarks.forEach(b => { const tg = tagsIn(b.title + '\n' + (b.notes || '')); if (tg.length) out.push({ kind: 'bookmark', id: b.id, label: b.title, sub: b.url, tags: tg }); });
+  S.mindmaps.forEach(m => { const tg = []; mmWalk(m.root, x => { tg.push(...tagsIn(x.text)); }); if (tg.length) out.push({ kind: 'map', id: m.id, label: m.title, sub: `${mmCount(m.root)} ideas`, tags: tg }); });
+  return out;
+}
+let tagIdxCache = null;
+/** Índice: clave normalizada → { key, name, items:[…], count } */
+function tagIndex() {
+  const stamp = (MEM.lastChange || 0) + ':' + S.notes.length + ':' + S.todos.length + ':' + S.tasks.length;
+  if (tagIdxCache && tagIdxCache.stamp === stamp) return tagIdxCache.map;
+  const map = new Map(), names = new Map();
+  taggedItems().forEach(it => {
+    const seen = new Set();
+    it.tags.forEach(name => {
+      const k = tagKey(name); if (!k || seen.has(k)) return; seen.add(k);
+      if (!map.has(k)) map.set(k, { key: k, items: [] });
+      map.get(k).items.push(it);
+      const nm = names.get(k) || new Map(); nm.set(name, (nm.get(name) || 0) + 1); names.set(k, nm);
+    });
+  });
+  map.forEach((e, k) => { const nm = names.get(k); e.name = [...nm.entries()].sort((a, b) => b[1] - a[1])[0][0]; e.count = e.items.length; });
+  // padres implícitos (#proyecto para #proyecto/portal)
+  [...map.keys()].forEach(k => tagParents(k).forEach(pk => { if (!map.has(pk)) map.set(pk, { key: pk, name: map.get(k).name.split('/').slice(0, pk.split('/').length).join('/'), items: [], count: 0, implicit: true }); }));
+  tagIdxCache = { stamp, map };
+  return map;
+}
+/** Elementos de una etiqueta, incluidos los de sus subetiquetas. */
+function tagItemsOf(key) {
+  const idx = tagIndex(), seen = new Set(), out = [];
+  idx.forEach((e, k) => { if (k === key || k.startsWith(key + '/')) e.items.forEach(it => { const id = it.kind + ':' + it.id; if (!seen.has(id)) { seen.add(id); out.push(it); } }); });
+  return out;
+}
+const tagChip = (name, extra = '') => `<button type="button" class="tag-chip" data-tag="${esc(tagKey(name))}" title="Ver todo lo etiquetado con #${esc(name)}">#${esc(name)}${extra}</button>`;
+/** Resalta las #etiquetas de un texto YA escapado (para listas de tareas, tarjetas…). */
+function tagHighlight(escaped) {
+  return escaped.replace(TAG_RX, (m, pre, name) => `${pre}<span class="tg-mini" data-tag="${esc(tagKey(name))}" title="Ver #${esc(name)}">#${name}</span>`);
+}
+
+/* ---------- Autocompletado al escribir # ---------- */
+const tagPop = document.createElement('div');
+tagPop.className = 'popover menu wl-pop'; tagPop.id = 'tagPop';
+document.body.append(tagPop);
+let tagAc = null;   // { kind:'editor'|'field', el, node?, start, q, items, idx }
+function tagSuggest(q, withLists) {
+  const nq = norm(q), idx = tagIndex();
+  let items = [...idx.values()].filter(e => !e.implicit || true).filter(e => !nq || e.key.includes(nq)).sort((a, b) => (b.key.startsWith(nq) - a.key.startsWith(nq)) || b.count - a.count).slice(0, 8).map(e => ({ tag: e.name, count: e.count }));
+  if (withLists) items = S.todoLists.filter(l => !nq || norm(l.name).replace(/\s+/g, '').includes(nq)).slice(0, 4).map(l => ({ list: l })).concat(items);
+  const exact = q && [...idx.keys()].includes(tagKey(q));
+  if (q && !exact && /^[\p{L}_][\p{L}\p{N}_\-/]*$/u.test(q)) items.push({ fresh: q });
+  return items;
+}
+function tagAcOpen(ctx, rect) {
+  const items = tagSuggest(ctx.q, ctx.lists);
+  if (!items.length) { tagAcClose(); return; }
+  tagAc = { ...ctx, items, idx: 0 };
+  tagPop.innerHTML = `<div class="muted small" style="padding:6px 10px">Etiquetas <span style="float:right"><kbd>↑</kbd><kbd>↓</kbd> <kbd>Enter</kbd></span></div>` + items.map((it, i) => `<button type="button" data-tg="${i}" class="${i === 0 ? 'on' : ''}">${it.list ? `${esc(it.list.emoji || '📋')} Lista «${esc(it.list.name)}»` : it.fresh ? `＋ Nueva etiqueta #${esc(it.fresh)}` : `🏷️ #${esc(it.tag)} <span class="muted small">· ${it.count}</span>`}</button>`).join('');
+  tagPop.classList.add('open');
+  const w = tagPop.offsetWidth, h = tagPop.offsetHeight;
+  let top = rect.bottom + 6; if (top + h > innerHeight - 10) top = Math.max(10, rect.top - h - 6);
+  tagPop.style.left = Math.max(10, Math.min(rect.left, innerWidth - w - 12)) + 'px';
+  tagPop.style.top = top + 'px';
+}
+function tagAcClose() { tagAc = null; tagPop.classList.remove('open'); }
+function tagAcChoose(i) {
+  const a = tagAc; if (!a) return;
+  const it = a.items[i]; if (!it) return;
+  tagAcClose();
+  const word = it.list ? it.list.name.replace(/\s+/g, '') : (it.tag || it.fresh);
+  if (a.kind === 'editor') {
+    const node = a.node; if (!node.isConnected) return;
+    const sel = getSelection();
+    const end = sel.rangeCount && sel.anchorNode === node ? sel.anchorOffset : a.start + 1 + a.q.length;
+    const r = document.createRange(); r.setStart(node, a.start); r.setEnd(node, end); r.deleteContents();
+    const span = document.createElement('span'); span.className = 'tg'; span.textContent = '#' + word;
+    const sp = document.createTextNode(' ');
+    r.insertNode(sp); r.insertNode(span);
+    r.setStartAfter(sp); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); savedRange = r.cloneRange();
+    markDirty();
+  } else {
+    const el = a.el, v = el.value, end = el.selectionStart;
+    const ins = '#' + word + ' ';
+    el.value = v.slice(0, a.start) + ins + v.slice(end);
+    const pos = a.start + ins.length; el.focus(); el.setSelectionRange(pos, pos);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+}
+function tagAcKey(e) {
+  if (!tagAc || !tagPop.classList.contains('open')) return false;
+  const n = tagAc.items.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); tagAc.idx = (tagAc.idx + (e.key === 'ArrowDown' ? 1 : -1) + n) % n; $$('#tagPop [data-tg]').forEach(b => b.classList.toggle('on', +b.dataset.tg === tagAc.idx)); return true; }
+  if ((e.key === 'Enter' || e.key === 'Tab') && n) { e.preventDefault(); e.stopImmediatePropagation(); tagAcChoose(tagAc.idx); return true; }
+  if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); tagAcClose(); return true; }
+  return false;
+}
+tagPop.addEventListener('mousedown', e => e.preventDefault());
+tagPop.addEventListener('click', e => { const b = e.target.closest('[data-tg]'); if (b) tagAcChoose(+b.dataset.tg); });
+const TAG_TYPING = /(^|[\s([{,;:¡¿"'«])#([\p{L}\p{N}_\-/]{0,40})$/u;
+/* En el editor de notas */
+editor.addEventListener('input', () => {
+  const sel = getSelection();
+  if (!sel.rangeCount || !sel.isCollapsed) { tagAcClose(); return; }
+  const node = sel.anchorNode, off = sel.anchorOffset;
+  if (!node || node.nodeType !== 3 || !editor.contains(node) || node.parentElement.closest('pre,code,a')) { tagAcClose(); return; }
+  const before = node.nodeValue.slice(0, off);
+  const m = TAG_TYPING.exec(before);
+  if (m && !(wlState && wlPop.classList.contains('open'))) {
+    let rect; try { const r = sel.getRangeAt(0).cloneRange(); rect = r.getClientRects()[0] || r.getBoundingClientRect(); } catch {}
+    tagAcOpen({ kind: 'editor', node, start: off - m[2].length - 1, q: m[2] }, rect && (rect.top || rect.left) ? rect : editor.getBoundingClientRect());
+    return;
+  }
+  tagAcClose();
+  // al terminar de escribir una etiqueta (espacio), se resalta
+  const t = /(^|[\s([{,;:¡¿"'«])#([\p{L}_][\p{L}\p{N}_-]*(?:\/[\p{L}\p{N}_-]+)*)[\s ]$/u.exec(before);
+  if (t && !node.parentElement.closest('.tg')) {
+    const start = off - 1 - t[2].length - 1;
+    const r = document.createRange(); r.setStart(node, start); r.setEnd(node, off - 1);
+    const span = document.createElement('span'); span.className = 'tg';
+    r.surroundContents(span);
+    const after = span.nextSibling;
+    if (after && after.nodeType === 3) { const rr = document.createRange(); rr.setStart(after, Math.min(1, after.nodeValue.length)); rr.collapse(true); sel.removeAllRanges(); sel.addRange(rr); }
+    markDirty();
+  }
+});
+editor.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== editor) tagAcClose(); }, 150));
+/** Marca visualmente las etiquetas del editor (al abrir una nota). */
+function tagDecorateEditor() {
+  editor.querySelectorAll('span.tg').forEach(s => { if (!/^#[\p{L}_]/u.test(s.textContent)) s.replaceWith(...s.childNodes); });
+  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.includes('#') && !n.parentElement.closest('pre,code,a,.tg') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(t => {
+    let node = t, m;
+    TAG_RX.lastIndex = 0;
+    while (node && (m = new RegExp(TAG_RX.source, 'u').exec(node.nodeValue))) {
+      const start = m.index + m[1].length, len = m[2].length + 1;
+      const mid = node.splitText(start), rest = mid.splitText(len);
+      const span = document.createElement('span'); span.className = 'tg'; mid.replaceWith(span); span.append(mid);
+      node = rest;
+    }
+  });
+}
+editor.addEventListener('click', e => {
+  const t = e.target.closest('span.tg'); if (!t || !(e.ctrlKey || e.metaKey)) return;
+  e.preventDefault(); openTagView(tagKey(t.textContent));
+}, true);
+/* En campos de texto (tarea rápida, notas de tarea, descripción de tarjeta, captura rápida…) */
+function tagAttachField(el, { lists = false } = {}) {
+  if (!el || el.dataset.tagac) return;
+  el.dataset.tagac = '1';
+  el.addEventListener('input', () => {
+    if (el.selectionStart !== el.selectionEnd) { tagAcClose(); return; }
+    const m = TAG_TYPING.exec(el.value.slice(0, el.selectionStart));
+    if (m && !(typeof wlfState !== 'undefined' && wlfState && wlfPop.classList.contains('open'))) tagAcOpen({ kind: 'field', el, start: el.selectionStart - m[2].length - 1, q: m[2], lists }, el.getBoundingClientRect());
+    else if (tagAc && tagAc.el === el) tagAcClose();
+  });
+  el.addEventListener('blur', () => setTimeout(() => { if (tagAc && tagAc.el === el && document.activeElement !== el) tagAcClose(); }, 150));
+}
+window.addEventListener('keydown', e => { if (tagAc && tagAc.kind === 'field' && e.target === tagAc.el) tagAcKey(e); }, true);
+document.addEventListener('focusin', e => {
+  const el = e.target;
+  if (el.matches && el.matches('.modal textarea[name=notes], .modal textarea[name=desc], .modal textarea[name=t], .modal input[name=title], .modal input[name=text]')) tagAttachField(el);
+});
+tagAttachField($('#todoInput'), { lists: true });
+tagAttachField($('#quickText'));
+
+/* ---------- Clic en cualquier etiqueta → vista de etiquetas ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tag]');
+  if (!t || t.closest('#view-tags .tag-cloud') || t.closest('#tagPop')) return;
+  e.preventDefault(); e.stopPropagation();
+  if ($('#modalBack').classList.contains('open')) { const b = $('#modal .modal-foot .btn.primary'); if (b) b.click(); }
+  setTimeout(() => openTagView(t.dataset.tag), 30);
+}, true);
+
+/* ---------- Renombrar / fusionar ---------- */
+function tagReplaceIn(text, oldKey, newName) {
+  let n = 0;
+  const out = String(text || '').replace(TAG_RX, (m, pre, name) => {
+    const k = tagKey(name);
+    if (k === oldKey || k.startsWith(oldKey + '/')) { n++; return `${pre}#${newName}${name.slice(name.split('/').slice(0, oldKey.split('/').length).join('/').length)}`; }
+    return m;
+  });
+  return [out, n];
+}
+async function tagRenameDialog(key) {
+  const e = tagIndex().get(key); if (!e) return;
+  const total = tagItemsOf(key).length;
+  const r = await modal({
+    title: `✏️ Renombrar #${e.name}`,
+    body: `<p class="small">Se cambiará en los <b>${total}</b> elementos que la usan${key.includes('/') ? '' : ' (y en sus subetiquetas)'}. Si escribes el nombre de otra etiqueta existente, <b>se fusionarán</b>. Antes se guarda una versión en el historial por si quieres deshacerlo.</p>
+      <div><label class="lbl">Nuevo nombre</label><input class="field" name="v" value="${esc(e.name)}" spellcheck="false"></div><div class="small muted" id="tgMergeInfo" style="min-height:1.3em;margin-top:6px"></div>`,
+    actions: [{ label: 'Cancelar', value: null, cls: 'ghost' }, { label: 'Aplicar', value: 'ok', cls: 'primary', validate: f => /^#?[\p{L}_][\p{L}\p{N}_-]*(?:\/[\p{L}\p{N}_-]+)*$/u.test(f.elements.namedItem('v').value.trim()) ? null : 'Usa letras, números, guiones o «/» (sin espacios), empezando por una letra' }],
+    onOpen: f => { const i = f.elements.namedItem('v'), info = $('#tgMergeInfo', f); i.addEventListener('input', () => { const k = tagKey(i.value.trim()); const ex = tagIndex().get(k); info.textContent = ex && k !== key ? `Se fusionará con #${ex.name} (${ex.count} elementos)` : ''; }); }
+  });
+  if (!r) return;
+  const newName = r.data.v.trim().replace(/^#/, '');
+  if (tagKey(newName) === key && newName === e.name) return;
+  await histSnapshot('before', `Antes de renombrar #${e.name} → #${newName}`, { force: true });
+  const n = tagRename(key, newName);
+  toast(`#${e.name} → #${newName}: ${n} cambio${n === 1 ? '' : 's'}`, 'success', 4000);
+  openTagView(tagKey(newName));
+}
+function tagRename(key, newName) {
+  flushNote();
+  let total = 0;
+  const fix = s => { const [o, n] = tagReplaceIn(s, key, newName); total += n; return o; };
+  let notes = false;
+  S.notes.forEach(n => {
+    if (!noteTags(n).some(t => { const k = tagKey(t); return k === key || k.startsWith(key + '/'); })) return;
+    const body = parseHtml(n.html);
+    const w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, { acceptNode: x => x.parentElement.closest('pre,code,a') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    const nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
+    nodes.forEach(t => { t.nodeValue = fix(t.nodeValue); });
+    n.html = body.innerHTML; n.text = htmlText(n.html); notes = true;
+  });
+  S.todos.forEach(t => { t.text = fix(t.text); t.notes = fix(t.notes); (t.steps || []).forEach(s => { s.text = fix(s.text); }); });
+  S.tasks.forEach(t => {
+    t.title = fix(t.title); t.desc = fix(t.desc); (t.subtasks || []).forEach(s => { s.text = fix(s.text); });
+    if (t.tags) { const seen = new Set(); t.tags = t.tags.map(g => { const k = tagKey(g); if (k === key || k.startsWith(key + '/')) { total++; return newName + g.slice(g.split('/').slice(0, key.split('/').length).join('/').length); } return g; }).filter(g => { const k = tagKey(g); if (seen.has(k)) return false; seen.add(k); return true; }); }
+  });
+  S.events.forEach(ev => { ev.title = fix(ev.title); ev.notes = fix(ev.notes); });
+  S.bookmarks.forEach(b => { b.title = fix(b.title); b.notes = fix(b.notes); });
+  S.mindmaps.forEach(m => mmWalk(m.root, x => { x.text = fix(x.text); }));
+  if (notes) save.notes();
+  save.todos(); save.tasks(); save.events(); save.bookmarks(); save.mindmaps();
+  tagIdxCache = null;
+  if (currentNoteId && getNote(currentNoteId)) renderNotesView();
+  return total;
+}
+/* =====================================================================
+   VISTA DE ETIQUETAS · NUBE · INTEGRACIONES
+   ===================================================================== */
+let tagSel = null, tagSort = 'count';
+const TAG_KIND = { note: ['📝', 'Notas'], todo: ['☑️', 'Tareas'], kanban: ['📋', 'Kanban'], event: ['📅', 'Calendario'], bookmark: ['🔖', 'Marcadores'], map: ['🧠', 'Mapas mentales'] };
+function openTagView(key) {
+  tagSel = key || null;
+  if (currentTab !== 'tags') showTab('tags'); else renderTagView();
+}
+function tagCloudHtml(entries, { max = 200, small = false } = {}) {
+  if (!entries.length) return '';
+  const counts = entries.map(e => tagItemsOf(e.key).length);
+  const lo = Math.min(...counts), hi = Math.max(...counts);
+  return entries.slice(0, max).map((e, i) => {
+    const n = counts[i], w = hi === lo ? 0.5 : Math.log(n - lo + 1) / Math.log(hi - lo + 1);
+    const size = small ? 0.8 + w * 0.55 : 0.85 + w * 1.15;
+    return `<button type="button" class="cloud-tag${e.key === tagSel ? ' on' : ''}" data-tag="${esc(e.key)}" style="font-size:${size.toFixed(2)}rem;--w:${(0.62 + w * 0.38).toFixed(2)}" title="${n} elemento${n === 1 ? '' : 's'}">#${esc(e.name)}<sup>${n}</sup></button>`;
+  }).join('');
+}
+function renderTagView() {
+  if (!$('#tgCloud')) return;
+  const idx = tagIndex(), q = norm($('#tgSearch').value.trim().replace(/^#/, ''));
+  let entries = [...idx.values()].filter(e => !q || e.key.includes(q));
+  entries.sort(tagSort === 'az' ? (a, b) => a.key.localeCompare(b.key, 'es') : (a, b) => tagItemsOf(b.key).length - tagItemsOf(a.key).length || a.key.localeCompare(b.key, 'es'));
+  $('#tgCloud').innerHTML = tagCloudHtml(entries) || `<div class="empty">${q ? 'Ninguna etiqueta coincide' : 'Todavía no hay etiquetas'}</div>`;
+  if (tagSel && !idx.has(tagSel)) tagSel = null;
+  if (!tagSel && entries.length && !q) tagSel = null;
+  const box = $('#tgDetail');
+  if (!tagSel) {
+    box.innerHTML = idx.size ? `<div class="empty"><div style="font-size:2.4rem">🏷️</div><p>Elige una etiqueta de la nube para ver todo lo que la lleva.</p><p class="muted small">${idx.size} etiquetas · ${taggedItems().length} elementos etiquetados</p></div>`
+      : `<div class="empty"><div style="font-size:2.4rem">🏷️</div><h3>Organiza por temas con etiquetas</h3><p class="muted">Escribe <b>#proyecto</b>, <b>#cliente-acme</b> o <b>#urgente</b> en una nota o en una tarea y aparecerá aquí, junto con todo lo que comparta esa etiqueta, sea de la sección que sea.</p></div>`;
+    return;
+  }
+  const e = idx.get(tagSel), items = tagItemsOf(tagSel);
+  const children = [...idx.values()].filter(x => x.key.startsWith(tagSel + '/') && x.key.split('/').length === tagSel.split('/').length + 1);
+  const parents = tagParents(tagSel).map(k => idx.get(k)).filter(Boolean);
+  // etiquetas que aparecen junto a esta
+  const co = new Map();
+  items.forEach(it => new Set(it.tags.map(tagKey)).forEach(k => { if (k !== tagSel && !k.startsWith(tagSel + '/') && !tagSel.startsWith(k + '/')) co.set(k, (co.get(k) || 0) + 1); }));
+  const related = [...co.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k, n]) => idx.get(k) && tagChip(idx.get(k).name, ` <span class="muted">${n}</span>`)).filter(Boolean);
+  const groups = Object.keys(TAG_KIND).map(kind => [kind, items.filter(it => it.kind === kind)]).filter(([, l]) => l.length);
+  box.innerHTML = `<div class="card-h"><h3 class="tg-title">${parents.map(p => `<button type="button" class="crumb" data-tag="${esc(p.key)}">#${esc(p.name.split('/').pop())}</button><span class="muted"> / </span>`).join('')}#${esc(e.name.split('/').pop())} <span class="badge accent">${items.length}</span></h3>
+      <div class="row" style="gap:4px"><button class="btn sm" data-tga="rename" title="Renombrar o fusionar con otra etiqueta">✏️ Renombrar / fusionar</button><button class="btn sm ghost" data-tga="graph" title="Ver en el grafo de conexiones">🕸️</button><button class="btn sm icon ghost" data-tga="close" title="Cerrar">✕</button></div></div>
+    ${children.length ? `<div class="bl-row"><span class="bl-h">Subetiquetas</span><div class="chips">${children.map(c => tagChip(c.name.split('/').slice(tagSel.split('/').length).join('/') ? c.name : c.name, ` <span class="muted">${tagItemsOf(c.key).length}</span>`)).join('')}</div></div>` : ''}
+    ${related.length ? `<div class="bl-row"><span class="bl-h" title="Etiquetas que aparecen en los mismos elementos">Suelen ir con</span><div class="chips">${related.join('')}</div></div>` : ''}
+    ${groups.map(([kind, list]) => `<div class="tg-group"><h4>${TAG_KIND[kind][0]} ${TAG_KIND[kind][1]} <span class="muted small">${list.length}</span></h4><div class="list">${list.map(it => `<div class="list-item${it.done ? ' done' : ''}" data-open="${kind}:${esc(it.id)}" tabindex="0"><span class="grow" style="min-width:0"><span class="ellipsis" style="display:block">${it.done ? '✓ ' : ''}${tagHighlight(esc(it.label))}</span>${it.sub ? `<span class="muted small ellipsis" style="display:block">${esc(it.sub)}</span>` : ''}</span><span class="tg-its">${[...new Set(it.tags)].filter(t => tagKey(t) !== tagSel).slice(0, 3).map(t => `<span class="tg-mini" data-tag="${esc(tagKey(t))}">#${esc(t)}</span>`).join('')}</span></div>`).join('')}</div></div>`).join('')}`;
+}
+function tagOpenItem(kind, id) {
+  if (kind === 'note') { showTab('notes'); openNote(id); }
+  else if (kind === 'todo') { showTab('todos'); openTodo(id); }
+  else if (kind === 'kanban') { showTab('kanban'); openTask(id); }
+  else if (kind === 'event') { const ev = S.events.find(x => x.id === id); showTab('calendar'); if (ev) { calGoto(ev.date); openEvent(ev.id); } }
+  else if (kind === 'bookmark') { showTab('bookmarks'); openBookmark(id); }
+  else if (kind === 'map') { mmOpenMap(id, false); mapsMode = 'mind'; store.set('mapsMode', 'mind'); showTab('maps'); }
+}
+$('#tgDetail').addEventListener('click', e => {
+  const a = e.target.closest('[data-tga]');
+  if (a) {
+    if (a.dataset.tga === 'close') { tagSel = null; renderTagView(); }
+    else if (a.dataset.tga === 'rename') tagRenameDialog(tagSel);
+    else if (a.dataset.tga === 'graph') { $('#grTags').checked = true; openGraph(null); setTimeout(() => { if (grById.has('g:' + tagSel)) { grSetFocus('g:' + tagSel, 1); } }, 80); }
+    return;
+  }
+  const o = e.target.closest('[data-open]'); if (o && !e.target.closest('[data-tag]')) { const [k, id] = o.dataset.open.split(':'); tagOpenItem(k, id); }
+});
+$('#tgDetail').addEventListener('keydown', e => { if (e.key === 'Enter') { const o = e.target.closest('[data-open]'); if (o) { const [k, id] = o.dataset.open.split(':'); tagOpenItem(k, id); } } });
+$('#tgSearch').addEventListener('input', debounce(renderTagView, 120));
+$('#tgSort').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (!b) return; tagSort = b.dataset.s; $$('#tgSort button').forEach(x => x.classList.toggle('on', x === b)); renderTagView(); });
+onShow.tags = renderTagView;
+
+/* ---------- Etiquetas de la nota abierta ---------- */
+function renderNoteTags() {
+  const box = $('#noteTags'); if (!box) return;
+  const n = getNote(currentNoteId);
+  const tags = n ? [...new Map(noteTags(n).map(t => [tagKey(t), t])).values()] : [];
+  box.hidden = !tags.length;
+  box.innerHTML = tags.length ? `<span class="bl-h">🏷️ Etiquetas</span><div class="chips">${tags.map(t => tagChip(t, ` <span class="muted">${tagItemsOf(tagKey(t)).length}</span>`)).join('')}</div>` : '';
+}
+
+/* ---------- Mini nube en Inicio ---------- */
+function renderDashTags() {
+  const box = $('#dashTags'); if (!box) return;
+  const idx = tagIndex();
+  const entries = [...idx.values()].filter(e => !e.implicit).sort((a, b) => b.count - a.count).slice(0, 24);
+  box.innerHTML = entries.length ? `<div class="tag-cloud small">${tagCloudHtml(entries, { small: true })}</div>` : '<div class="empty small">Escribe <b>#etiqueta</b> en notas o tareas para agruparlas por tema.</div>';
+}
 let calcExpr = '', calcJust = false;
 let lastAns = '';
 function initCalc() { lastAns = S.calcHist.length ? S.calcHist[S.calcHist.length - 1].result : ''; }
@@ -8079,6 +8574,176 @@ $('#txBtns').addEventListener('click', e => {
 });
 $('#txIn').addEventListener('input', txStats);
 function initDevtools() { initDevHelp(); initRegex(); setTool(store.get('devTool', 'json')); }
+/* =====================================================================
+   HERRAMIENTAS · LISTAS (separar, limpiar, seleccionar, unir y comparar)
+   ===================================================================== */
+const LS_SPLIT = { line: /\r?\n/, comma: /,/, semi: /;/, tab: /\t/, space: /\s+/, pipe: /\|/, multi: /[\r\n,;\t]+/ };
+const LS_SPLIT_NAME = { line: 'saltos de línea', comma: 'comas', semi: 'punto y coma', tab: 'tabuladores', space: 'espacios', pipe: 'barras |', multi: 'línea, coma, ; y tab' };
+const lsState = { unchecked: new Set(), mode: 'pick', items: [], dups: [] };
+const lsVal = id => $('#' + id).value;
+const lsOn = id => $('#' + id).checked;
+
+function lsDetect(t) {
+  const lines = t.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length >= 2) return lines.some(l => l.includes('\t')) && lines.every(l => !l.includes(',')) && lines.length < 3 ? 'tab' : 'line';
+  const one = lines[0] || '';
+  if (one.includes('\t')) return 'tab';
+  if (one.includes(';')) return 'semi';
+  if (one.includes(',')) return 'comma';
+  if (one.includes('|')) return 'pipe';
+  return 'space';
+}
+const lsKey = v => lsOn('lsLoose') ? norm(v) : v;
+const lsTitle = v => v.toLocaleLowerCase('es').replace(/(^|[\s\-/(])(\p{L})/gu, (m, a, b) => a + b.toLocaleUpperCase('es'));
+/** Separa y limpia un texto según las opciones. Devuelve { items, dups:[[valor, veces]], raw, how } */
+function lsParse(text) {
+  let how = lsVal('lsSplit');
+  if (how === 'auto') how = lsDetect(text);
+  let parts;
+  if (how === 'custom') { const sep = lsVal('lsSplitCustom'); parts = sep ? text.split(sep) : [text]; }
+  else parts = text.split(LS_SPLIT[how]);
+  let items = parts;
+  if (lsOn('lsTrim')) items = items.map(v => v.trim());
+  if (lsOn('lsUnquote')) items = items.map(v => v.replace(/^(['"`«])(.*)(['"`»])$/s, '$2'));
+  if (lsOn('lsEmpty')) items = items.filter(v => v !== '');
+  const c = lsVal('lsCase');
+  if (c === 'up') items = items.map(v => v.toLocaleUpperCase('es'));
+  else if (c === 'low') items = items.map(v => v.toLocaleLowerCase('es'));
+  else if (c === 'title') items = items.map(lsTitle);
+  else if (c === 'noacc') items = items.map(v => v.normalize('NFD').replace(/[̀-ͯ]/g, ''));
+  const counts = new Map();
+  items.forEach(v => { const k = lsKey(v); const e = counts.get(k); if (e) e.n++; else counts.set(k, { v, n: 1 }); });
+  const dups = [...counts.values()].filter(e => e.n > 1).sort((a, b) => b.n - a.n).map(e => [e.v, e.n]);
+  const raw = items.length;
+  if (lsOn('lsDedupe')) { const seen = new Set(); items = items.filter(v => { const k = lsKey(v); if (seen.has(k)) return false; seen.add(k); return true; }); }
+  const s = lsVal('lsSort');
+  const coll = new Intl.Collator('es', { sensitivity: 'base' }), natc = new Intl.Collator('es', { numeric: true, sensitivity: 'base' });
+  if (s === 'az') items = [...items].sort(coll.compare);
+  else if (s === 'za') items = [...items].sort((a, b) => coll.compare(b, a));
+  else if (s === 'nat') items = [...items].sort(natc.compare);
+  else if (s === 'len') items = [...items].sort((a, b) => a.length - b.length || coll.compare(a, b));
+  else if (s === 'rev') items = [...items].reverse();
+  return { items, dups, raw, unique: counts.size, how };
+}
+/* ---------- Formatos ---------- */
+const lsEscRx = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const lsSqlQ = v => `'${v.replace(/'/g, "''")}'`;
+function lsFormat(items, f = lsFmtOpts()) {
+  if (!items.length) return '';
+  const wrap = v => { const q = f.quote; const inner = q === "'" ? v.replace(/'/g, "''") : q === '"' ? v.replace(/"/g, '""') : v; return f.pre + q + inner + q + f.suf; };
+  switch (f.preset) {
+    case 'or': return items.map(wrap).join(' OR ');
+    case 'and': return items.map(wrap).join(' AND ');
+    case 'cs': return items.map(wrap).join(', ');
+    case 'c': return items.map(wrap).join(',');
+    case 'sc': return items.map(wrap).join(';');
+    case 'lines': return items.map(wrap).join('\n');
+    case 'tab': return items.map(wrap).join('\t');
+    case 'custom': return items.map(wrap).join(f.sep.replace(/\\n/g, '\n').replace(/\\t/g, '\t'));
+    case 'sqlin': case 'sqlnum': {
+      const val = f.preset === 'sqlin' ? lsSqlQ : v => v.trim();
+      const n = Math.max(1, f.chunk | 0 || 1000), col = f.col.trim();
+      const blocks = [];
+      for (let i = 0; i < items.length; i += n) blocks.push(`IN (${items.slice(i, i + n).map(val).join(', ')})`);
+      if (!col) return blocks.length === 1 ? blocks[0] : blocks.map(b => 'columna ' + b).join('\n   OR ');
+      return blocks.length === 1 ? `${col} ${blocks[0]}` : `(${blocks.map(b => `${col} ${b}`).join('\n   OR ')})`;
+    }
+    case 'json': return JSON.stringify(items);
+    case 'csv': return items.map(v => `"${v.replace(/"/g, '""')}"`).join(',');
+    case 'md': return items.map(v => `- ${v}`).join('\n');
+    case 'rx': return `(?:${[...items].sort((a, b) => b.length - a.length).map(lsEscRx).join('|')})`;
+  }
+  return items.join('\n');
+}
+function lsFmtOpts() {
+  return { preset: lsVal('lsPreset'), sep: lsVal('lsSep'), quote: lsVal('lsQuote'), pre: lsVal('lsPre'), suf: lsVal('lsSuf'), col: lsVal('lsCol'), chunk: +lsVal('lsChunk') };
+}
+/* ---------- Render ---------- */
+function lsOut(id, title, items, extra = '') {
+  const txt = lsFormat(items);
+  return `<div class="ls-out"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><label class="lbl" for="${id}" style="margin:0">${title} <span class="badge">${items.length}</span>${extra}</label><button class="btn sm" data-lscopy="${id}">📋 Copiar</button></div>
+    <textarea class="field code" id="${id}" rows="4" readonly spellcheck="false">${esc(txt)}</textarea></div>`;
+}
+function lsRender() {
+  if (!$('#lsIn')) return;
+  const A = lsParse(lsVal('lsIn'));
+  lsState.items = A.items; lsState.dups = A.dups;
+  const p = lsVal('lsPreset');
+  $$('#view-devtools [data-lsf]').forEach(el => {
+    const k = el.dataset.lsf;
+    el.hidden = k === 'custom' ? p !== 'custom' : k === 'wrap' ? !['or', 'and', 'cs', 'c', 'sc', 'lines', 'tab', 'custom'].includes(p) : k === 'sql' ? !['sqlin', 'sqlnum'].includes(p) : false;
+  });
+  $('#lsSplitCustom').hidden = lsVal('lsSplit') !== 'custom';
+  $('#lsDetected').textContent = lsVal('lsIn').trim() ? (lsVal('lsSplit') === 'auto' ? `Detectado: ${LS_SPLIT_NAME[A.how]}` : '') : '';
+  const dupTxt = A.dups.length ? ` · <a href="#" data-ls="dups" title="Ver cuáles se repiten">${A.dups.length} valor${A.dups.length === 1 ? '' : 'es'} repetido${A.dups.length === 1 ? '' : 's'}</a>` : ' · sin repetidos';
+  $('#lsStats').innerHTML = lsVal('lsIn').trim() ? `<b>${A.raw}</b> valores · <b>${A.unique}</b> distintos${dupTxt}${lsOn('lsDedupe') && A.raw !== A.items.length ? ` · quedan <b>${A.items.length}</b> tras quitar duplicados` : ''}` : 'Pega una lista arriba para empezar.';
+  if (lsState.mode === 'cmp') {
+    const B = lsParse(lsVal('lsInB'));
+    const kb = new Set(B.items.map(lsKey)), ka = new Set(A.items.map(lsKey));
+    const onlyA = A.items.filter(v => !kb.has(lsKey(v))), onlyB = B.items.filter(v => !ka.has(lsKey(v))), both = A.items.filter(v => kb.has(lsKey(v)));
+    $('#lsOuts').innerHTML = `<div class="ls-grid3">${lsOut('lsOutA', 'Solo en A', onlyA)}${lsOut('lsOutB', 'Solo en B', onlyB)}${lsOut('lsOutAB', 'En las dos', both)}</div>`;
+    return;
+  }
+  // seleccionar
+  const q = norm(lsVal('lsFilter').trim());
+  const shown = [], MAX = 1500;
+  let matches = 0;
+  A.items.forEach((v, i) => { if (!q || norm(v).includes(q)) { matches++; if (shown.length < MAX) shown.push([v, i]); } });
+  $('#lsItems').innerHTML = shown.map(([v, i]) => `<label class="ls-item"><input type="checkbox" class="check" data-i="${i}"${lsState.unchecked.has(lsKey(v)) ? '' : ' checked'}><span>${esc(v) || '<i class="muted">(vacío)</i>'}</span></label>`).join('')
+    + (matches > MAX ? `<div class="muted small" style="padding:6px">Se muestran ${MAX} de ${matches}. Los botones y el resultado incluyen todos.</div>` : '')
+    + (!A.items.length ? '<div class="muted small" style="padding:6px">Aquí aparecerán los valores para que marques cuáles van al grupo 1.</div>' : '');
+  const g1 = A.items.filter(v => !lsState.unchecked.has(lsKey(v))), g2 = A.items.filter(v => lsState.unchecked.has(lsKey(v)));
+  $('#lsPickInfo').textContent = q ? `${matches} coinciden con el filtro` : '';
+  $('#lsOuts').innerHTML = `<div class="ls-grid2">${lsOut('lsOut1', '✅ Grupo 1 · marcados', g1)}${lsOut('lsOut2', '⬜ Grupo 2 · sin marcar', g2)}</div>`;
+}
+const lsRenderSoon = debounce(lsRender, 120);
+['lsIn', 'lsInB', 'lsSplitCustom', 'lsSep', 'lsPre', 'lsSuf', 'lsCol', 'lsChunk', 'lsFilter'].forEach(id => $('#' + id).addEventListener('input', lsRenderSoon));
+['lsSplit', 'lsTrim', 'lsEmpty', 'lsUnquote', 'lsDedupe', 'lsLoose', 'lsSort', 'lsCase', 'lsPreset', 'lsQuote'].forEach(id => $('#' + id).addEventListener('change', lsRender));
+$('#lsMode').addEventListener('click', e => {
+  const b = e.target.closest('[data-m]'); if (!b) return;
+  lsState.mode = b.dataset.m;
+  $$('#lsMode button').forEach(x => x.classList.toggle('on', x === b));
+  $$('#view-devtools .ls-pane').forEach(p => { p.hidden = p.dataset.lm !== lsState.mode; });
+  $('#lsLblA').hidden = lsState.mode !== 'cmp';
+  lsRender();
+});
+$('#lsItems').addEventListener('change', e => {
+  const cb = e.target.closest('input[data-i]'); if (!cb) return;
+  const k = lsKey(lsState.items[+cb.dataset.i]);
+  if (cb.checked) lsState.unchecked.delete(k); else lsState.unchecked.add(k);
+  lsRender();
+});
+$('#view-devtools').addEventListener('click', e => {
+  const c = e.target.closest('[data-lscopy]'); if (c) { copyText($('#' + c.dataset.lscopy).value, 'Copiado'); return; }
+  const b = e.target.closest('[data-ls]'); if (!b) return;
+  e.preventDefault();
+  const q = norm(lsVal('lsFilter').trim()), it = lsState.items, hit = v => !q || norm(v).includes(q);
+  switch (b.dataset.ls) {
+    case 'all': lsState.unchecked.clear(); break;
+    case 'none': it.forEach(v => lsState.unchecked.add(lsKey(v))); break;
+    case 'inv': it.forEach(v => { const k = lsKey(v); lsState.unchecked.has(k) ? lsState.unchecked.delete(k) : lsState.unchecked.add(k); }); break;
+    case 'matchOn': it.filter(hit).forEach(v => lsState.unchecked.delete(lsKey(v))); break;
+    case 'matchOff': it.filter(hit).forEach(v => lsState.unchecked.add(lsKey(v))); break;
+    case 'dups':
+      modal({ title: '🔁 Valores repetidos', body: `<p class="small muted">${lsOn('lsLoose') ? 'Sin distinguir mayúsculas ni tildes.' : 'Distinguiendo mayúsculas y tildes.'}</p><div class="list" style="max-height:50vh;overflow:auto">${lsState.dups.map(([v, n]) => `<div class="list-item" style="cursor:default;padding:5px 8px"><span class="grow ellipsis">${esc(v)}</span><span class="badge warning">× ${n}</span></div>`).join('')}</div>`, actions: [{ label: 'Copiar la lista', value: 'copy', cls: '' }, { label: 'Cerrar', value: 'ok', cls: 'primary' }] })
+        .then(r => { if (r && r.action === 'copy') copyText(lsState.dups.map(([v, n]) => `${v}\t${n}`).join('\n'), 'Repetidos copiados'); });
+      return;
+    default: return;
+  }
+  lsRender();
+});
+lsRender();
+DEV_HELP.lists = {
+  what: 'Convierte una lista de valores (pegada de Excel, de un correo, de una consulta…) en el formato que necesites: separada por <code>OR</code>, como <code>IN (…)</code> de SQL, JSON, regex… Además la limpia, te deja elegir qué valores usar y compara dos listas.',
+  uses: ['Montar la condición de una consulta con muchos identificadores: <code>ID IN (\'A1\', \'B2\', …)</code>. Si pasan de 1000 (límite de Oracle), la parte sola en varios <code>IN</code> unidos con <code>OR</code>.', 'Preparar búsquedas con <code>OR</code> para un buscador, un filtro de correo o Jira.', 'Quitar duplicados y saber <b>cuáles</b> se repiten y cuántas veces.', 'Separar una lista en dos grupos (marcados y sin marcar) para tratarlos de forma distinta.', 'Cruzar dos extracciones: qué está solo en una, solo en la otra o en las dos.'],
+  how: ['Pega la lista. Se separa sola por líneas, tabuladores, punto y coma, comas o espacios (o elige el separador).', 'Ajusta la limpieza: espacios, vacíos, comillas, duplicados, orden y mayúsculas.', '<b>Seleccionar y unir</b>: desmarca los valores que no quieras; filtra para marcar o desmarcar muchos a la vez.', '<b>Comparar</b>: pega una segunda lista y obtén las diferencias y coincidencias.', 'Elige el <b>formato de salida</b> y copia el resultado.'],
+  tip: 'Con «Ignorar mayúsculas y tildes», «Ávila», «AVILA» y «avila» cuentan como el mismo valor al quitar duplicados y al comparar.',
+  examples: [
+    { label: 'IN de SQL con duplicados', fn: () => { setVal('lsIn', '28001\n28002\n28005\n28001\n28013\n  28002 \n\n28045'); setVal('lsPreset', 'sqlin', 'change'); setVal('lsCol', 'COD_POSTAL'); $('#lsDedupe').checked = true; lsRender(); exampleLoaded('Mira el aviso de repetidos y el resultado SQL'); } },
+    { label: 'Columna de Excel → OR', fn: () => { setVal('lsIn', 'Madrid\nMóstoles\nAlcorcón\nFuenlabrada\nGetafe'); setVal('lsPreset', 'or', 'change'); setVal('lsQuote', '"', 'change'); lsRender(); exampleLoaded('Desmarca algún municipio y míralo en el grupo 2'); } },
+    { label: 'Comparar dos listas', fn: () => { setVal('lsIn', 'EXP-001\nEXP-002\nEXP-003\nEXP-004'); $('#lsMode [data-m=cmp]').click(); setVal('lsInB', 'EXP-003, EXP-004, EXP-005'); setVal('lsPreset', 'lines', 'change'); lsRender(); exampleLoaded('Solo en A, solo en B y en las dos'); } }
+  ]
+};
 /* =====================================================================
    REGEX · PROBAR, EXPLICAR, CONSTRUIR, INFERIR, BIBLIOTECA Y CÓDIGO
    ===================================================================== */

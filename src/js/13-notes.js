@@ -79,12 +79,12 @@ function renderNotesView() {
     $('#pinNoteBtn').title = n.pinned ? 'Desfijar' : 'Fijar arriba';
     $('#noteSaved').textContent = `Editada ${relTime(n.updated)}`;
     savedRange = null;
-    wlClose(); wlRefreshEditor(); highlightAllPre();
+    wlClose(); wlRefreshEditor(); highlightAllPre(); tagDecorateEditor();
     updateCount(); updateEmpty();
   }
   store.set('currentNote', currentNoteId);
   renderNoteList();
-  wkRenderCrumbs(); wkRenderSubpages();
+  wkRenderCrumbs(); wkRenderSubpages(); renderNoteTags();
   renderBacklinks();
 }
 function updateEmpty() { editor.classList.toggle('is-empty', !editor.textContent.trim() && !editor.querySelector('input,hr,li')); }
@@ -105,7 +105,7 @@ function flushNote(force = false) {
   save.notes();
   $('#noteSaved').textContent = '✓ Guardado a las ' + fmtTime(Date.now());
   renderNoteList();
-  renderBacklinks();
+  renderBacklinks(); renderNoteTags();
 }
 const saveNoteSoon = debounce(() => flushNote(), 600);
 function markDirty() { noteDirty = true; $('#noteSaved').textContent = 'Guardando…'; updateEmpty(); updateCount(); saveNoteSoon(); }
@@ -308,6 +308,7 @@ function firstMeaningful(el) {
 }
 editor.addEventListener('keydown', e => {
   if (wlKey(e)) return;
+  if (tagAcKey(e)) return;
   const k = e.key.toLowerCase();
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && k === 'k') { e.preventDefault(); insertLink(); return; }
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && k === 'x') { e.preventDefault(); insertChecklist(); return; }

@@ -12,6 +12,7 @@
         <button data-tool="time">Fechas / epoch</button>
         <button data-tool="valid">NIF · CIF · IBAN</button>
         <button data-tool="text">Texto</button>
+        <button data-tool="lists">Listas</button>
       </div>
 
       <div class="card tool-pane active" data-pane="json">
@@ -214,6 +215,67 @@
         <input class="field mono" id="valIn" placeholder="12345678Z · X1234567L · B12345674 · ES91 2100 0418 4502 0005 1332" spellcheck="false" style="font-size:1.05rem">
         <div class="result-box" id="valOut"><span class="muted">Escribe un documento o una cuenta y se detecta el tipo automáticamente. Con 8 dígitos calcula la letra del DNI.</span></div>
         <p class="hint">Comprueba solo el dígito o letra de control: no confirma que el documento o la cuenta existan.</p>
+      </div>
+
+
+      <div class="card tool-pane" data-pane="lists">
+        <div class="ls-top">
+          <div class="ls-in">
+            <label class="lbl" for="lsIn">Lista <span id="lsLblA" hidden>A</span></label>
+            <textarea class="field code" id="lsIn" rows="9" spellcheck="false" placeholder="Pega aquí tus valores: uno por línea, separados por comas, una columna de Excel…"></textarea>
+          </div>
+          <div class="ls-opts">
+            <div><label class="lbl" for="lsSplit">Separar por</label>
+              <div class="row" style="flex-wrap:nowrap;gap:6px">
+                <select class="field" id="lsSplit"><option value="auto">✨ Detectar</option><option value="line">Saltos de línea</option><option value="comma">Comas</option><option value="semi">Punto y coma</option><option value="tab">Tabuladores</option><option value="space">Espacios</option><option value="pipe">Barra vertical |</option><option value="multi">Línea, coma, ; y tab</option><option value="custom">Otro…</option></select>
+                <input class="field" id="lsSplitCustom" placeholder="p. ej. -" hidden style="max-width:110px">
+              </div>
+              <div class="muted small" id="lsDetected" style="min-height:1.2em;margin-top:4px"></div>
+            </div>
+            <div class="ls-checks">
+              <label class="check-row"><input type="checkbox" class="check" id="lsTrim" checked> Quitar espacios</label>
+              <label class="check-row"><input type="checkbox" class="check" id="lsEmpty" checked> Quitar vacíos</label>
+              <label class="check-row"><input type="checkbox" class="check" id="lsUnquote"> Quitar comillas</label>
+              <label class="check-row"><input type="checkbox" class="check" id="lsDedupe"> Quitar duplicados</label>
+              <label class="check-row" title="Al quitar duplicados y al comparar, «Ávila» = «avila»"><input type="checkbox" class="check" id="lsLoose" checked> Ignorar mayúsculas y tildes</label>
+            </div>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div><label class="lbl" for="lsSort">Ordenar</label><select class="field" id="lsSort"><option value="">Como están</option><option value="az">A → Z</option><option value="za">Z → A</option><option value="nat">Natural (2 antes que 10)</option><option value="len">Por longitud</option><option value="rev">Invertir orden</option></select></div>
+              <div><label class="lbl" for="lsCase">Transformar</label><select class="field" id="lsCase"><option value="">Sin cambios</option><option value="up">MAYÚSCULAS</option><option value="low">minúsculas</option><option value="title">Primera Mayúscula</option><option value="noacc">Sin tildes</option></select></div>
+            </div>
+          </div>
+        </div>
+        <div class="status-line ls-stats" id="lsStats"></div>
+        <div class="seg" id="lsMode"><button data-m="pick" class="on">✅ Seleccionar y unir</button><button data-m="cmp">⚖️ Comparar con otra lista</button></div>
+
+        <div class="ls-pane" data-lm="pick">
+          <div class="row" style="margin:10px 0 6px">
+            <input class="field" id="lsFilter" placeholder="🔍 Filtrar…" style="max-width:220px">
+            <button class="btn sm" data-ls="all">Marcar todos</button><button class="btn sm" data-ls="none">Ninguno</button><button class="btn sm" data-ls="inv">Invertir</button><button class="btn sm" data-ls="matchOn" title="Marca los que coinciden con el filtro">Marcar filtrados</button><button class="btn sm" data-ls="matchOff" title="Desmarca los que coinciden con el filtro">Desmarcar filtrados</button>
+            <span class="muted small" id="lsPickInfo"></span>
+          </div>
+          <div class="ls-items" id="lsItems"></div>
+        </div>
+        <div class="ls-pane" data-lm="cmp" hidden>
+          <label class="lbl" for="lsInB" style="margin-top:10px">Lista B <span class="muted small">(se separa y limpia igual que la A)</span></label>
+          <textarea class="field code" id="lsInB" rows="7" spellcheck="false" placeholder="Pega aquí la segunda lista…"></textarea>
+        </div>
+
+        <div class="ls-format">
+          <div><label class="lbl" for="lsPreset">Formato de salida</label>
+            <select class="field" id="lsPreset">
+              <option value="or">valor OR valor</option><option value="and">valor AND valor</option><option value="cs">valor, valor</option><option value="c">valor,valor</option><option value="sc">valor;valor</option><option value="lines">Uno por línea</option><option value="tab">Separado por tabuladores</option>
+              <option value="sqlin">SQL: IN ('a', 'b')</option><option value="sqlnum">SQL: IN (1, 2) numérico</option><option value="json">JSON: ["a", "b"]</option><option value="csv">CSV entre comillas</option><option value="md">Lista Markdown</option><option value="rx">Regex: (?:a|b)</option><option value="custom">Personalizado…</option>
+            </select></div>
+          <div data-lsf="custom"><label class="lbl" for="lsSep">Separador</label><input class="field" id="lsSep" value=" | " spellcheck="false"></div>
+          <div data-lsf="wrap"><label class="lbl" for="lsQuote">Comillas</label><select class="field" id="lsQuote"><option value="">Ninguna</option><option value="'">'simples'</option><option value='"'>"dobles"</option><option value="`">`invertidas`</option></select></div>
+          <div data-lsf="wrap"><label class="lbl" for="lsPre">Prefijo</label><input class="field" id="lsPre" spellcheck="false"></div>
+          <div data-lsf="wrap"><label class="lbl" for="lsSuf">Sufijo</label><input class="field" id="lsSuf" spellcheck="false"></div>
+          <div data-lsf="sql"><label class="lbl" for="lsCol">Columna</label><input class="field" id="lsCol" placeholder="p. ej. ID_EXPEDIENTE" spellcheck="false"></div>
+          <div data-lsf="sql"><label class="lbl" for="lsChunk" title="Oracle admite como máximo 1000 valores en un IN">Máx. por IN</label><input class="field" type="number" id="lsChunk" value="1000" min="1" max="100000"></div>
+        </div>
+
+        <div class="ls-outs" id="lsOuts"></div>
       </div>
 
       <div class="card tool-pane" data-pane="text">

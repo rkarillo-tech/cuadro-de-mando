@@ -26,6 +26,12 @@ csp = ("default-src 'none'; script-src 'sha256-%s'; style-src 'unsafe-inline'; i
        "worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'") % sha
 html = html.replace('<!--CSP-->', '<meta http-equiv="Content-Security-Policy" content="%s">' % csp)
 
+# Iconos de la pestaña y de la pantalla de inicio (incrustados: sin archivos ni conexiones)
+svg_b64 = base64.b64encode(open(os.path.join(ROOT, 'assets', 'icono.svg'), 'rb').read()).decode()
+png_b64 = base64.b64encode(open(os.path.join(ROOT, 'assets', 'icono-180.png'), 'rb').read()).decode()
+assert html.count('<!--ICONS-->') == 1, 'ICONS'
+html = html.replace('<!--ICONS-->', ('<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,%s">\n'
+    '<link rel="apple-touch-icon" href="data:image/png;base64,%s">\n<meta name="theme-color" content="#7464f0">') % (svg_b64, png_b64))
 # Versión y aviso de licencia (fuera del <script>, no afecta a la huella de la CSP)
 import datetime
 version = open(os.path.join(ROOT, 'VERSION'), encoding='utf-8').read().strip()

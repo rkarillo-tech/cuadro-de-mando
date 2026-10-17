@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando 1.1.0 (2026-10-17) · productividad personal 100 % local, sin servidor
+  Cuadro de Mando 1.1.1 (2026-10-17) · productividad personal 100 % local, sin servidor
   https://github.com/rkarillo-tech/cuadro-de-mando
 
   MIT License
@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ihGiiiufghY8kiJ6S49/3xB3AjlE7atSjtxCi+as2PA='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-yJHwxclh16G1dzDe+icOKSV+hV422buSOHn6SqBuYSU='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -907,7 +907,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.1.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.1.1 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -1880,7 +1880,7 @@ details.bl-row summary.bl-h{cursor:pointer}
             <p class="small"><b>¿Cómo restauro una copia exportada?</b> En «Copias de seguridad» → «⬆️ Importar copia». Si está cifrada, te pedirá la contraseña con la que la creaste. Antes de aplicar nada te enseña qué cambia y te deja elegir: <b>🔀 Combinar</b> (junta lo de los dos sin perder nada) o <b>Reemplazar todo</b>. En ambos casos se guarda antes una versión en el historial.</p>
             <p class="small"><b>¿Cómo sé si un archivo está cifrado?</b> El nombre termina en <code>_cifrada.json</code>. Si lo abres con un editor de texto verás <code>"encrypted":true</code> y un bloque de caracteres ilegibles en lugar de tus notas.</p>
             <p class="small"><b>¿Y si olvido la contraseña?</b> No hay forma de recuperarla. Las copias o versiones cifradas con ella quedan inservibles; solo te salvará una copia sin cifrar o cifrada con otra contraseña que recuerdes.</p>
-            <p class="small"><b>¿Uso el archivo en varios equipos?</b> Sí. Si otro equipo ha guardado en el archivo (al abrir la app, al volver a la pestaña o antes de guardar), no se pisa: te enseña qué cambia y puedes <b>🔀 Combinar</b> lo de los dos. Desde el móvil: exporta una copia y, en un portátil, impórtala con «Combinar».</p>
+            <p class="small"><b>¿Uso el archivo en varios equipos y en el móvil?</b> Sí: vincula <b>el mismo archivo</b> (por ejemplo, en Google Drive) en cada uno; en el móvil también funciona con Chrome para Android. Cada cambio se guarda en él y, cuando otro dispositivo lo ha modificado (al abrir la app, al volver a la pestaña o antes de guardar), se <b>combina solo</b> si no hay conflicto. Si algo se cambió en los dos sitios o se va a borrar, te enseña qué cambia para que decidas.</p>
           </details>
         </div>
 
@@ -1953,7 +1953,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
         <div class="card" id="licCard">
           <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
-          <p>Cuadro de Mando 1.1.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p>Cuadro de Mando 1.1.1 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
           <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
           <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
 
@@ -2501,13 +2501,13 @@ async function openBackup(o, pass) {
 }
 /** Sustituye TODOS los datos por los de una copia y recarga.
     Se marca como el cambio más reciente: así el archivo vinculado no lo «pisa» al reabrir. */
-async function replaceAllData(data) {
+async function replaceAllData(data, { keepNote = null } = {}) {
   const clean = {};
   for (const [k, v] of Object.entries(data || {})) if (!PLAIN_KEYS.has(k)) clean[k] = v;
   clean.lastChange = Date.now();
   if (data && (data.theme === 'light' || data.theme === 'dark' || data.theme === 'system')) ls.set('theme', data.theme);
   ls.set('migrated', true);
-  clean.currentNote = null;
+  clean.currentNote = keepNote || null;
   MEM = clean;
   if (CRYPT) await flushEnc();
   else {
@@ -10823,9 +10823,23 @@ async function fsCheckNewer(external = false) {
     if (fileLc > mine + 1000 || (external && fileLc !== mine)) {
       const data = o.encrypted ? await askBackupPassword(o) : o.data;
       if (!data) { fsState = 'conflict'; renderFs(); return; }
+      // Sin conflictos (nada cambiado en los dos sitios a la vez y nada que borrar): se combina solo
+      if (fsSeenLc) {
+        flushNote();
+        const local = JSON.parse(JSON.stringify(MEM)), merged = mergeData(local, data), d = diffData(local, data, merged, fsSeenLc);
+        if (!d.mergeDeletes && !d.conflicts) {
+          await fsRememberMtime(mtime, fileLc);
+          await histSnapshot('auto', 'Antes de sincronizar con «' + fsName() + '»', { force: true });
+          const parts = [d.mergeAdds && `+${d.mergeAdds} nuevo${d.mergeAdds === 1 ? '' : 's'}`, d.mergeUpdates && `${d.mergeUpdates} actualizado${d.mergeUpdates === 1 ? '' : 's'}`].filter(Boolean);
+          try { sessionStorage.setItem('cdm-sync-msg', '🔄 Sincronizado con otro dispositivo' + (parts.length ? ': ' + parts.join(', ') : '')); } catch {}
+          await replaceAllData(merged, { keepNote: currentNoteId });
+          setTimeout(() => reloadSafe(), 150);
+          return;
+        }
+      }
       const res = await syncChoiceDialog(data, {
         mode: 'file', title: external && fileLc <= mine ? '🗄️ Otro dispositivo ha modificado el archivo' : '🗄️ El archivo tiene cambios más recientes', otherLabel: 'el archivo',
-        intro: `<p class="small">El archivo vinculado «${esc(fsName())}» se guardó el <b>${esc(fmtDateTime(fileLc))}</b>; los datos de este navegador, el <b>${mine ? esc(fmtDateTime(mine)) : '—'}</b>. Quizá lo usaste desde otro equipo. <b>Combinar</b> junta lo de los dos sin perder nada.</p>`
+        intro: `<p class="small">El archivo vinculado «${esc(fsName())}» se guardó el <b>${esc(fmtDateTime(fileLc))}</b>; los datos de este navegador, el <b>${mine ? esc(fmtDateTime(mine)) : '—'}</b>. Hay algo que decidir: elementos modificados en los dos sitios, o borrados en otro dispositivo. <b>Combinar</b> junta lo de los dos y, si algo cambió en ambos, se queda la versión más reciente.</p>`
       });
       if (!res.choice) { fsState = 'conflict'; renderFs(); return; }
       if (res.choice === 'keep') { fsState = 'ok'; await fsRememberMtime(mtime, fileLc); fsAsking = false; await fsWrite(); }
@@ -10917,7 +10931,7 @@ function renderFs() {
   if (!$('#fsStatus')) return;
   let st = '', btns = '';
   switch (fsState) {
-    case 'unsupported': st = '⚪ No disponible en este navegador. Usa Chrome o Edge (o usa las copias de seguridad).'; break;
+    case 'unsupported': st = '⚪ No disponible en este navegador. Usa Chrome o Edge, en el ordenador o en Android (o usa las copias de seguridad).'; break;
     case 'none': st = '⚪ Sin archivo vinculado'; btns = '<button class="btn primary" data-fs="new">🔗 Vincular nuevo archivo</button><button class="btn" data-fs="open">📂 Abrir archivo existente</button>'; break;
     case 'ok': st = fsErr ? `🔴 Error al guardar en «${esc(fsName())}»: ${esc(fsErr)}` : `🟢 Guardando en «${esc(fsName())}»${fsLastWrite ? ` · última escritura a las ${fmtTime(fsLastWrite)}` : ''}${CRYPT ? ' · cifrado' : ''}`; btns = '<button class="btn" data-fs="write">💾 Guardar ahora</button><button class="btn" data-fs="new">🔗 Cambiar de archivo</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;
     case 'perm': st = `🟡 El navegador necesita que vuelvas a autorizar «${esc(fsName())}»`; btns = '<button class="btn primary" data-fs="reconnect">Reconectar</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;
@@ -11323,19 +11337,20 @@ const DIFF_SECTIONS = [
   ['holidays', '🎉 Festivos', x => x.name || x.date]
 ];
 /** Compara este equipo (L) con la otra versión (R) y con el resultado de combinar (M). */
-function diffData(L, R, M) {
+function diffData(L, R, M, base = 0) {
   const rows = [];
   DIFF_SECTIONS.forEach(([k, label, nameOf]) => {
     const a = isIdList(L[k]) ? L[k] : [], b = isIdList(R[k]) ? R[k] : [], m = isIdList(M[k]) ? M[k] : [];
     if (!a.length && !b.length) return;
     const am = new Map(a.map(x => [String(x.id), x])), bm = new Map(b.map(x => [String(x.id), x])), mm = new Map(m.map(x => [String(x.id), x]));
     const nm = x => { try { return String(nameOf(x) || '(sin título)').replace(/<[^>]+>/g, '').slice(0, 80); } catch { return '(sin título)'; } };
-    const r = { key: k, label, here: a.length, copy: b.length, onlyHere: [], onlyCopy: [], newerHere: [], newerCopy: [], same: 0, mergeAdds: [], mergeUpdates: [], mergeDeletes: [], mergeSkips: [] };
+    const r = { key: k, label, here: a.length, copy: b.length, onlyHere: [], onlyCopy: [], newerHere: [], newerCopy: [], same: 0, mergeAdds: [], mergeUpdates: [], mergeDeletes: [], mergeSkips: [], conflicts: [] };
     am.forEach((x, id) => {
       const y = bm.get(id);
       if (!y && !mm.has(id)) { /* se borró en el otro dispositivo: no cuenta como «solo aquí» */ }
       else if (!y) r.onlyHere.push(nm(x));
       else if (trkHash(x) === trkHash(y)) r.same++;
+      else if (base && (+x._m || 0) > base && (+y._m || 0) > base) { r.conflicts.push(nm(x)); if ((+y._m || 0) > (+x._m || 0)) r.newerCopy.push(nm(y)); else r.newerHere.push(nm(x)); }
       else if ((+y._m || 0) > (+x._m || 0)) r.newerCopy.push(nm(y));
       else r.newerHere.push(nm(x));
       const z = mm.get(id);
@@ -11350,7 +11365,7 @@ function diffData(L, R, M) {
     rows,
     replaceLoses: sum(r => r.onlyHere.length + r.newerHere.length),
     replaceGains: sum(r => r.onlyCopy.length + r.newerCopy.length),
-    mergeAdds: sum(r => r.mergeAdds.length), mergeUpdates: sum(r => r.mergeUpdates.length), mergeDeletes: sum(r => r.mergeDeletes.length), mergeSkips: sum(r => r.mergeSkips.length),
+    mergeAdds: sum(r => r.mergeAdds.length), mergeUpdates: sum(r => r.mergeUpdates.length), mergeDeletes: sum(r => r.mergeDeletes.length), mergeSkips: sum(r => r.mergeSkips.length), conflicts: sum(r => r.conflicts.length),
     identical: rows.every(r => !r.onlyHere.length && !r.onlyCopy.length && !r.newerHere.length && !r.newerCopy.length)
   };
 }
@@ -11396,6 +11411,12 @@ async function applySyncChoice(res, other, label) {
   setTimeout(() => reloadSafe(), 700);
   return true;
 }
+
+/** Tras recargar por una sincronización automática, se muestra qué ha llegado. */
+setTimeout(() => {
+  let msg = null; try { msg = sessionStorage.getItem('cdm-sync-msg'); sessionStorage.removeItem('cdm-sync-msg'); } catch {}
+  if (msg) toast(msg, 'success', 4500);
+}, 1200);
 /* =====================================================================
    ARRANQUE
    ===================================================================== */

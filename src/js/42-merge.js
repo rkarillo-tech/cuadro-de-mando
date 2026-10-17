@@ -72,19 +72,20 @@ const DIFF_SECTIONS = [
   ['holidays', '🎉 Festivos', x => x.name || x.date]
 ];
 /** Compara este equipo (L) con la otra versión (R) y con el resultado de combinar (M). */
-function diffData(L, R, M) {
+function diffData(L, R, M, base = 0) {
   const rows = [];
   DIFF_SECTIONS.forEach(([k, label, nameOf]) => {
     const a = isIdList(L[k]) ? L[k] : [], b = isIdList(R[k]) ? R[k] : [], m = isIdList(M[k]) ? M[k] : [];
     if (!a.length && !b.length) return;
     const am = new Map(a.map(x => [String(x.id), x])), bm = new Map(b.map(x => [String(x.id), x])), mm = new Map(m.map(x => [String(x.id), x]));
     const nm = x => { try { return String(nameOf(x) || '(sin título)').replace(/<[^>]+>/g, '').slice(0, 80); } catch { return '(sin título)'; } };
-    const r = { key: k, label, here: a.length, copy: b.length, onlyHere: [], onlyCopy: [], newerHere: [], newerCopy: [], same: 0, mergeAdds: [], mergeUpdates: [], mergeDeletes: [], mergeSkips: [] };
+    const r = { key: k, label, here: a.length, copy: b.length, onlyHere: [], onlyCopy: [], newerHere: [], newerCopy: [], same: 0, mergeAdds: [], mergeUpdates: [], mergeDeletes: [], mergeSkips: [], conflicts: [] };
     am.forEach((x, id) => {
       const y = bm.get(id);
       if (!y && !mm.has(id)) { /* se borró en el otro dispositivo: no cuenta como «solo aquí» */ }
       else if (!y) r.onlyHere.push(nm(x));
       else if (trkHash(x) === trkHash(y)) r.same++;
+      else if (base && (+x._m || 0) > base && (+y._m || 0) > base) { r.conflicts.push(nm(x)); if ((+y._m || 0) > (+x._m || 0)) r.newerCopy.push(nm(y)); else r.newerHere.push(nm(x)); }
       else if ((+y._m || 0) > (+x._m || 0)) r.newerCopy.push(nm(y));
       else r.newerHere.push(nm(x));
       const z = mm.get(id);
@@ -99,7 +100,7 @@ function diffData(L, R, M) {
     rows,
     replaceLoses: sum(r => r.onlyHere.length + r.newerHere.length),
     replaceGains: sum(r => r.onlyCopy.length + r.newerCopy.length),
-    mergeAdds: sum(r => r.mergeAdds.length), mergeUpdates: sum(r => r.mergeUpdates.length), mergeDeletes: sum(r => r.mergeDeletes.length), mergeSkips: sum(r => r.mergeSkips.length),
+    mergeAdds: sum(r => r.mergeAdds.length), mergeUpdates: sum(r => r.mergeUpdates.length), mergeDeletes: sum(r => r.mergeDeletes.length), mergeSkips: sum(r => r.mergeSkips.length), conflicts: sum(r => r.conflicts.length),
     identical: rows.every(r => !r.onlyHere.length && !r.onlyCopy.length && !r.newerHere.length && !r.newerCopy.length)
   };
 }
@@ -145,3 +146,9 @@ async function applySyncChoice(res, other, label) {
   setTimeout(() => reloadSafe(), 700);
   return true;
 }
+
+/** Tras recargar por una sincronización automática, se muestra qué ha llegado. */
+setTimeout(() => {
+  let msg = null; try { msg = sessionStorage.getItem('cdm-sync-msg'); sessionStorage.removeItem('cdm-sync-msg'); } catch {}
+  if (msg) toast(msg, 'success', 4500);
+}, 1200);

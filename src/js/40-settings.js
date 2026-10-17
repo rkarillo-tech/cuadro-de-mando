@@ -271,9 +271,23 @@ async function fsCheckNewer(external = false) {
     if (fileLc > mine + 1000 || (external && fileLc !== mine)) {
       const data = o.encrypted ? await askBackupPassword(o) : o.data;
       if (!data) { fsState = 'conflict'; renderFs(); return; }
+      // Sin conflictos (nada cambiado en los dos sitios a la vez y nada que borrar): se combina solo
+      if (fsSeenLc) {
+        flushNote();
+        const local = JSON.parse(JSON.stringify(MEM)), merged = mergeData(local, data), d = diffData(local, data, merged, fsSeenLc);
+        if (!d.mergeDeletes && !d.conflicts) {
+          await fsRememberMtime(mtime, fileLc);
+          await histSnapshot('auto', 'Antes de sincronizar con «' + fsName() + '»', { force: true });
+          const parts = [d.mergeAdds && `+${d.mergeAdds} nuevo${d.mergeAdds === 1 ? '' : 's'}`, d.mergeUpdates && `${d.mergeUpdates} actualizado${d.mergeUpdates === 1 ? '' : 's'}`].filter(Boolean);
+          try { sessionStorage.setItem('cdm-sync-msg', '🔄 Sincronizado con otro dispositivo' + (parts.length ? ': ' + parts.join(', ') : '')); } catch {}
+          await replaceAllData(merged, { keepNote: currentNoteId });
+          setTimeout(() => reloadSafe(), 150);
+          return;
+        }
+      }
       const res = await syncChoiceDialog(data, {
         mode: 'file', title: external && fileLc <= mine ? '🗄️ Otro dispositivo ha modificado el archivo' : '🗄️ El archivo tiene cambios más recientes', otherLabel: 'el archivo',
-        intro: `<p class="small">El archivo vinculado «${esc(fsName())}» se guardó el <b>${esc(fmtDateTime(fileLc))}</b>; los datos de este navegador, el <b>${mine ? esc(fmtDateTime(mine)) : '—'}</b>. Quizá lo usaste desde otro equipo. <b>Combinar</b> junta lo de los dos sin perder nada.</p>`
+        intro: `<p class="small">El archivo vinculado «${esc(fsName())}» se guardó el <b>${esc(fmtDateTime(fileLc))}</b>; los datos de este navegador, el <b>${mine ? esc(fmtDateTime(mine)) : '—'}</b>. Hay algo que decidir: elementos modificados en los dos sitios, o borrados en otro dispositivo. <b>Combinar</b> junta lo de los dos y, si algo cambió en ambos, se queda la versión más reciente.</p>`
       });
       if (!res.choice) { fsState = 'conflict'; renderFs(); return; }
       if (res.choice === 'keep') { fsState = 'ok'; await fsRememberMtime(mtime, fileLc); fsAsking = false; await fsWrite(); }
@@ -365,7 +379,7 @@ function renderFs() {
   if (!$('#fsStatus')) return;
   let st = '', btns = '';
   switch (fsState) {
-    case 'unsupported': st = '⚪ No disponible en este navegador. Usa Chrome o Edge (o usa las copias de seguridad).'; break;
+    case 'unsupported': st = '⚪ No disponible en este navegador. Usa Chrome o Edge, en el ordenador o en Android (o usa las copias de seguridad).'; break;
     case 'none': st = '⚪ Sin archivo vinculado'; btns = '<button class="btn primary" data-fs="new">🔗 Vincular nuevo archivo</button><button class="btn" data-fs="open">📂 Abrir archivo existente</button>'; break;
     case 'ok': st = fsErr ? `🔴 Error al guardar en «${esc(fsName())}»: ${esc(fsErr)}` : `🟢 Guardando en «${esc(fsName())}»${fsLastWrite ? ` · última escritura a las ${fmtTime(fsLastWrite)}` : ''}${CRYPT ? ' · cifrado' : ''}`; btns = '<button class="btn" data-fs="write">💾 Guardar ahora</button><button class="btn" data-fs="new">🔗 Cambiar de archivo</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;
     case 'perm': st = `🟡 El navegador necesita que vuelvas a autorizar «${esc(fsName())}»`; btns = '<button class="btn primary" data-fs="reconnect">Reconectar</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;

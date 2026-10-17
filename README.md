@@ -31,15 +31,18 @@ funciona **sin conexión a internet y sin servidor**, y tus datos **nunca salen 
 - **Haz copias de seguridad** (Ajustes → Exportar), mejor cifradas. Si borras los datos del navegador,
   se borran también los del Cuadro de Mando.
 - **Historial de versiones**: la aplicación guarda instantáneas automáticas para poder volver atrás.
-- **Varios equipos**: en Chrome y Edge de escritorio puedes vincular un archivo `.json` (por ejemplo,
-  en una carpeta sincronizada) donde se guarda cada cambio. En el móvil se usa importando la copia.
+- **Varios dispositivos**: en Chrome y Edge (ordenador y Android) puedes vincular un mismo archivo `.json`,
+  por ejemplo en Google Drive o OneDrive, donde se guarda cada cambio. Cuando otro dispositivo lo ha modificado,
+  la app combina los cambios sola; si algo se cambió en los dos sitios o se va a borrar, te enseña qué cambia
+  para que decidas.
 
 ## Preguntas frecuentes
 
 **¿Necesito internet?** No. Solo para descargar el archivo la primera vez.
 
-**¿Funciona en el móvil?** Sí, ábrelo desde la carpeta de descargas. Como la aplicación guarda sola,
-no hace falta recargar la página.
+**¿Funciona en el móvil?** Sí. Lo más cómodo es abrirla desde su dirección web
+(https://rkarillo-tech.github.io/cuadro-de-mando/) y añadirla a la pantalla de inicio. Con Chrome para Android
+puedes vincular el mismo archivo `.json` que en el ordenador y se sincronizan solos.
 
 **¿Puedo usarlo, modificarlo o compartirlo?** Sí, con licencia MIT (ver abajo).
 

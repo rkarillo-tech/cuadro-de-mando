@@ -87,13 +87,33 @@ with sync_playwright() as p:
     pg.evaluate("createNote('Cambio local','<div>l</div>',false); fsWrite(); 0"); pg.wait_for_timeout(400)
     ok(pg.evaluate("JSON.parse(__F.txt).data.notes.some(n=>n.title==='Cambio local')"),'sin cambios externos, guarda en el archivo con normalidad')
     pg.evaluate("""()=>{const d=JSON.parse(__F.txt).data; const now=Date.now()+9000; d.notes.push({id:'otro1',title:'Del otro portátil',html:'',text:'',created:now,updated:now,_m:now}); d.lastChange=now; __F.txt=JSON.stringify(backupPlain(d)); __F.m+=50;}""")
-    pg.evaluate("createNote('Otro cambio local','<div>l</div>',false); fsWrite(); 0"); pg.wait_for_timeout(600)
-    t=pg.inner_text('#modal') if pg.is_visible('#modal') else ''
-    ok('Combinar' in t and ('archivo' in t),'si otro dispositivo cambió el archivo, no lo pisa: pregunta')
-    ok('Otro cambio local' not in pg.evaluate("__F.txt"),'el archivo no se ha sobrescrito')
-    pg.click('.modal-foot .btn.primary'); pg.wait_for_timeout(2200)
+    uno=pg.evaluate("S.notes.find(n=>n.title==='Uno').id"); pg.evaluate(f"showTab('notes'); openNote({uno!r})")
+    pg.evaluate("createNote('Otro cambio local','<div>l</div>',false); fsWrite(); 0"); pg.wait_for_timeout(2500)
+    ok(not pg.is_visible('#modal'),'sin conflictos no pregunta: combina solo')
     r=pg.evaluate("S.notes.map(n=>n.title)")
-    ok('Del otro portátil' in r and 'Otro cambio local' in r,'combinar con el archivo junta los dos: '+str(r))
+    ok('Del otro portátil' in r and 'Otro cambio local' in r,'la combinación automática junta los dos: '+str(r))
+    ok(pg.evaluate("currentNoteId")==uno,'se conserva la nota abierta')
+    ok('Sincronizado con otro dispositivo' in pg.inner_text('body'),'avisa de lo que ha llegado')
+    # --- conflicto: la misma nota cambiada en los dos sitios desde la última sincronización ---
+    MOCK="""()=>{ window.__F={txt:JSON.stringify(backupPlain()), m:5000};
+      fsHandle={name:'cdm.json', getFile:async()=>({lastModified:__F.m, text:async()=>__F.txt}),
+        createWritable:async()=>({write:async t=>{__F.txt=t;}, close:async()=>{__F.m++;}}), queryPermission:async()=>'granted'};
+      fsState='ok'; fsSeenMtime=5000; fsSeenLc=MEM.lastChange; }"""
+    pg.evaluate(MOCK); pg.wait_for_timeout(50)
+    pg.evaluate(f"""()=>{{const d=JSON.parse(__F.txt).data; const now=Date.now()+9000; const n=d.notes.find(n=>n.id==={uno!r}); n.title='Uno (portátil B)'; n._m=now; d.lastChange=now; __F.txt=JSON.stringify(backupPlain(d)); __F.m+=7;}}""")
+    pg.evaluate(f"getNote({uno!r}).title='Uno (aquí)'; save.notes(); fsWrite(); 0"); pg.wait_for_timeout(700)
+    t=pg.inner_text('#modal') if pg.is_visible('#modal') else ''
+    ok('Combinar' in t and 'dos sitios' in t,'si algo cambió en los dos sitios, pregunta')
+    ok('Uno (aquí)' not in pg.evaluate("__F.txt"),'y no sobrescribe el archivo')
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
+    # --- borrado en otro dispositivo: también pregunta ---
+    pg.goto('about:blank'); pg.goto(URL); pg.wait_for_timeout(1000)
+    pg.evaluate(MOCK); pg.wait_for_timeout(50)
+    pg.evaluate("""()=>{const d=JSON.parse(__F.txt).data; const now=Date.now()+9000; const n=d.notes.find(n=>n.title==='Cambio local'); d.notes=d.notes.filter(x=>x!==n); d.tombstones=Object.assign({},d.tombstones,{['notes:'+n.id]:now}); d.lastChange=now; __F.txt=JSON.stringify(backupPlain(d)); __F.m+=7;}""")
+    pg.evaluate("fsCheckNewer(true); 0"); pg.wait_for_timeout(700)
+    t=pg.inner_text('#modal') if pg.is_visible('#modal') else ''
+    ok('Combinar' in t and 'borrado' in t,'si se va a borrar algo, pregunta')
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
     m=ctx.new_page(); m.set_viewport_size({'width':390,'height':844}); m.goto(URL); m.wait_for_timeout(900)
     m.evaluate("showTab('settings')"); m.set_input_files('#bkImportFile', f); m.wait_for_timeout(500)
     ok(m.evaluate("document.documentElement.scrollWidth")<=390,'vista previa en móvil sin scroll horizontal')

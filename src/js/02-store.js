@@ -255,13 +255,13 @@ async function openBackup(o, pass) {
 }
 /** Sustituye TODOS los datos por los de una copia y recarga.
     Se marca como el cambio más reciente: así el archivo vinculado no lo «pisa» al reabrir. */
-async function replaceAllData(data) {
+async function replaceAllData(data, { keepNote = null } = {}) {
   const clean = {};
   for (const [k, v] of Object.entries(data || {})) if (!PLAIN_KEYS.has(k)) clean[k] = v;
   clean.lastChange = Date.now();
   if (data && (data.theme === 'light' || data.theme === 'dark' || data.theme === 'system')) ls.set('theme', data.theme);
   ls.set('migrated', true);
-  clean.currentNote = null;
+  clean.currentNote = keepNote || null;
   MEM = clean;
   if (CRYPT) await flushEnc();
   else {

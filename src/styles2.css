@@ -13,6 +13,9 @@ body.booting .app{visibility:hidden}
 .pill.live{border-color:var(--success);color:var(--success)}
 .pill.warn{border-color:var(--warning);color:var(--warning)}
 .pill.err{border-color:var(--danger);color:var(--danger)}
+.pill.off{color:var(--muted);font-weight:550}
+.pill-sub{font-weight:500;opacity:.75;font-size:.72rem}
+@media (max-width:600px){.pill-sub{display:none}}
 .mobile-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--panel);border-top:1px solid var(--border);padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
 .mobile-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;border:0;background:none;color:var(--muted);font-size:.66rem;font-weight:600;padding:6px 2px;border-radius:10px;cursor:pointer}
 .mobile-nav button span{font-size:1.15rem}

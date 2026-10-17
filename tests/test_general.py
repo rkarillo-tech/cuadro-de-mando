@@ -218,7 +218,7 @@ with sync_playwright() as p:
     pg.evaluate("showTab('settings')"); pg.evaluate("fsLinkNew()"); pg.wait_for_timeout(300)
     d=json.loads(pg.evaluate("window.__fsData"))
     ok(d['app']=='cuadro-de-mando' and len(d['data']['todos'])>=5,'archivo vinculado: guarda todo')
-    ok('Guardado' in pg.inner_text('#syncPill'),'indicador de guardado arriba')
+    ok('Al día' in pg.inner_text('#syncPill'),'indicador de sincronización arriba')
     pg.evaluate("addTodoFromText('Tarea para el archivo','inbox')"); pg.wait_for_timeout(1900)
     ok('Tarea para el archivo' in pg.evaluate("window.__fsData"),'los cambios se escriben solos en el archivo')
     # ---------- J. Bloqueo con contraseña ----------

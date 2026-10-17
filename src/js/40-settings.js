@@ -189,7 +189,7 @@ $('#lockForgot').addEventListener('click', async () => {
 /* ---------- Archivo en disco (File System Access API) ---------- */
 const FS_OK = typeof window.showSaveFilePicker === 'function' && window.isSecureContext;
 let fsHandle = null, fsState = FS_OK ? 'none' : 'unsupported', fsTimer = null, fsLastWrite = 0, fsErr = '', fsBusy = false;
-let fsSeenMtime = 0, fsSeenLc = 0, fsAsking = false;   // fecha de modificación del archivo la última vez que lo leímos o escribimos: si cambia, lo tocó otro dispositivo
+let fsSeenMtime = 0, fsSeenLc = 0, fsAsking = false, fsLastCheck = 0, fsSyncing = false;   // fecha de modificación del archivo la última vez que lo leímos o escribimos: si cambia, lo tocó otro dispositivo
 function idbOpen() { return new Promise((res, rej) => { const r = indexedDB.open('cdm-fs', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
 async function idbReq(mode, fn) { const db = await idbOpen(); return new Promise((res, rej) => { const tx = db.transaction('kv', mode); const req = fn(tx.objectStore('kv')); tx.oncomplete = () => res(req && req.result); tx.onerror = () => rej(tx.error); }); }
 const idbGet = k => idbReq('readonly', s => s.get(k));
@@ -228,7 +228,7 @@ async function fsWrite() {
     await w.write(JSON.stringify(obj));
     await w.close();
     await fsRememberMtime(0, obj.lastChange);
-    fsLastWrite = Date.now(); fsErr = '';
+    fsLastWrite = fsLastCheck = Date.now(); fsErr = '';
   } catch (e) {
     fsErr = (e && e.message) || 'Error al escribir';
     if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) fsState = 'perm';
@@ -276,6 +276,7 @@ async function fsCheckNewer(external = false) {
         flushNote();
         const local = JSON.parse(JSON.stringify(MEM)), merged = mergeData(local, data), d = diffData(local, data, merged, fsSeenLc);
         if (!d.mergeDeletes && !d.conflicts) {
+          fsSyncing = true; renderFsPill();
           await fsRememberMtime(mtime, fileLc);
           await histSnapshot('auto', 'Antes de sincronizar con «' + fsName() + '»', { force: true });
           const parts = [d.mergeAdds && `+${d.mergeAdds} nuevo${d.mergeAdds === 1 ? '' : 's'}`, d.mergeUpdates && `${d.mergeUpdates} actualizado${d.mergeUpdates === 1 ? '' : 's'}`].filter(Boolean);
@@ -294,7 +295,7 @@ async function fsCheckNewer(external = false) {
       else { await fsRememberMtime(mtime, fileLc); await applySyncChoice(res, data, 'el archivo «' + fsName() + '»'); return; }
     } else {
       await fsRememberMtime(mtime, fileLc);
-      fsAsking = false;
+      fsAsking = false; fsLastCheck = Date.now();
       if (mine > fileLc) await fsWrite();
       else fsLastWrite = fsLastWrite || fileLc;
     }
@@ -361,19 +362,48 @@ async function fsUnlink() {
   renderFs(); renderNotices();
   toast('Archivo desvinculado. El archivo sigue en tu disco.', 'info');
 }
+const fsAgo = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'hace un momento' : m < 60 ? `hace ${m} min` : 'a las ' + fmtTime(t); };
+/** Semáforo de sincronización en la barra superior. */
 function renderFsPill() {
   const pill = $('#syncPill');
-  if (!fsHandle || fsState === 'none' || fsState === 'unsupported') { pill.hidden = true; return; }
   pill.hidden = false;
   pill.className = 'pill';
-  if (fsState === 'perm') { pill.classList.add('warn'); pill.textContent = '🗄️ Reconectar archivo'; }
-  else if (fsState === 'conflict') { pill.classList.add('warn'); pill.textContent = '🗄️ Revisar archivo'; }
-  else if (fsErr) { pill.classList.add('err'); pill.textContent = '🗄️ Error al guardar'; }
-  else if (fsTimer || fsBusy) pill.textContent = '🗄️ Guardando…';
-  else pill.textContent = '🗄️ Guardado';
-  pill.title = `Archivo: ${fsName()}${fsLastWrite ? ' · última escritura ' + fmtTime(fsLastWrite) : ''}${fsErr ? ' · ' + fsErr : ''}`;
+  let txt, tip;
+  if (!fsHandle || fsState === 'none' || fsState === 'unsupported') {
+    txt = '⚪ Sin sincronizar';
+    tip = fsState === 'unsupported' ? 'Este navegador no puede vincular un archivo: usa las copias de seguridad, o Chrome o Edge (también en Android)' : 'Este dispositivo no tiene un archivo vinculado: pulsa para vincular el mismo archivo que en tus otros dispositivos';
+    pill.classList.add('off');
+  }
+  else if (fsState === 'perm') { pill.classList.add('warn'); txt = '⚠️ Reconectar'; tip = `El navegador necesita que vuelvas a autorizar «${fsName()}». Pulsa para reconectar.`; }
+  else if (fsState === 'conflict') { pill.classList.add('warn'); txt = '⚠️ Revisar'; tip = 'Hay cambios de otro dispositivo que necesitan tu decisión. Pulsa para verlos.'; }
+  else if (fsErr) { pill.classList.add('err'); txt = '⛔ Error al guardar'; tip = fsErr; }
+  else if (fsSyncing) { txt = '🔄 Sincronizando…'; tip = 'Combinando los cambios de otro dispositivo'; }
+  else if (fsTimer || fsBusy) { txt = '⏳ Guardando…'; tip = `Guardando en «${fsName()}»`; }
+  else { pill.classList.add('live'); txt = '✅ Al día'; tip = `Coincide con el archivo «${fsName()}»${fsLastCheck ? ' · comprobado ' + fsAgo(fsLastCheck) : ''}. Pulsa para comprobarlo ahora.`; }
+  pill.textContent = txt;
+  if (txt === '✅ Al día' && fsLastCheck) { const sm = document.createElement('span'); sm.className = 'pill-sub'; sm.textContent = fsAgo(fsLastCheck); pill.append(sm); }
+  pill.title = tip;
 }
-$('#syncPill').addEventListener('click', () => { if (fsState === 'perm') fsReconnect(); else if (fsState === 'conflict') fsCheckNewer(); else showTab('settings'); });
+/** «Sincronizar ahora»: guarda lo pendiente y mira si otro dispositivo ha cambiado el archivo. */
+async function fsSyncNow({ quiet = false } = {}) {
+  if (fsState !== 'ok' || fsBusy || fsAsking) return;
+  if (!quiet) { flushNote(); if (fsTimer) await fsWrite(); }
+  if (await fsExternallyChanged()) { await fsCheckNewer(true); return; }
+  fsLastCheck = Date.now();
+  renderFsPill();
+  if (!quiet) toast('✅ Al día: este dispositivo tiene lo último del archivo', 'success', 2200);
+}
+$('#syncPill').addEventListener('click', () => {
+  if (!fsHandle || fsState === 'none' || fsState === 'unsupported') { showTab('settings'); setTimeout(() => { const c = $('#fsCard'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
+  else if (fsState === 'perm') fsReconnect();
+  else if (fsState === 'conflict') fsCheckNewer(true);
+  else fsSyncNow();
+});
+// Comprobación ligera cada minuto mientras la app está a la vista (solo mira la fecha del archivo)
+setInterval(() => {
+  if (document.hidden || !APP_READY) return;
+  if (fsState === 'ok') fsSyncNow({ quiet: true }); else renderFsPill();
+}, 60000);
 function renderFs() {
   renderFsPill();
   if (!$('#fsStatus')) return;

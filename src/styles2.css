@@ -538,3 +538,21 @@ details.bl-row summary.bl-h{cursor:pointer}
 .link-inline{border:0;background:none;padding:0;font:inherit;color:var(--info);cursor:pointer;text-decoration:underline}
 .lic-det summary{cursor:pointer;color:var(--accent);font-size:.85rem;margin:6px 0}
 .lic-text{white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:.74rem;line-height:1.55;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);padding:12px 14px;border-radius:var(--radius-sm);max-height:260px;overflow:auto;margin:6px 0}
+
+/* ===== Importar / combinar: vista previa de diferencias ===== */
+.df-banner{padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:12px;line-height:1.55;font-size:.9rem;border:1px solid}
+.df-banner.ok{background:color-mix(in srgb,var(--success) 12%,transparent);border-color:color-mix(in srgb,var(--success) 40%,transparent)}
+.df-banner.warn{background:color-mix(in srgb,var(--warning) 12%,transparent);border-color:color-mix(in srgb,var(--warning) 45%,transparent)}
+.df-bad{color:var(--danger);font-weight:600}
+.df-good{color:var(--success);font-weight:600}
+.df-table{width:100%;border-collapse:collapse;font-size:.86rem}
+.df-table th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:650;padding:4px 6px;border-bottom:1px solid var(--border)}
+.df-table td{padding:6px;border-bottom:1px solid var(--border);vertical-align:top}
+.df-table td:nth-child(2),.df-table td:nth-child(3),.df-table th:nth-child(2),.df-table th:nth-child(3){text-align:center;width:70px;font-variant-numeric:tabular-nums}
+.df-table summary{cursor:pointer}
+.df-h{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:8px 0 2px}
+.df-list{margin:0 0 4px 18px;padding:0}
+.df-list li{margin:1px 0}
+.df-list.bad li::marker{color:var(--danger)}
+.df-list.good li::marker{color:var(--success)}
+@media (max-width:600px){.df-table td:nth-child(2),.df-table td:nth-child(3),.df-table th:nth-child(2),.df-table th:nth-child(3){width:44px}}

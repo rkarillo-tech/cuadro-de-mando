@@ -66,9 +66,14 @@ async function importBackupFile(file, { fromLock = false } = {}) {
   if (!isBackup(o)) { toast('El archivo no es una copia válida de esta app', 'danger', 4000); return; }
   const data = o.encrypted ? await askBackupPassword(o) : o.data;
   if (!data) return;
-  if (!(await confirmDialog(`Se reemplazarán ${fromLock ? 'los datos cifrados de este navegador' : 'TODOS los datos actuales'} por los de la copia (${summarizeData(data)}). ¿Continuar?`, 'Importar y reemplazar'))) return;
-  if (!fromLock) await histSnapshot('before', 'Antes de importar «' + file.name + '»', { force: true });
-  if (fromLock) { ls.del('enc'); ls.set('lock', { enabled: false }); CRYPT = null; ls.keys().forEach(k => { if (!PLAIN_KEYS.has(k)) ls.del(k); }); }
+  if (!fromLock) {
+    // Vista previa: qué se gana y qué se perdería; por defecto, combinar
+    const res = await syncChoiceDialog(data, { mode: 'import', title: `📥 Importar «${file.name}»`, otherLabel: 'la copia' });
+    await applySyncChoice(res, data, '«' + file.name + '»');
+    return;
+  }
+  if (!(await confirmDialog(`Se reemplazarán los datos cifrados de este navegador por los de la copia (${summarizeData(data)}). ¿Continuar?`, 'Importar y reemplazar'))) return;
+  ls.del('enc'); ls.set('lock', { enabled: false }); CRYPT = null; ls.keys().forEach(k => { if (!PLAIN_KEYS.has(k)) ls.del(k); });
   await replaceAllData(data);
   toast('Copia importada. Recargando…', 'success');
   setTimeout(() => reloadSafe(), 600);
@@ -184,6 +189,7 @@ $('#lockForgot').addEventListener('click', async () => {
 /* ---------- Archivo en disco (File System Access API) ---------- */
 const FS_OK = typeof window.showSaveFilePicker === 'function' && window.isSecureContext;
 let fsHandle = null, fsState = FS_OK ? 'none' : 'unsupported', fsTimer = null, fsLastWrite = 0, fsErr = '', fsBusy = false;
+let fsSeenMtime = 0, fsSeenLc = 0, fsAsking = false;   // fecha de modificación del archivo la última vez que lo leímos o escribimos: si cambia, lo tocó otro dispositivo
 function idbOpen() { return new Promise((res, rej) => { const r = indexedDB.open('cdm-fs', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
 async function idbReq(mode, fn) { const db = await idbOpen(); return new Promise((res, rej) => { const tx = db.transaction('kv', mode); const req = fn(tx.objectStore('kv')); tx.oncomplete = () => res(req && req.result); tx.onerror = () => rej(tx.error); }); }
 const idbGet = k => idbReq('readonly', s => s.get(k));
@@ -196,7 +202,7 @@ const FS_TYPES = [{ description: 'Datos del Cuadro de Mando', accept: { 'applica
 
 async function fsInit() {
   if (!FS_OK) { renderFs(); return; }
-  try { fsHandle = await idbGet('sync'); } catch { fsHandle = null; }
+  try { fsHandle = await idbGet('sync'); fsSeenMtime = +(await idbGet('seenMtime')) || 0; fsSeenLc = +(await idbGet('seenLc')) || 0; } catch { fsHandle = null; }
   if (!fsHandle) { fsState = 'none'; renderFs(); return; }
   let p = 'prompt';
   try { p = await fsHandle.queryPermission({ mode: 'readwrite' }); } catch {}
@@ -212,13 +218,16 @@ function fileSyncSchedule() {
 }
 async function fsWrite() {
   clearTimeout(fsTimer); fsTimer = null;
-  if (fsState !== 'ok' || !fsHandle || fsBusy) return;
+  if (fsState !== 'ok' || !fsHandle || fsBusy || fsAsking) return;
   fsBusy = true;
   try {
+    // ¿Lo ha cambiado otro dispositivo desde la última vez? Entonces no se pisa: se pregunta (y se puede combinar)
+    if (await fsExternallyChanged()) { fsBusy = false; await fsCheckNewer(true); return; }
     const obj = CRYPT ? await backupEncrypted(CRYPT.key, CRYPT.salt, CRYPT.iter) : backupPlain();
     const w = await fsHandle.createWritable();
     await w.write(JSON.stringify(obj));
     await w.close();
+    await fsRememberMtime(0, obj.lastChange);
     fsLastWrite = Date.now(); fsErr = '';
   } catch (e) {
     fsErr = (e && e.message) || 'Error al escribir';
@@ -229,41 +238,67 @@ async function fsWrite() {
 async function fsRead(h) {
   const f = await h.getFile(), txt = await f.text();
   let o = null; try { o = JSON.parse(txt); } catch {}
-  return { o, empty: !txt.trim() };
+  return { o, empty: !txt.trim(), mtime: f.lastModified };
 }
-async function fsCheckNewer() {
+/** Recuerda cómo estaba el archivo (fecha y «lastChange») la última vez que lo leímos o escribimos. */
+async function fsRememberMtime(m, lc) {
   try {
-    const { o, empty } = await fsRead(fsHandle);
-    if (empty || !isBackup(o)) { await fsWrite(); return; }
+    fsSeenMtime = m || (await fsHandle.getFile()).lastModified;
+    if (lc != null) fsSeenLc = +lc || 0;
+    await idbSet('seenMtime', fsSeenMtime); await idbSet('seenLc', fsSeenLc);
+  } catch {}
+}
+/** ¿Otro dispositivo ha guardado en el archivo desde entonces? (no basta con la fecha: Drive a veces la toca sin cambiar nada) */
+async function fsExternallyChanged() {
+  if (!fsHandle || !fsSeenMtime || !fsSeenLc) return false;
+  try {
+    const f = await fsHandle.getFile();
+    if (f.lastModified === fsSeenMtime) return false;
+    let lc = 0; try { lc = +JSON.parse(await f.text()).lastChange || 0; } catch {}
+    if (!lc || lc === fsSeenLc) { await fsRememberMtime(f.lastModified); return false; }
+    return true;
+  } catch { return false; }
+}
+/** Compara el archivo con los datos de este navegador. external = otro dispositivo lo ha modificado. */
+async function fsCheckNewer(external = false) {
+  if ((fsBusy && !external) || fsAsking) return;
+  fsAsking = true;
+  try {
+    const { o, empty, mtime } = await fsRead(fsHandle);
+    if (empty || !isBackup(o)) { fsAsking = false; await fsWrite(); return; }
     const fileLc = +o.lastChange || 0, mine = +MEM.lastChange || 0;
-    if (fileLc > mine + 1000) {
-      const r = await modal({
-        title: '🗄️ El archivo tiene cambios más recientes',
-        body: `<p>El archivo vinculado «${esc(fsName())}» se guardó el <b>${esc(fmtDateTime(fileLc))}</b>, después que los datos de este navegador (<b>${mine ? esc(fmtDateTime(mine)) : 'sin cambios'}</b>). Quizá lo usaste desde otro equipo.</p><p class="muted small">¿Qué datos quieres conservar? Los otros se sustituirán.</p>`,
-        actions: [{ label: 'Los de este navegador', value: 'mine', cls: '' }, { label: 'Los del archivo', value: 'file', cls: 'primary' }]
+    external = external || (fsSeenLc && fileLc !== fsSeenLc);
+    if (fileLc > mine + 1000 || (external && fileLc !== mine)) {
+      const data = o.encrypted ? await askBackupPassword(o) : o.data;
+      if (!data) { fsState = 'conflict'; renderFs(); return; }
+      const res = await syncChoiceDialog(data, {
+        mode: 'file', title: external && fileLc <= mine ? '🗄️ Otro dispositivo ha modificado el archivo' : '🗄️ El archivo tiene cambios más recientes', otherLabel: 'el archivo',
+        intro: `<p class="small">El archivo vinculado «${esc(fsName())}» se guardó el <b>${esc(fmtDateTime(fileLc))}</b>; los datos de este navegador, el <b>${mine ? esc(fmtDateTime(mine)) : '—'}</b>. Quizá lo usaste desde otro equipo. <b>Combinar</b> junta lo de los dos sin perder nada.</p>`
       });
-      if (!r) { fsState = 'conflict'; renderFs(); return; }
-      if (r.action === 'file') {
-        const data = o.encrypted ? await askBackupPassword(o) : o.data;
-        if (!data) { fsState = 'conflict'; renderFs(); return; }
-        await histSnapshot('before', 'Antes de cargar el archivo «' + fsName() + '»', { force: true });
-        await replaceAllData(data);
-        toast('Datos cargados desde el archivo. Recargando…', 'success');
-        setTimeout(() => reloadSafe(), 500);
-        return;
-      }
-      fsState = 'ok'; await fsWrite();
-    } else if (mine > fileLc) await fsWrite();
-    else fsLastWrite = fsLastWrite || fileLc;
+      if (!res.choice) { fsState = 'conflict'; renderFs(); return; }
+      if (res.choice === 'keep') { fsState = 'ok'; await fsRememberMtime(mtime, fileLc); fsAsking = false; await fsWrite(); }
+      else { await fsRememberMtime(mtime, fileLc); await applySyncChoice(res, data, 'el archivo «' + fsName() + '»'); return; }
+    } else {
+      await fsRememberMtime(mtime, fileLc);
+      fsAsking = false;
+      if (mine > fileLc) await fsWrite();
+      else fsLastWrite = fsLastWrite || fileLc;
+    }
   } catch (e) { fsErr = (e && e.message) || 'Error al leer el archivo'; }
+  finally { fsAsking = false; }
   renderFs();
 }
+// Al volver a la pestaña, se mira si otro dispositivo ha tocado el archivo
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden || !APP_READY || fsState !== 'ok' || fsBusy) return;
+  if (await fsExternallyChanged()) fsCheckNewer(true);
+});
 async function fsLinkNew() {
   let h;
   try { h = await window.showSaveFilePicker({ suggestedName: 'cuadro-de-mando.json', types: FS_TYPES }); }
   catch (e) { if (e.name !== 'AbortError') toast('No se pudo vincular: ' + e.message, 'danger', 5000); return; }
-  fsHandle = h; fsState = 'ok';
-  try { await idbSet('sync', h); } catch {}
+  fsHandle = h; fsState = 'ok'; fsSeenMtime = 0; fsSeenLc = 0;
+  try { await idbSet('sync', h); await idbSet('seenMtime', 0); } catch {}
   flushNote();
   await fsWrite();
   toast(`Vinculado a «${h.name}»: cada cambio se guardará ahí automáticamente`, 'success', 4500);
@@ -279,7 +314,7 @@ async function fsOpenExisting() {
   const r = await modal({
     title: '🗄️ Abrir archivo existente',
     body: `<p>«${esc(h.name)}» tiene datos guardados el <b>${esc(fmtDateTime(when))}</b>${o.encrypted ? ' (cifrados)' : ''}: ${o.encrypted ? 'contenido cifrado' : esc(summarizeData(o.data))}.</p><p class="muted small">Desde ahora, la app guardará los cambios en este archivo.</p>`,
-    actions: [{ label: 'Cancelar', value: null, cls: 'ghost' }, { label: 'Sobrescribirlo con mis datos', value: 'mine', cls: '' }, { label: 'Cargar sus datos aquí', value: 'file', cls: 'primary' }]
+    actions: [{ label: 'Cancelar', value: null, cls: 'ghost' }, { label: 'Sobrescribirlo con mis datos', value: 'mine', cls: '' }, { label: 'Cargar o combinar sus datos…', value: 'file', cls: 'primary' }]
   });
   if (!r) return;
   let perm = 'denied';
@@ -290,13 +325,13 @@ async function fsOpenExisting() {
   if (r.action === 'file') {
     const data = o.encrypted ? await askBackupPassword(o) : o.data;
     if (!data) return;
-    await histSnapshot('before', 'Antes de cargar el archivo «' + h.name + '»', { force: true });
-    await replaceAllData(data);
-    toast('Datos cargados. Recargando…', 'success');
-    setTimeout(() => reloadSafe(), 500);
+    const res = await syncChoiceDialog(data, { mode: 'import', title: `🗄️ Cargar «${h.name}»`, otherLabel: 'el archivo' });
+    if (!res.choice) return;
+    await fsRememberMtime((await h.getFile()).lastModified, +o.lastChange || 0);
+    await applySyncChoice(res, data, 'el archivo «' + h.name + '»');
     return;
   }
-  fsState = 'ok'; await fsWrite();
+  fsState = 'ok'; fsSeenMtime = 0; fsSeenLc = 0; await fsWrite();
   toast(`Vinculado a «${h.name}»`, 'success');
 }
 async function fsReconnect() {
@@ -307,7 +342,8 @@ async function fsReconnect() {
 }
 async function fsUnlink() {
   fsHandle = null; fsState = FS_OK ? 'none' : 'unsupported'; clearTimeout(fsTimer); fsTimer = null;
-  try { await idbDel('sync'); } catch {}
+  fsSeenMtime = 0; fsSeenLc = 0;
+  try { await idbDel('sync'); await idbDel('seenMtime'); await idbDel('seenLc'); } catch {}
   renderFs(); renderNotices();
   toast('Archivo desvinculado. El archivo sigue en tu disco.', 'info');
 }

@@ -248,8 +248,8 @@ with sync_playwright() as p:
     # importar la copia cifrada (misma contraseña → sin preguntar)
     pg.evaluate("showTab('settings')")
     pg.set_input_files('#bkImportFile', shutil_path); pg.wait_for_timeout(300)
-    ok('Se reemplazarán' in pg.inner_text('#modal'),'importar copia cifrada pide confirmación')
-    modal_ok(pg); pg.wait_for_timeout(1500)
+    ok('Si reemplazas' in pg.inner_text('#modal'),'importar copia cifrada muestra qué cambia')
+    pg.click('.modal-foot button:has-text("Reemplazar todo")'); pg.wait_for_timeout(250); modal_ok(pg); pg.wait_for_timeout(1500)
     pg.fill('#lockPass','clave-larga-123'); pg.click('#lockBtn'); pg.wait_for_timeout(1800)
     ok(pg.evaluate("S.todos.length")==snap_todos and not pg.evaluate("S.todos.some(t=>t.text==='Escrita cifrada')"),'copia cifrada restaurada')
     # desactivar bloqueo
@@ -262,7 +262,9 @@ with sync_playwright() as p:
     open(SC+'/b2.json','w').write(open(d.value.path()).read())
     pg.evaluate("S.todos=[]; save.todos()")
     pg.set_input_files('#bkImportFile', SC+'/b2.json'); pg.wait_for_timeout(200)
-    pg.fill('.modal input[name=p]','otra123'); modal_ok(pg); pg.wait_for_timeout(1500); modal_ok(pg); pg.wait_for_timeout(1200)
+    pg.fill('.modal input[name=p]','otra123'); modal_ok(pg); pg.wait_for_timeout(1500)
+    ok('borraste aquí' in pg.inner_text('#modal'),'avisa de que lo borrado aquí no vuelve al combinar')
+    pg.click('.modal-foot button:has-text("Reemplazar todo")'); pg.wait_for_timeout(1500)
     ok(pg.evaluate("S.todos.length")==snap_todos,'importar copia cifrada con otra contraseña')
     # ---------- M. Móvil ----------
     m=ctx.new_page(); m.set_viewport_size({'width':390,'height':844}); m.on('pageerror', lambda e: errs.append('m:'+str(e)))

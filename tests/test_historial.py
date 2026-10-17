@@ -51,8 +51,9 @@ with sync_playwright() as p:
     open(SC+'/plain.json','w').write(json.dumps(o))
     # importar crea versión de seguridad
     pg.evaluate("addTodoFromText('Delta','inbox')"); pg.wait_for_timeout(100)
-    pg.set_input_files('#bkImportFile', SC+'/plain.json'); pg.wait_for_timeout(300); modal_ok(pg); pg.wait_for_timeout(1500)
-    s=snaps(pg); ok(any(x['kind']=='before' and 'importar' in x['label'] and x['todos']==4 for x in s),'versión de seguridad antes de importar')
+    pg.set_input_files('#bkImportFile', SC+'/plain.json'); pg.wait_for_timeout(400)
+    pg.click('.modal-foot button:has-text("Reemplazar todo")'); pg.wait_for_timeout(250); modal_ok(pg); pg.wait_for_timeout(1500)
+    s=snaps(pg); ok(any(x['kind']=='before' and 'reemplazar' in x['label'] and x['todos']==4 for x in s),'versión de seguridad antes de importar (reemplazar)')
     ok(pg.evaluate("S.todos.length")==3,'importación aplicada')
     lc=pg.evaluate("MEM.lastChange"); ok(abs(lc-pg.evaluate("Date.now()"))<10000,'importar marca los datos como los más recientes')
     # bloqueo → versiones cifradas

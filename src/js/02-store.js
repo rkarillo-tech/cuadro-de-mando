@@ -145,6 +145,7 @@ const store = {
   set(k, v) {
     if (FROZEN) return false;
     if (PLAIN_KEYS.has(k)) return ls.set(k, v);
+    if (!VOLATILE_KEYS.has(k)) { try { trackChanges(k, v); } catch (e) { console.warn(e); } }
     MEM[k] = v;
     const real = !VOLATILE_KEYS.has(k);
     if (real) MEM.lastChange = Date.now();
@@ -316,6 +317,42 @@ function migrateLegacy() {
 }
 const legacyPresent = () => LEGACY_KEYS.filter(k => { try { return localStorage.getItem(k) !== null; } catch { return false; } });
 
+
+/* ---------- Seguimiento de cambios por elemento (para poder COMBINAR copias sin perder nada) ----------
+   Cada elemento de una lista con «id» (notas, tareas, tarjetas…) lleva «_m»: cuándo se modificó por última vez.
+   Lo que se borra queda anotado en MEM.tombstones { "notes:id": fecha } para que, al combinar con otro
+   dispositivo, no «resucite». Se detecta solo al guardar, comparando con la versión anterior de cada elemento. */
+const TRACK = new Map();          // clave → Map(id → huella)
+const TOMB_DAYS = 400;
+function trkHash(o) {
+  const s = JSON.stringify(o, (k, v) => k === '_m' ? undefined : v) || '';
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(36) + ':' + s.length;
+}
+const isIdList = v => Array.isArray(v) && v.every(x => x && typeof x === 'object' && x.id != null);
+function trackBaseline() {
+  TRACK.clear();
+  Object.entries(MEM).forEach(([k, v]) => { if (k !== 'tombstones' && !VOLATILE_KEYS.has(k) && isIdList(v)) TRACK.set(k, new Map(v.map(x => [String(x.id), trkHash(x)]))); });
+  // las lápidas muy antiguas se olvidan
+  const T = MEM.tombstones;
+  if (T && typeof T === 'object') { const lim = Date.now() - TOMB_DAYS * 864e5; Object.keys(T).forEach(id => { if (!(T[id] > lim)) delete T[id]; }); }
+}
+function trackChanges(k, v) {
+  if (k === 'tombstones' || !isIdList(v)) return;
+  const prev = TRACK.get(k), next = new Map(), now = Date.now();
+  let T = MEM.tombstones && typeof MEM.tombstones === 'object' ? MEM.tombstones : null, tChanged = false;
+  v.forEach(x => {
+    const id = String(x.id), h = trkHash(x);
+    next.set(id, h);
+    if (!prev || prev.get(id) !== h) x._m = now;
+    if (T && T[k + ':' + id]) { delete T[k + ':' + id]; tChanged = true; }   // ha vuelto (p. ej. «Deshacer»)
+  });
+  if (prev) prev.forEach((h, id) => { if (!next.has(id)) { T = T || {}; T[k + ':' + id] = now; tChanged = true; } });
+  TRACK.set(k, next);
+  if (tChanged) { MEM.tombstones = T; if (CRYPT) scheduleEncFlush(); else ls.set('tombstones', T); }
+}
+
 /* ---------- Estado de la aplicación ---------- */
 const S = {};
 const DEFAULT_LISTS = [{ id: 'inbox', name: 'Tareas', emoji: '📥' }];
@@ -345,6 +382,7 @@ function loadState() {
     store.set('tagMeta', S.tagMeta);
   }
   S.prefs = Object.assign({ start: 'last', backupDays: 14 }, store.get('prefs', {}));
+  trackBaseline();
 }
 const save = {
   notes: () => store.set('notes', S.notes),

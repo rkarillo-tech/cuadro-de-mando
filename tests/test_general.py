@@ -249,8 +249,8 @@ with sync_playwright() as p:
     pg.evaluate("showTab('settings')")
     pg.set_input_files('#bkImportFile', shutil_path); pg.wait_for_timeout(300)
     ok('Si reemplazas' in pg.inner_text('#modal'),'importar copia cifrada muestra qué cambia')
-    pg.click('.modal-foot button:has-text("Reemplazar todo")'); pg.wait_for_timeout(250); modal_ok(pg); pg.wait_for_timeout(1500)
-    pg.fill('#lockPass','clave-larga-123'); pg.click('#lockBtn'); pg.wait_for_timeout(1800)
+    pg.click('.modal-foot button:has-text("Reemplazar todo")'); pg.wait_for_timeout(250); modal_ok(pg); pg.wait_for_timeout(2000)
+    ok(not pg.is_visible('#lockScreen'),'importar no recarga: el bloqueo no vuelve a pedir la contraseña')
     ok(pg.evaluate("S.todos.length")==snap_todos and not pg.evaluate("S.todos.some(t=>t.text==='Escrita cifrada')"),'copia cifrada restaurada')
     # desactivar bloqueo
     pg.evaluate("showTab('settings')"); pg.click('#secBtns [data-sec=off]'); pg.fill('.modal input[name=p]','clave-larga-123'); modal_ok(pg); pg.wait_for_timeout(1500); modal_ok(pg); pg.wait_for_timeout(800)

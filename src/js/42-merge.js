@@ -163,15 +163,11 @@ async function applySyncChoice(res, other, label, { fileLc = 0 } = {}) {
   const final = res.choice === 'merge' ? res.merged : other;
   // Si el resultado es exactamente lo que ya hay en el archivo, se conserva su marca de tiempo
   // (si no, se le devolvería como «cambio nuevo» y los dos dispositivos se reescribirían sin fin)
-  await replaceAllData(final, { lastChange: fileLc && sameData(final, other) ? fileLc : 0 });
+  await replaceAllData(final, { keepNote: currentNoteId, lastChange: fileLc && sameData(final, other) ? fileLc : 0, live: true });
+  refreshApp();                         // sin recargar la pestaña
+  try { fileSyncSchedule(); } catch {}  // y lo aplicado se guarda también en el archivo vinculado
   const d = res.diff;
-  toast(res.choice === 'merge' ? `Combinado: +${d.mergeAdds} nuevos, ${d.mergeUpdates} actualizados${d.mergeDeletes ? `, ${d.mergeDeletes} borrados` : ''}. Recargando…` : 'Datos reemplazados. Recargando…', 'success', 3000);
-  setTimeout(() => reloadSafe(), 700);
+  toast(res.choice === 'merge' ? `Combinado: +${d.mergeAdds} nuevos, ${d.mergeUpdates} actualizados${d.mergeDeletes ? `, ${d.mergeDeletes} borrados` : ''}` : 'Datos reemplazados', 'success', 3000);
   return true;
 }
 
-/** Tras recargar por una sincronización automática, se muestra qué ha llegado. */
-setTimeout(() => {
-  let msg = null; try { msg = sessionStorage.getItem('cdm-sync-msg'); sessionStorage.removeItem('cdm-sync-msg'); } catch {}
-  if (msg) toast(msg, 'success', 4500);
-}, 1200);

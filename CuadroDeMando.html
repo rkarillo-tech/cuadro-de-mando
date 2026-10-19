@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando 1.2.4 (2026-10-19) · productividad personal 100 % local, sin servidor
+  Cuadro de Mando 1.2.5 (2026-10-19) · productividad personal 100 % local, sin servidor
   https://github.com/rkarillo-tech/cuadro-de-mando
 
   MIT License
@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OiirV2PICU2gVe76KD3a0lPCkR64zElwFGs5fd65DPY='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-yXiyENuY6fj7teXuQcvJ3EOblosM/xD7hd624LDakhc='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -284,7 +284,7 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
 .pw-out .s{color:var(--warning)}
 
 /* ===== Modal / Toast ===== */
-.modal-back{position:fixed;inset:0;background:rgba(5,7,12,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
+.modal-back{position:fixed;inset:0;background:rgba(5,7,12,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:16px;z-index:400}
 .modal-back.open{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.4);width:100%;max-width:440px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;animation:pop .15s ease}
 .modal.wide{max-width:640px}
@@ -294,7 +294,7 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
 .modal-body{padding:10px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
 .modal-foot{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px 16px;flex-wrap:wrap}
 .shortcuts{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:center;font-size:.9rem}
-.toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:200;pointer-events:none}
+.toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:500;pointer-events:none}
 .toast{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--info);padding:10px 12px 10px 14px;border-radius:10px;box-shadow:var(--shadow);font-size:.9rem;transform:translateY(10px);opacity:0;transition:.25s;max-width:360px;pointer-events:auto}
 .toast.show{transform:none;opacity:1}
 .toast.success{border-left-color:var(--success)}
@@ -384,7 +384,7 @@ body.booting .app{visibility:hidden}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
 /* ---------- Paleta de comandos ---------- */
-.palette-back{position:fixed;inset:0;background:rgba(5,7,12,.55);backdrop-filter:blur(3px);display:none;justify-content:center;align-items:flex-start;padding:10vh 16px 16px;z-index:150}
+.palette-back{position:fixed;inset:0;background:rgba(5,7,12,.55);backdrop-filter:blur(3px);display:none;justify-content:center;align-items:flex-start;padding:10vh 16px 16px;z-index:450}
 .palette-back.open{display:flex}
 .palette{width:min(660px,100%);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;max-height:min(72vh,600px);overflow:hidden;animation:pop .15s ease}
 .palette-input{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
@@ -547,7 +547,7 @@ mark.rx:nth-of-type(2n){background:rgba(76,179,245,.35)}
   .two-col{grid-template-columns:1fr}
   .settings-grid{grid-template-columns:1fr}
   .search-btn{min-width:0;padding:8px 10px}
-  .search-btn .lbl-txt{display:none}
+  .search-btn .lbl-txt,#lockNowBtn .lbl-txt{display:none}
   .palette-back{padding-top:12px}
 }
 #todoNewListMobile{display:none}
@@ -810,7 +810,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 .tagf .tf-chip{padding-top:3px;padding-bottom:3px}
 .wk-row.wk-ctx{opacity:.5}
 /* selector */
-.tag-picker{z-index:130;width:300px;max-width:calc(100vw - 20px);padding:0;overflow:hidden}
+.tag-picker{z-index:430;width:300px;max-width:calc(100vw - 20px);padding:0;overflow:hidden}
 .tag-picker .tp-head{padding:8px;border-bottom:1px solid var(--border)}
 .tag-picker .tp-q{width:100%}
 .tp-list{max-height:300px;overflow:auto;padding:4px}
@@ -913,7 +913,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.2.4 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.2.5 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -928,7 +928,7 @@ details.bl-row summary.bl-h{cursor:pointer}
         <button class="pill" id="syncPill" hidden title="Archivo de sincronización"></button>
         <button class="search-btn" id="searchBtn" title="Buscar y ejecutar acciones (Ctrl+K)">🔍 <span class="lbl-txt">Buscar…</span><span class="kbd-hint"><kbd>Ctrl</kbd><kbd>K</kbd></span></button>
         <span class="muted small" id="clock"></span>
-        <button class="btn icon" id="lockNowBtn" title="Bloquear ahora" hidden>🔒</button>
+        <button class="btn" id="lockNowBtn" title="Bloquear ahora y pedir la contraseña (Alt+L)" hidden>🔒<span class="lbl-txt"> Bloquear</span></button>
         <button class="btn icon" id="helpBtn" title="Atajos de teclado">⌨️</button>
         <button class="btn icon" id="themeBtn" title="Cambiar tema">☀️</button>
       </div>
@@ -1959,7 +1959,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
         <div class="card" id="licCard">
           <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
-          <p>Cuadro de Mando 1.2.4 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p>Cuadro de Mando 1.2.5 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
           <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
           <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
 
@@ -2522,7 +2522,7 @@ async function openBackup(o, pass) {
 }
 /** Sustituye TODOS los datos por los de una copia y recarga.
     Se marca como el cambio más reciente: así el archivo vinculado no lo «pisa» al reabrir. */
-async function replaceAllData(data, { keepNote = null, lastChange = 0 } = {}) {
+async function replaceAllData(data, { keepNote = null, lastChange = 0, live = false } = {}) {
   const clean = {};
   for (const [k, v] of Object.entries(data || {})) if (!PLAIN_KEYS.has(k)) clean[k] = v;
   clean.lastChange = +lastChange || Date.now();   // si el contenido ya es el del archivo, se conserva su marca
@@ -2535,7 +2535,8 @@ async function replaceAllData(data, { keepNote = null, lastChange = 0 } = {}) {
     ls.keys().forEach(k => { if (!PLAIN_KEYS.has(k)) ls.del(k); });
     Object.keys(MEM).forEach(k => ls.set(k, MEM[k]));
   }
-  FROZEN = true; APP_READY = false;
+  // «live»: la aplicación sigue en marcha y se repinta sola (refreshApp); si no, se recarga la página
+  if (!live) { FROZEN = true; APP_READY = false; }
 }
 
 /** Marca que algo ha cambiado (p. ej. el cifrado) para que los demás dispositivos lo detecten. */
@@ -10900,9 +10901,8 @@ async function fsExternallyChanged() {
   } catch { return false; }
 }
 /**
- * Cortafuegos: la combinación automática recarga la página. Si eso se repitiera muchas veces
- * seguidas (dos dispositivos reescribiéndose el archivo sin parar), se corta y se deja la
- * decisión al usuario en vez de dejar la pestaña recargando sola.
+ * Cortafuegos: si la combinación automática se repitiera muchas veces seguidas (dos dispositivos
+ * reescribiéndose el archivo sin parar), se corta y se deja la decisión al usuario.
  */
 const SYNC_RELOADS = 'cdm-sync-reloads';
 function syncLoopOk() {
@@ -11001,9 +11001,13 @@ async function fsCheckNewer(external = false) {
           await fsRememberMtime(mtime, fileLc);
           await histSnapshot('auto', 'Antes de sincronizar con «' + fsName() + '»', { force: true });
           const parts = [d.mergeAdds && `+${d.mergeAdds} nuevo${d.mergeAdds === 1 ? '' : 's'}`, d.mergeUpdates && `${d.mergeUpdates} actualizado${d.mergeUpdates === 1 ? '' : 's'}`].filter(Boolean);
-          try { sessionStorage.setItem('cdm-sync-msg', '🔄 Sincronizado con otro dispositivo' + (parts.length ? ': ' + parts.join(', ') : '')); } catch {}
-          await replaceAllData(merged, { keepNote: currentNoteId, lastChange: sameData(merged, data) ? fileLc : 0 });
-          setTimeout(() => reloadSafe(), 150);
+          await replaceAllData(merged, { keepNote: currentNoteId, lastChange: sameData(merged, data) ? fileLc : 0, live: true });
+          refreshApp();                       // se repinta sin recargar: el bloqueo no vuelve a pedir la contraseña
+          fsSyncing = false; fsAsking = false; fsLastCheck = Date.now();
+          renderFs();
+          toast('🔄 Sincronizado con otro dispositivo' + (parts.length ? ': ' + parts.join(', ') : ''), 'success', 4000);
+          // lo combinado también tiene que volver al archivo, para que el otro equipo lo reciba
+          if (!sameData(merged, data)) await fsWrite();
           return;
         }
       }
@@ -11381,9 +11385,9 @@ async function histRestore(id) {
   if (!r) return;
   const data = await histOpen(rec); if (!data) return;
   await histSnapshot('before', 'Antes de restaurar la versión del ' + fmtDateTime(rec.at), { force: true });
-  await replaceAllData(data);
-  toast('Versión restaurada. Recargando…', 'success');
-  setTimeout(() => reloadSafe(), 600);
+  await replaceAllData(data, { live: true });
+  refreshApp();
+  toast('Versión restaurada', 'success');
 }
 async function histDownload(id) {
   const rec = (await histAll()).find(r => r.id === id); if (!rec) return;
@@ -11636,18 +11640,13 @@ async function applySyncChoice(res, other, label, { fileLc = 0 } = {}) {
   const final = res.choice === 'merge' ? res.merged : other;
   // Si el resultado es exactamente lo que ya hay en el archivo, se conserva su marca de tiempo
   // (si no, se le devolvería como «cambio nuevo» y los dos dispositivos se reescribirían sin fin)
-  await replaceAllData(final, { lastChange: fileLc && sameData(final, other) ? fileLc : 0 });
+  await replaceAllData(final, { keepNote: currentNoteId, lastChange: fileLc && sameData(final, other) ? fileLc : 0, live: true });
+  refreshApp();                         // sin recargar la pestaña
+  try { fileSyncSchedule(); } catch {}  // y lo aplicado se guarda también en el archivo vinculado
   const d = res.diff;
-  toast(res.choice === 'merge' ? `Combinado: +${d.mergeAdds} nuevos, ${d.mergeUpdates} actualizados${d.mergeDeletes ? `, ${d.mergeDeletes} borrados` : ''}. Recargando…` : 'Datos reemplazados. Recargando…', 'success', 3000);
-  setTimeout(() => reloadSafe(), 700);
+  toast(res.choice === 'merge' ? `Combinado: +${d.mergeAdds} nuevos, ${d.mergeUpdates} actualizados${d.mergeDeletes ? `, ${d.mergeDeletes} borrados` : ''}` : 'Datos reemplazados', 'success', 3000);
   return true;
 }
-
-/** Tras recargar por una sincronización automática, se muestra qué ha llegado. */
-setTimeout(() => {
-  let msg = null; try { msg = sessionStorage.getItem('cdm-sync-msg'); sessionStorage.removeItem('cdm-sync-msg'); } catch {}
-  if (msg) toast(msg, 'success', 4500);
-}, 1200);
 /* =====================================================================
    ARRANQUE
    ===================================================================== */
@@ -11672,6 +11671,28 @@ function startApp() {
   updateClock(); setInterval(updateClock, 15000);
   ttTick(); renderSecurity(); histInit().catch(() => {}).then(fsInit);
   if (!window.crypto || !crypto.subtle) toast('Aviso: este navegador no permite el cifrado en este contexto', 'warning', 6000);
+}
+/**
+ * Vuelve a pintar toda la aplicación con los datos que haya ahora (tras combinar con otro
+ * dispositivo, importar una copia o restaurar una versión), SIN recargar la pestaña: así el
+ * bloqueo no vuelve a pedir la contraseña y no se pierde de vista lo que estabas haciendo.
+ * Solo rehace estado y vistas: los botones, atajos y temporizadores se dejaron puestos al arrancar.
+ */
+function refreshApp() {
+  loadState();
+  initNotes(); initPomo(); initCalc(); initTime();
+  const tv = store.get('todoView', 'today');
+  todoView = typeof tv === 'string' ? tv : 'today';
+  calFilters = { ...CAL_FILTER_DEF, ...(store.get('calFilters', {}) || {}) };
+  // si estás escribiendo en una nota que no ha cambiado, no se toca el editor
+  const cur = getNote(currentNoteId);
+  if (document.activeElement === editor && cur && editor.innerHTML === cur.html) renderNoteList();
+  else renderNotesView();
+  renderBoard(); renderCalcHist(); calcRender(); renderVault(); renderPgHist();
+  fillPomoSettings(); fillPomoTasks(); pomoRender(); renderPomoToday();
+  try { tagStyleRefresh(); } catch {}
+  renderFsPill(); updateClock();
+  showTab(currentTab);          // repinta la pestaña que estés viendo
 }
 async function boot() {
   setThemePref(ls.get('theme', 'system'));          // antes de cargar: el tema sale de localStorage

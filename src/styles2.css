@@ -53,7 +53,7 @@ body.booting .app{visibility:hidden}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
 /* ---------- Paleta de comandos ---------- */
-.palette-back{position:fixed;inset:0;background:rgba(5,7,12,.55);backdrop-filter:blur(3px);display:none;justify-content:center;align-items:flex-start;padding:10vh 16px 16px;z-index:150}
+.palette-back{position:fixed;inset:0;background:rgba(5,7,12,.55);backdrop-filter:blur(3px);display:none;justify-content:center;align-items:flex-start;padding:10vh 16px 16px;z-index:450}
 .palette-back.open{display:flex}
 .palette{width:min(660px,100%);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;max-height:min(72vh,600px);overflow:hidden;animation:pop .15s ease}
 .palette-input{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
@@ -216,7 +216,7 @@ mark.rx:nth-of-type(2n){background:rgba(76,179,245,.35)}
   .two-col{grid-template-columns:1fr}
   .settings-grid{grid-template-columns:1fr}
   .search-btn{min-width:0;padding:8px 10px}
-  .search-btn .lbl-txt{display:none}
+  .search-btn .lbl-txt,#lockNowBtn .lbl-txt{display:none}
   .palette-back{padding-top:12px}
 }
 #todoNewListMobile{display:none}
@@ -479,7 +479,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 .tagf .tf-chip{padding-top:3px;padding-bottom:3px}
 .wk-row.wk-ctx{opacity:.5}
 /* selector */
-.tag-picker{z-index:130;width:300px;max-width:calc(100vw - 20px);padding:0;overflow:hidden}
+.tag-picker{z-index:430;width:300px;max-width:calc(100vw - 20px);padding:0;overflow:hidden}
 .tag-picker .tp-head{padding:8px;border-bottom:1px solid var(--border)}
 .tag-picker .tp-q{width:100%}
 .tp-list{max-height:300px;overflow:auto;padding:4px}

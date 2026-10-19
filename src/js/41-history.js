@@ -141,9 +141,9 @@ async function histRestore(id) {
   if (!r) return;
   const data = await histOpen(rec); if (!data) return;
   await histSnapshot('before', 'Antes de restaurar la versión del ' + fmtDateTime(rec.at), { force: true });
-  await replaceAllData(data);
-  toast('Versión restaurada. Recargando…', 'success');
-  setTimeout(() => reloadSafe(), 600);
+  await replaceAllData(data, { live: true });
+  refreshApp();
+  toast('Versión restaurada', 'success');
 }
 async function histDownload(id) {
   const rec = (await histAll()).find(r => r.id === id); if (!rec) return;

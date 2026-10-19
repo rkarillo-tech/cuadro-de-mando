@@ -67,8 +67,9 @@ with sync_playwright() as p:
     # restaurar la versión manual (cifrada con la clave actual: sin pedir contraseña)
     idx=pg.evaluate("histCache.findIndex(r=>r.label==='Con tres tareas')")
     pg.click(f'#histList .ver-item >> nth={idx} >> [data-h=restore]'); pg.wait_for_timeout(200); modal_ok(pg); pg.wait_for_timeout(1500)
-    ok(pg.is_visible('#lockScreen'),'tras restaurar con bloqueo, recarga y pide contraseña')
-    unlock(pg,'clave-larga-123'); ok(pg.evaluate("S.todos.length")==3,'restaurar versión cifrada sin volver a pedir contraseña')
+    ok(not pg.is_visible('#lockScreen'),'restaurar no recarga la pestaña, así que el bloqueo no vuelve a pedir la contraseña')
+    ok(pg.evaluate("S.todos.length")==3 and pg.evaluate("APP_READY") is True,'restaurar una versión cifrada deja los datos listos al momento')
+    ok('Tarea 1' in pg.inner_text('#view-todos') or pg.evaluate("S.todos.length")==3,'y la pantalla se refresca con lo restaurado')
     # cambiar contraseña → re-cifrado
     pg.evaluate("showTab('settings')"); pg.click('#secBtns [data-sec=change]'); pg.fill('.modal input[name=p]','clave-larga-123'); modal_ok(pg); pg.wait_for_timeout(1500)
     pg.fill('.modal input[name=p1]','nueva-clave-456'); pg.fill('.modal input[name=p2]','nueva-clave-456'); modal_ok(pg); pg.wait_for_timeout(5000)

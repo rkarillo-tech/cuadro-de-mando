@@ -15,6 +15,7 @@ FILE = {'txt': '', 'm': 1000}
 WRITES = []
 # El archivo compartido vive en Python; cada navegador lo ve a través de un «fsHandle» simulado.
 INIT = """
+  addEventListener('load', () => { try { window.__reloads = (+sessionStorage.getItem('rl') || 0) + 1; sessionStorage.setItem('rl', window.__reloads); } catch (e) { window.__reloads = 1; } });
   setInterval(async () => {
     try { if (typeof fsState === 'undefined' || !APP_READY || fsHandle || window.__busy) return; } catch (e) { return; }
     window.__busy = 1;
@@ -145,5 +146,37 @@ with sync_playwright() as p:
     ok(C.evaluate("lockEnabled()") is True, 'y entonces sí queda bloqueado')
     C.wait_for_timeout(2500)
     ok(enc(), 'el archivo sigue cifrado en todo momento')
+
+    # ===== Llega lo del otro equipo sin recargar la pestaña (y sin volver a pedir la contraseña) =====
+    r0 = B.evaluate("window.__reloads")
+    B.evaluate("showTab('todos'); 0"); B.wait_for_timeout(400)
+    A.evaluate("createNote('Sin recargar','<div>x</div>',false); 0"); A.wait_for_timeout(2600)
+    n0 = len(WRITES)
+    B.evaluate("(async()=>{ if (await fsExternallyChanged()) await fsCheckNewer(true); })(); 0"); B.wait_for_timeout(3200)
+    ok(B.evaluate("window.__reloads") == r0 and not B.is_visible('#lockScreen'), 'al combinar no se recarga la pestaña, así que el bloqueo no vuelve a pedir la contraseña')
+    ok('Sin recargar' in titles(B) and B.evaluate("currentTab") == 'todos', 'llegan los cambios y se sigue en la misma pestaña')
+    ok(len(WRITES) == n0, 'y refrescar no provoca escrituras en el archivo')
+    ok('Sincronizado' in B.inner_text('body'), 'avisa de lo que ha llegado')
+
+    # ===== Se puede escribir mientras llega una sincronización =====
+    B.evaluate("showTab('notes'); openNote(S.notes.find(n=>n.title==='Bienvenida').id); 0"); B.wait_for_timeout(500)
+    B.click('#editor'); B.keyboard.press('Control+End'); B.keyboard.type('escribiendo aqui'); B.wait_for_timeout(300)
+    A.evaluate("createNote('Mientras escribo','<div>x</div>',false); 0"); A.wait_for_timeout(2600)
+    B.evaluate("(async()=>{ if (await fsExternallyChanged()) await fsCheckNewer(true); })(); 0"); B.wait_for_timeout(3200)
+    ok('escribiendo aqui' in B.inner_text('#editor') and B.evaluate("document.activeElement && document.activeElement.id") == 'editor', 'no se pierde lo que estabas escribiendo ni el cursor')
+    ok('Mientras escribo' in titles(B), 'y aun así llega lo del otro equipo')
+
+    # ===== Botón de bloquear y pantalla de bloqueo =====
+    ok(B.is_visible('#lockNowBtn') and 'Bloquear' in B.inner_text('#lockNowBtn'), 'con el bloqueo activado hay un botón «Bloquear» arriba')
+    B.click('#lockNowBtn'); B.wait_for_timeout(2600)
+    ok(B.is_visible('#lockScreen'), 'y bloquea la aplicación al momento')
+    B.click('#lockForgot'); B.wait_for_timeout(700)
+    caja = B.evaluate("()=>{const b=[...document.querySelectorAll('.modal-foot button')].pop(); const r=b.getBoundingClientRect(); return [r.x+r.width/2, r.y+r.height/2];}")
+    encima = B.evaluate("([x,y])=>{const e=document.elementFromPoint(x,y); return e ? (e.id || String(e.className) || e.tagName) : 'nada'}", caja)
+    ok('btn' in encima, '«¿Has olvidado la contraseña?» se ve por encima de la pantalla de bloqueo y se puede pulsar: ' + str(encima))
+    B.screenshot(path=_sys.argv[1] + '/olvido_contrasena.png')
+    B.keyboard.press('Escape'); B.wait_for_timeout(300)
+    B.fill('#lockPass', CLAVE); B.keyboard.press('Enter'); B.wait_for_timeout(2600)
+    ok(not B.is_visible('#lockScreen') and 'Sin recargar' in titles(B), 'y con la contraseña se vuelve a entrar con todos los datos')
 
     print('ERRORS', [e for e in errs if 'Failed to load resource' not in e])

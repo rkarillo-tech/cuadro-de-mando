@@ -23,6 +23,28 @@ function startApp() {
   ttTick(); renderSecurity(); histInit().catch(() => {}).then(fsInit);
   if (!window.crypto || !crypto.subtle) toast('Aviso: este navegador no permite el cifrado en este contexto', 'warning', 6000);
 }
+/**
+ * Vuelve a pintar toda la aplicación con los datos que haya ahora (tras combinar con otro
+ * dispositivo, importar una copia o restaurar una versión), SIN recargar la pestaña: así el
+ * bloqueo no vuelve a pedir la contraseña y no se pierde de vista lo que estabas haciendo.
+ * Solo rehace estado y vistas: los botones, atajos y temporizadores se dejaron puestos al arrancar.
+ */
+function refreshApp() {
+  loadState();
+  initNotes(); initPomo(); initCalc(); initTime();
+  const tv = store.get('todoView', 'today');
+  todoView = typeof tv === 'string' ? tv : 'today';
+  calFilters = { ...CAL_FILTER_DEF, ...(store.get('calFilters', {}) || {}) };
+  // si estás escribiendo en una nota que no ha cambiado, no se toca el editor
+  const cur = getNote(currentNoteId);
+  if (document.activeElement === editor && cur && editor.innerHTML === cur.html) renderNoteList();
+  else renderNotesView();
+  renderBoard(); renderCalcHist(); calcRender(); renderVault(); renderPgHist();
+  fillPomoSettings(); fillPomoTasks(); pomoRender(); renderPomoToday();
+  try { tagStyleRefresh(); } catch {}
+  renderFsPill(); updateClock();
+  showTab(currentTab);          // repinta la pestaña que estés viendo
+}
 async function boot() {
   setThemePref(ls.get('theme', 'system'));          // antes de cargar: el tema sale de localStorage
   renderNav();

@@ -259,7 +259,7 @@ async function openBackup(o, pass) {
 }
 /** Sustituye TODOS los datos por los de una copia y recarga.
     Se marca como el cambio más reciente: así el archivo vinculado no lo «pisa» al reabrir. */
-async function replaceAllData(data, { keepNote = null, lastChange = 0 } = {}) {
+async function replaceAllData(data, { keepNote = null, lastChange = 0, live = false } = {}) {
   const clean = {};
   for (const [k, v] of Object.entries(data || {})) if (!PLAIN_KEYS.has(k)) clean[k] = v;
   clean.lastChange = +lastChange || Date.now();   // si el contenido ya es el del archivo, se conserva su marca
@@ -272,7 +272,8 @@ async function replaceAllData(data, { keepNote = null, lastChange = 0 } = {}) {
     ls.keys().forEach(k => { if (!PLAIN_KEYS.has(k)) ls.del(k); });
     Object.keys(MEM).forEach(k => ls.set(k, MEM[k]));
   }
-  FROZEN = true; APP_READY = false;
+  // «live»: la aplicación sigue en marcha y se repinta sola (refreshApp); si no, se recarga la página
+  if (!live) { FROZEN = true; APP_READY = false; }
 }
 
 /** Marca que algo ha cambiado (p. ej. el cifrado) para que los demás dispositivos lo detecten. */

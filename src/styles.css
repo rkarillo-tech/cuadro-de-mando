@@ -244,7 +244,7 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
 .pw-out .s{color:var(--warning)}
 
 /* ===== Modal / Toast ===== */
-.modal-back{position:fixed;inset:0;background:rgba(5,7,12,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
+.modal-back{position:fixed;inset:0;background:rgba(5,7,12,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:16px;z-index:400}
 .modal-back.open{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.4);width:100%;max-width:440px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;animation:pop .15s ease}
 .modal.wide{max-width:640px}
@@ -254,7 +254,7 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
 .modal-body{padding:10px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
 .modal-foot{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px 16px;flex-wrap:wrap}
 .shortcuts{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:center;font-size:.9rem}
-.toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:200;pointer-events:none}
+.toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:500;pointer-events:none}
 .toast{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--info);padding:10px 12px 10px 14px;border-radius:10px;box-shadow:var(--shadow);font-size:.9rem;transform:translateY(10px);opacity:0;transition:.25s;max-width:360px;pointer-events:auto}
 .toast.show{transform:none;opacity:1}
 .toast.success{border-left-color:var(--success)}

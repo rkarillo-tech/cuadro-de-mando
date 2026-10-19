@@ -277,9 +277,8 @@ async function fsExternallyChanged() {
   } catch { return false; }
 }
 /**
- * Cortafuegos: la combinación automática recarga la página. Si eso se repitiera muchas veces
- * seguidas (dos dispositivos reescribiéndose el archivo sin parar), se corta y se deja la
- * decisión al usuario en vez de dejar la pestaña recargando sola.
+ * Cortafuegos: si la combinación automática se repitiera muchas veces seguidas (dos dispositivos
+ * reescribiéndose el archivo sin parar), se corta y se deja la decisión al usuario.
  */
 const SYNC_RELOADS = 'cdm-sync-reloads';
 function syncLoopOk() {
@@ -378,9 +377,13 @@ async function fsCheckNewer(external = false) {
           await fsRememberMtime(mtime, fileLc);
           await histSnapshot('auto', 'Antes de sincronizar con «' + fsName() + '»', { force: true });
           const parts = [d.mergeAdds && `+${d.mergeAdds} nuevo${d.mergeAdds === 1 ? '' : 's'}`, d.mergeUpdates && `${d.mergeUpdates} actualizado${d.mergeUpdates === 1 ? '' : 's'}`].filter(Boolean);
-          try { sessionStorage.setItem('cdm-sync-msg', '🔄 Sincronizado con otro dispositivo' + (parts.length ? ': ' + parts.join(', ') : '')); } catch {}
-          await replaceAllData(merged, { keepNote: currentNoteId, lastChange: sameData(merged, data) ? fileLc : 0 });
-          setTimeout(() => reloadSafe(), 150);
+          await replaceAllData(merged, { keepNote: currentNoteId, lastChange: sameData(merged, data) ? fileLc : 0, live: true });
+          refreshApp();                       // se repinta sin recargar: el bloqueo no vuelve a pedir la contraseña
+          fsSyncing = false; fsAsking = false; fsLastCheck = Date.now();
+          renderFs();
+          toast('🔄 Sincronizado con otro dispositivo' + (parts.length ? ': ' + parts.join(', ') : ''), 'success', 4000);
+          // lo combinado también tiene que volver al archivo, para que el otro equipo lo reciba
+          if (!sameData(merged, data)) await fsWrite();
           return;
         }
       }

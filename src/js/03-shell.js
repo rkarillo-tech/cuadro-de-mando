@@ -97,7 +97,10 @@ function openPopover(pop, anchor) {
 }
 function closePopovers(except) { $$('.popover.open').forEach(p => { if (p !== except) p.classList.remove('open'); }); }
 document.addEventListener('mousedown', e => { if (!e.target.closest('.popover') && !e.target.closest('[data-popanchor]')) closePopovers(); });
-window.addEventListener('resize', () => closePopovers());
+// Solo al cambiar el ANCHO (giro de pantalla, ventana). En el móvil, abrir el teclado cambia solo el alto
+// y no debe cerrar los desplegables (p. ej. el de etiquetas, que pone el foco en su buscador).
+let popW = innerWidth;
+window.addEventListener('resize', () => { if (Math.abs(innerWidth - popW) > 40) { popW = innerWidth; closePopovers(); if (typeof tpClose === 'function') tpClose(); } });
 
 /* ---------- Atajos ---------- */
 function showShortcuts() {

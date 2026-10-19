@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando 1.2.1 (2026-10-17) · productividad personal 100 % local, sin servidor
+  Cuadro de Mando 1.2.2 (2026-10-19) · productividad personal 100 % local, sin servidor
   https://github.com/rkarillo-tech/cuadro-de-mando
 
   MIT License
@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rj1oizi608req4ztOrBnaQYgGAivowISvrxVcp7Wa9Y='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-uyisOVIYo2mE8UpoCciMPXpb9186zYOWRdyj9cMduGs='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -913,7 +913,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.2.1 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.2.2 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -1959,7 +1959,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
         <div class="card" id="licCard">
           <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
-          <p>Cuadro de Mando 1.2.1 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p>Cuadro de Mando 1.2.2 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
           <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
           <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
 
@@ -2138,6 +2138,17 @@ async function confirmDialog(msg, okLabel = 'Eliminar', danger = true) {
     actions: [{ label: 'Cancelar', value: null, cls: 'ghost' }, { label: okLabel, value: 'ok', cls: danger ? 'danger-solid' : 'primary' }]
   });
   return !!r;
+}
+
+
+/** Cambia el texto de un elemento sin sustituir su nodo de texto.
+    Sustituir nodos en la página mientras se escribe rompe el «Deshacer» del editor (Chrome deshace letra a letra). */
+function setText(el, t) {
+  if (!el) return;
+  t = String(t);
+  const c = el.firstChild;
+  if (c && c.nodeType === 3 && !c.nextSibling) { if (c.nodeValue !== t) c.nodeValue = t; }
+  else if (el.textContent !== t) el.textContent = t;
 }
 /* =====================================================================
    UTILIDADES ADICIONALES (fechas, colores, menús, CSV)
@@ -2755,7 +2766,10 @@ function openPopover(pop, anchor) {
 }
 function closePopovers(except) { $$('.popover.open').forEach(p => { if (p !== except) p.classList.remove('open'); }); }
 document.addEventListener('mousedown', e => { if (!e.target.closest('.popover') && !e.target.closest('[data-popanchor]')) closePopovers(); });
-window.addEventListener('resize', () => closePopovers());
+// Solo al cambiar el ANCHO (giro de pantalla, ventana). En el móvil, abrir el teclado cambia solo el alto
+// y no debe cerrar los desplegables (p. ej. el de etiquetas, que pone el foco en su buscador).
+let popW = innerWidth;
+window.addEventListener('resize', () => { if (Math.abs(innerWidth - popW) > 40) { popW = innerWidth; closePopovers(); if (typeof tpClose === 'function') tpClose(); } });
 
 /* ---------- Atajos ---------- */
 function showShortcuts() {
@@ -4025,6 +4039,7 @@ function sanitize(html) {
         if (keep.length) c.setAttribute('style', keep.join(';')); else c.removeAttribute('style');
       }
       if (tag === 'INPUT') c.classList.add('chk');
+      if (tag === 'SPAN' && !c.attributes.length) { clean(c); c.replaceWith(...c.childNodes); continue; } // <span> vacío (lo deja el editor al insertar)
       clean(c);
     }
   };
@@ -4084,23 +4099,24 @@ function updateCount() {
   const t = editor.innerText || '';
   const words = (t.match(/\S+/g) || []).length;
   const chk = editor.querySelectorAll('input.chk').length, done = editor.querySelectorAll('input.chk[checked]').length;
-  $('#noteCount').textContent = `${words} palabra${words === 1 ? '' : 's'} · ${t.replace(/\s/g, '').length} caracteres${chk ? ` · ☑ ${done}/${chk} tareas` : ''}`;
+  setText($('#noteCount'), `${words} palabra${words === 1 ? '' : 's'} · ${t.replace(/\s/g, '').length} caracteres${chk ? ` · ☑ ${done}/${chk} tareas` : ''}`);
 }
 function flushNote(force = false) {
   if (!noteDirty && !force) return;
   const n = getNote(currentNoteId);
   noteDirty = false;
   if (!n) return;
+  if (typeof tagRefreshEditorKeys === 'function') tagRefreshEditorKeys();
   n.html = editor.innerHTML;
   n.text = htmlText(n.html);
   n.updated = Date.now();
   save.notes();
-  $('#noteSaved').textContent = '✓ Guardado a las ' + fmtTime(Date.now());
+  setText($('#noteSaved'), '✓ Guardado a las ' + fmtTime(Date.now()));
   renderNoteList();
   renderBacklinks(); renderNoteTags();
 }
 const saveNoteSoon = debounce(() => flushNote(), 600);
-function markDirty() { noteDirty = true; $('#noteSaved').textContent = 'Guardando…'; updateEmpty(); updateCount(); saveNoteSoon(); }
+function markDirty() { noteDirty = true; setText($('#noteSaved'), 'Guardando…'); updateEmpty(); updateCount(); saveNoteSoon(); }
 
 function uniqueTitle(base, exceptId) {
   const ex = new Set(S.notes.filter(n => n.id !== exceptId).map(n => n.title.trim().toLowerCase()));
@@ -4195,18 +4211,28 @@ function updateToolbarState() {
   try { v = String(document.queryCommandValue('formatBlock') || '').toLowerCase().replace(/[<>]/g, ''); } catch {}
   $('#blockSelect').value = ['h1', 'h2', 'h3', 'blockquote', 'pre'].includes(v) ? v : 'div';
 }
-// Inserta la casilla exactamente en el cursor (sin execCommand, que añade estilos extra)
+/**
+ * Sustituye un rango del editor por HTML pasando por execCommand, para que el navegador
+ * lo apunte en su historial y Ctrl+Z / «Deshacer» puedan revertirlo. (Tocar el DOM a mano
+ * —insertNode, innerHTML…— deja el historial del editor bloqueado.)
+ */
+function edReplace(range, html) {
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  let ok = false;
+  try { ok = document.execCommand(html ? 'insertHTML' : 'delete', false, html); } catch {}
+  if (!ok) { // respaldo (navegadores sin execCommand): no se podrá deshacer, pero funciona
+    const r = sel.rangeCount ? sel.getRangeAt(0) : range; r.deleteContents();
+    if (html) { const f = r.createContextualFragment(html), last = f.lastChild; r.insertNode(f); if (last) r.setStartAfter(last); }
+    r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
+  }
+  if (sel.rangeCount) savedRange = sel.getRangeAt(0).cloneRange();
+}
+// Inserta la casilla en el cursor
 function insertChkAtCaret() {
   const sel = getSelection(); if (!sel.rangeCount) return;
   const r = sel.getRangeAt(0);
   if (!editor.contains(r.startContainer)) return;
-  r.deleteContents();
-  const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'chk';
-  const sp = document.createTextNode(' ');
-  r.insertNode(sp); r.insertNode(cb);
-  r.setStartAfter(sp); r.collapse(true);
-  sel.removeAllRanges(); sel.addRange(r);
-  savedRange = r.cloneRange();
+  edReplace(r, '<input type="checkbox" class="chk">&nbsp;');
 }
 function insertChecklist() { restoreSel(); insertChkAtCaret(); markDirty(); }
 
@@ -4319,9 +4345,8 @@ editor.addEventListener('keydown', e => {
       const txt = line.textContent.replace(/\u00a0/g, ' ').trim();
       if (!txt) { // casilla vacía: Enter la quita (fin de la lista de tareas)
         e.preventDefault();
-        line.innerHTML = '<br>';
-        const r = document.createRange(); r.setStart(line, 0); r.collapse(true);
-        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        const r = document.createRange(); r.selectNodeContents(line);
+        edReplace(r, '');
         markDirty();
         return;
       }
@@ -4727,36 +4752,41 @@ function wlTextRefs(text) {
 }
 
 /* ---------- Conversión de [[...]] escrito o pegado ---------- */
-function wlConvertTextNode(t, caret) {
-  let m, changed = false;
-  while (t && (m = /\[\[([^\[\]\n]{1,120})\]\]/.exec(t.nodeValue))) {
-    if (!wlCleanTitle(m[1])) break;
-    const mid = t.splitText(m.index), after = mid.splitText(m[0].length);
-    const chip = wlMakeChip(noteByTitle(m[1]), m[1]);
-    mid.replaceWith(chip);
-    if (caret && caret.node === t) {
-      if (caret.off > m.index + m[0].length) { caret.node = after; caret.off -= m.index + m[0].length; }
-      else if (caret.off > m.index) { caret.node = after; caret.off = 0; }
-    }
-    t = after; changed = true;
-  }
-  return changed;
+/**
+ * Pone un enlace en lugar del rango r. Se incluye el carácter anterior (o uno invisible al
+ * principio de línea) porque Chrome saca de la línea un elemento no editable que vaya primero.
+ */
+function wlReplaceWithChip(r, chip, tail = '') {
+  const t = r.startContainer, o = r.startOffset;
+  let lead = '\u200b';
+  if (t.nodeType === 3 && o > 0) { lead = t.nodeValue[o - 1]; r.setStart(t, o - 1); }
+  edReplace(r, (lead === ' ' ? '&nbsp;' : esc(lead)) + chip.outerHTML + tail);
 }
 function wlConvertTyped() {
   const sel = getSelection();
   const caret = sel.rangeCount && sel.isCollapsed ? { node: sel.anchorNode, off: sel.anchorOffset } : null;
-  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.includes('[[') && !n.parentElement.closest('a,pre') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
-  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
-  let changed = false;
-  nodes.forEach(t => { if (wlConvertTextNode(t, caret)) changed = true; });
-  if (changed) {
-    if (caret && caret.node && caret.node.isConnected) { const r = document.createRange(); r.setStart(caret.node, Math.min(caret.off, caret.node.nodeValue.length)); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); }
-    markDirty();
+  let changed = false, guard = 50;
+  while (guard--) {
+    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.includes('[[') && !n.parentElement.closest('a,pre') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+    let t, m = null;
+    while ((t = walker.nextNode())) { m = /\[\[([^\[\]\n]{1,120})\]\]/.exec(t.nodeValue); if (m && wlCleanTitle(m[1])) break; m = null; }
+    if (!m) break;
+    // se sustituye con execCommand para que Ctrl+Z pueda deshacerlo
+    const atCaret = caret && caret.node === t && caret.off >= m.index + m[0].length;
+    const keep = !atCaret && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+    const r = document.createRange(); r.setStart(t, m.index); r.setEnd(t, m.index + m[0].length);
+    // al final de la línea se deja un carácter invisible tras el enlace para poder seguir escribiendo
+    const end = atCaret && m.index + m[0].length === t.nodeValue.length && !t.nextSibling;
+    wlReplaceWithChip(r, wlMakeChip(noteByTitle(m[1]), m[1]), end ? '&#8203;' : '');
+    if (keep && keep.startContainer.isConnected) { sel.removeAllRanges(); sel.addRange(keep); }
+    changed = true;
   }
+  if (changed) markDirty();
 }
 
 /* ---------- Autocompletado al escribir [[ ---------- */
-function wlOnInput() {
+function wlOnInput(e) {
+  if (e && /^history/.test(e.inputType || '')) { wlClose(); return; } // deshacer/rehacer: no volver a convertir
   const sel = getSelection();
   if (!sel.rangeCount || !sel.isCollapsed) { wlClose(); return; }
   const node = sel.anchorNode, off = sel.anchorOffset;
@@ -4811,12 +4841,9 @@ function wlChoose(i) {
   const sel = getSelection();
   let end = sel.rangeCount && sel.anchorNode === node ? sel.anchorOffset : Math.min(node.nodeValue.length, st.start + 2 + st.q.length);
   if (node.nodeValue.slice(end, end + 2) === ']]') end += 2;
-  const r = document.createRange(); r.setStart(node, st.start); r.setEnd(node, end); r.deleteContents();
-  const chip = wlMakeChip(note), sp = document.createTextNode(' ');
-  r.insertNode(sp); r.insertNode(chip);
-  r.setStartAfter(sp); r.collapse(true);
-  sel.removeAllRanges(); sel.addRange(r); savedRange = r.cloneRange();
+  const r = document.createRange(); r.setStart(node, st.start); r.setEnd(node, end);
   editor.focus({ preventScroll: true });
+  wlReplaceWithChip(r, wlMakeChip(note), '&nbsp;');
   markDirty(); flushNote(); renderBacklinks();
 }
 function wlKey(e) {
@@ -7678,11 +7705,8 @@ function tagAcChoose(i) {
     const node = a.node; if (!node.isConnected) return;
     const sel = getSelection();
     const end = sel.rangeCount && sel.anchorNode === node ? sel.anchorOffset : a.start + 1 + a.q.length;
-    const r = document.createRange(); r.setStart(node, a.start); r.setEnd(node, end); r.deleteContents();
-    const span = document.createElement('span'); span.className = 'tg'; span.textContent = '#' + word; span.dataset.tk = tagKey(word);
-    const sp = document.createTextNode(' ');
-    r.insertNode(sp); r.insertNode(span);
-    r.setStartAfter(sp); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); savedRange = r.cloneRange();
+    const r = document.createRange(); r.setStart(node, a.start); r.setEnd(node, end);
+    edReplace(r, `<span class="tg" data-tk="${esc(tagKey(word))}">#${esc(word)}</span>&nbsp;`);
     markDirty();
   } else {
     const el = a.el, v = el.value, end = el.selectionStart;
@@ -7704,9 +7728,9 @@ tagPop.addEventListener('mousedown', e => e.preventDefault());
 tagPop.addEventListener('click', e => { const b = e.target.closest('[data-tg]'); if (b) tagAcChoose(+b.dataset.tg); });
 const TAG_TYPING = /(^|[\s([{,;:¡¿"'«])#([\p{L}\p{N}_\-/]{0,40})$/u;
 /* En el editor de notas */
-editor.addEventListener('input', () => {
+editor.addEventListener('input', e => {
   const sel = getSelection();
-  if (!sel.rangeCount || !sel.isCollapsed) { tagAcClose(); return; }
+  if (!sel.rangeCount || !sel.isCollapsed || /^history/.test(e.inputType || '')) { tagAcClose(); return; }
   const node = sel.anchorNode, off = sel.anchorOffset;
   if (!node || node.nodeType !== 3 || !editor.contains(node) || node.parentElement.closest('pre,code,a')) { tagAcClose(); return; }
   const before = node.nodeValue.slice(0, off);
@@ -7721,22 +7745,46 @@ editor.addEventListener('input', () => {
   const t = /(^|[\s([{,;:¡¿"'«])#([\p{L}_][\p{L}\p{N}_-]*(?:\/[\p{L}\p{N}_-]+)*)[\s ]$/u.exec(before);
   if (t && !node.parentElement.closest('.tg')) {
     const start = off - 1 - t[2].length - 1;
-    const r = document.createRange(); r.setStart(node, start); r.setEnd(node, off - 1);
-    const span = document.createElement('span'); span.className = 'tg';
-    r.surroundContents(span); span.dataset.tk = tagKey(span.textContent);
-    const after = span.nextSibling;
-    if (after && after.nodeType === 3) { const rr = document.createRange(); rr.setStart(after, Math.min(1, after.nodeValue.length)); rr.collapse(true); sel.removeAllRanges(); sel.addRange(rr); }
+    // se envuelve con execCommand para que Ctrl+Z pueda deshacerlo
+    const r = document.createRange(); r.setStart(node, start); r.setEnd(node, off);
+    const word = node.nodeValue.slice(start, off - 1), gap = node.nodeValue[off - 1];
+    edReplace(r, `<span class="tg" data-tk="${esc(tagKey(word))}">${esc(word)}</span>${gap === ' ' ? '&nbsp;' : esc(gap)}`);
     markDirty();
   }
 });
-editor.addEventListener('input', () => {
-  const sel = getSelection(), a = sel.rangeCount && sel.anchorNode, sp = a && (a.nodeType === 3 ? a.parentElement : a).closest('span.tg');
-  if (sp && editor.contains(sp)) { const k = tagKey(sp.textContent); if (sp.dataset.tk !== k) { sp.dataset.tk = k; try { tagStyleRefresh([k]); } catch {} } }
+/* Si al escribir dentro de una etiqueta resaltada deja de serlo (un espacio al final, por ejemplo),
+   el resaltado se recorta a la parte que sigue siendo etiqueta. Con execCommand, para poder deshacerlo. */
+const TAG_WHOLE = /^#[\p{L}_][\p{L}\p{N}_-]*(?:\/[\p{L}\p{N}_-]+)*/u;
+editor.addEventListener('input', e => {
+  if (e.isComposing || /^history/.test(e.inputType || '')) return;
+  const sel = getSelection(), a = sel.rangeCount && sel.isCollapsed && sel.anchorNode;
+  const sp = a && (a.nodeType === 3 ? a.parentElement : a).closest('span.tg');
+  if (!sp || !editor.contains(sp)) return;
+  const txt = sp.textContent, m = TAG_WHOLE.exec(txt);
+  if (m && m[0].length === txt.length) return;
+  let caret = txt.length;
+  if (a.nodeType === 3 && sp.contains(a)) { const r = document.createRange(); r.selectNodeContents(sp); r.setEnd(a, sel.anchorOffset); caret = r.toString().length; }
+  const keep = m ? m[0] : '', rest = txt.slice(keep.length);
+  const r = document.createRange(); r.selectNode(sp);
+  edReplace(r, (keep ? `<span class="tg" data-tk="${esc(tagKey(keep))}">${esc(keep)}</span>` : '') + esc(rest).replace(/^ | $/g, '&nbsp;'));
+  for (let i = txt.length - caret; i > 0; i--) sel.modify('move', 'backward', 'character');
+  markDirty();
 });
+/** Actualiza el color de las etiquetas del editor que han cambiado de nombre (se hace al guardar,
+    no a cada tecla, porque tocar el DOM mientras se escribe estropea el «deshacer» por palabras). */
+function tagRefreshEditorKeys() {
+  const fresh = [];
+  editor.querySelectorAll('span.tg').forEach(s => { const k = tagKey(s.textContent); if (s.dataset.tk !== k) { s.dataset.tk = k; fresh.push(k); } });
+  if (fresh.length) try { tagStyleRefresh(fresh); } catch {}
+}
 editor.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== editor) tagAcClose(); }, 150));
 /** Marca visualmente las etiquetas del editor (al abrir una nota). */
 function tagDecorateEditor() {
-  editor.querySelectorAll('span.tg').forEach(s => { if (!/^#[\p{L}_]/u.test(s.textContent)) s.replaceWith(...s.childNodes); });
+  editor.querySelectorAll('span.tg').forEach(s => {
+    const m = TAG_WHOLE.exec(s.textContent);
+    if (!m) { s.replaceWith(...s.childNodes); return; }
+    if (m[0].length < s.textContent.length && s.childNodes.length === 1 && s.firstChild.nodeType === 3) s.after(s.firstChild.splitText(m[0].length));
+  });
   const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.includes('#') && !n.parentElement.closest('pre,code,a,.tg') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
   const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
   nodes.forEach(t => {

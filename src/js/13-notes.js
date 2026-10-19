@@ -35,6 +35,7 @@ function sanitize(html) {
         if (keep.length) c.setAttribute('style', keep.join(';')); else c.removeAttribute('style');
       }
       if (tag === 'INPUT') c.classList.add('chk');
+      if (tag === 'SPAN' && !c.attributes.length) { clean(c); c.replaceWith(...c.childNodes); continue; } // <span> vacío (lo deja el editor al insertar)
       clean(c);
     }
   };
@@ -94,23 +95,24 @@ function updateCount() {
   const t = editor.innerText || '';
   const words = (t.match(/\S+/g) || []).length;
   const chk = editor.querySelectorAll('input.chk').length, done = editor.querySelectorAll('input.chk[checked]').length;
-  $('#noteCount').textContent = `${words} palabra${words === 1 ? '' : 's'} · ${t.replace(/\s/g, '').length} caracteres${chk ? ` · ☑ ${done}/${chk} tareas` : ''}`;
+  setText($('#noteCount'), `${words} palabra${words === 1 ? '' : 's'} · ${t.replace(/\s/g, '').length} caracteres${chk ? ` · ☑ ${done}/${chk} tareas` : ''}`);
 }
 function flushNote(force = false) {
   if (!noteDirty && !force) return;
   const n = getNote(currentNoteId);
   noteDirty = false;
   if (!n) return;
+  if (typeof tagRefreshEditorKeys === 'function') tagRefreshEditorKeys();
   n.html = editor.innerHTML;
   n.text = htmlText(n.html);
   n.updated = Date.now();
   save.notes();
-  $('#noteSaved').textContent = '✓ Guardado a las ' + fmtTime(Date.now());
+  setText($('#noteSaved'), '✓ Guardado a las ' + fmtTime(Date.now()));
   renderNoteList();
   renderBacklinks(); renderNoteTags();
 }
 const saveNoteSoon = debounce(() => flushNote(), 600);
-function markDirty() { noteDirty = true; $('#noteSaved').textContent = 'Guardando…'; updateEmpty(); updateCount(); saveNoteSoon(); }
+function markDirty() { noteDirty = true; setText($('#noteSaved'), 'Guardando…'); updateEmpty(); updateCount(); saveNoteSoon(); }
 
 function uniqueTitle(base, exceptId) {
   const ex = new Set(S.notes.filter(n => n.id !== exceptId).map(n => n.title.trim().toLowerCase()));
@@ -205,18 +207,28 @@ function updateToolbarState() {
   try { v = String(document.queryCommandValue('formatBlock') || '').toLowerCase().replace(/[<>]/g, ''); } catch {}
   $('#blockSelect').value = ['h1', 'h2', 'h3', 'blockquote', 'pre'].includes(v) ? v : 'div';
 }
-// Inserta la casilla exactamente en el cursor (sin execCommand, que añade estilos extra)
+/**
+ * Sustituye un rango del editor por HTML pasando por execCommand, para que el navegador
+ * lo apunte en su historial y Ctrl+Z / «Deshacer» puedan revertirlo. (Tocar el DOM a mano
+ * —insertNode, innerHTML…— deja el historial del editor bloqueado.)
+ */
+function edReplace(range, html) {
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  let ok = false;
+  try { ok = document.execCommand(html ? 'insertHTML' : 'delete', false, html); } catch {}
+  if (!ok) { // respaldo (navegadores sin execCommand): no se podrá deshacer, pero funciona
+    const r = sel.rangeCount ? sel.getRangeAt(0) : range; r.deleteContents();
+    if (html) { const f = r.createContextualFragment(html), last = f.lastChild; r.insertNode(f); if (last) r.setStartAfter(last); }
+    r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
+  }
+  if (sel.rangeCount) savedRange = sel.getRangeAt(0).cloneRange();
+}
+// Inserta la casilla en el cursor
 function insertChkAtCaret() {
   const sel = getSelection(); if (!sel.rangeCount) return;
   const r = sel.getRangeAt(0);
   if (!editor.contains(r.startContainer)) return;
-  r.deleteContents();
-  const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'chk';
-  const sp = document.createTextNode(' ');
-  r.insertNode(sp); r.insertNode(cb);
-  r.setStartAfter(sp); r.collapse(true);
-  sel.removeAllRanges(); sel.addRange(r);
-  savedRange = r.cloneRange();
+  edReplace(r, '<input type="checkbox" class="chk">&nbsp;');
 }
 function insertChecklist() { restoreSel(); insertChkAtCaret(); markDirty(); }
 
@@ -329,9 +341,8 @@ editor.addEventListener('keydown', e => {
       const txt = line.textContent.replace(/\u00a0/g, ' ').trim();
       if (!txt) { // casilla vacía: Enter la quita (fin de la lista de tareas)
         e.preventDefault();
-        line.innerHTML = '<br>';
-        const r = document.createRange(); r.setStart(line, 0); r.collapse(true);
-        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        const r = document.createRange(); r.selectNodeContents(line);
+        edReplace(r, '');
         markDirty();
         return;
       }

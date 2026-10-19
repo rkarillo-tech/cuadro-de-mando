@@ -37,36 +37,41 @@ function wlTextRefs(text) {
 }
 
 /* ---------- Conversión de [[...]] escrito o pegado ---------- */
-function wlConvertTextNode(t, caret) {
-  let m, changed = false;
-  while (t && (m = /\[\[([^\[\]\n]{1,120})\]\]/.exec(t.nodeValue))) {
-    if (!wlCleanTitle(m[1])) break;
-    const mid = t.splitText(m.index), after = mid.splitText(m[0].length);
-    const chip = wlMakeChip(noteByTitle(m[1]), m[1]);
-    mid.replaceWith(chip);
-    if (caret && caret.node === t) {
-      if (caret.off > m.index + m[0].length) { caret.node = after; caret.off -= m.index + m[0].length; }
-      else if (caret.off > m.index) { caret.node = after; caret.off = 0; }
-    }
-    t = after; changed = true;
-  }
-  return changed;
+/**
+ * Pone un enlace en lugar del rango r. Se incluye el carácter anterior (o uno invisible al
+ * principio de línea) porque Chrome saca de la línea un elemento no editable que vaya primero.
+ */
+function wlReplaceWithChip(r, chip, tail = '') {
+  const t = r.startContainer, o = r.startOffset;
+  let lead = '\u200b';
+  if (t.nodeType === 3 && o > 0) { lead = t.nodeValue[o - 1]; r.setStart(t, o - 1); }
+  edReplace(r, (lead === ' ' ? '&nbsp;' : esc(lead)) + chip.outerHTML + tail);
 }
 function wlConvertTyped() {
   const sel = getSelection();
   const caret = sel.rangeCount && sel.isCollapsed ? { node: sel.anchorNode, off: sel.anchorOffset } : null;
-  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.includes('[[') && !n.parentElement.closest('a,pre') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
-  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
-  let changed = false;
-  nodes.forEach(t => { if (wlConvertTextNode(t, caret)) changed = true; });
-  if (changed) {
-    if (caret && caret.node && caret.node.isConnected) { const r = document.createRange(); r.setStart(caret.node, Math.min(caret.off, caret.node.nodeValue.length)); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); }
-    markDirty();
+  let changed = false, guard = 50;
+  while (guard--) {
+    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.includes('[[') && !n.parentElement.closest('a,pre') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+    let t, m = null;
+    while ((t = walker.nextNode())) { m = /\[\[([^\[\]\n]{1,120})\]\]/.exec(t.nodeValue); if (m && wlCleanTitle(m[1])) break; m = null; }
+    if (!m) break;
+    // se sustituye con execCommand para que Ctrl+Z pueda deshacerlo
+    const atCaret = caret && caret.node === t && caret.off >= m.index + m[0].length;
+    const keep = !atCaret && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+    const r = document.createRange(); r.setStart(t, m.index); r.setEnd(t, m.index + m[0].length);
+    // al final de la línea se deja un carácter invisible tras el enlace para poder seguir escribiendo
+    const end = atCaret && m.index + m[0].length === t.nodeValue.length && !t.nextSibling;
+    wlReplaceWithChip(r, wlMakeChip(noteByTitle(m[1]), m[1]), end ? '&#8203;' : '');
+    if (keep && keep.startContainer.isConnected) { sel.removeAllRanges(); sel.addRange(keep); }
+    changed = true;
   }
+  if (changed) markDirty();
 }
 
 /* ---------- Autocompletado al escribir [[ ---------- */
-function wlOnInput() {
+function wlOnInput(e) {
+  if (e && /^history/.test(e.inputType || '')) { wlClose(); return; } // deshacer/rehacer: no volver a convertir
   const sel = getSelection();
   if (!sel.rangeCount || !sel.isCollapsed) { wlClose(); return; }
   const node = sel.anchorNode, off = sel.anchorOffset;
@@ -121,12 +126,9 @@ function wlChoose(i) {
   const sel = getSelection();
   let end = sel.rangeCount && sel.anchorNode === node ? sel.anchorOffset : Math.min(node.nodeValue.length, st.start + 2 + st.q.length);
   if (node.nodeValue.slice(end, end + 2) === ']]') end += 2;
-  const r = document.createRange(); r.setStart(node, st.start); r.setEnd(node, end); r.deleteContents();
-  const chip = wlMakeChip(note), sp = document.createTextNode(' ');
-  r.insertNode(sp); r.insertNode(chip);
-  r.setStartAfter(sp); r.collapse(true);
-  sel.removeAllRanges(); sel.addRange(r); savedRange = r.cloneRange();
+  const r = document.createRange(); r.setStart(node, st.start); r.setEnd(node, end);
   editor.focus({ preventScroll: true });
+  wlReplaceWithChip(r, wlMakeChip(note), '&nbsp;');
   markDirty(); flushNote(); renderBacklinks();
 }
 function wlKey(e) {

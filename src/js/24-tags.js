@@ -109,11 +109,8 @@ function tagAcChoose(i) {
     const node = a.node; if (!node.isConnected) return;
     const sel = getSelection();
     const end = sel.rangeCount && sel.anchorNode === node ? sel.anchorOffset : a.start + 1 + a.q.length;
-    const r = document.createRange(); r.setStart(node, a.start); r.setEnd(node, end); r.deleteContents();
-    const span = document.createElement('span'); span.className = 'tg'; span.textContent = '#' + word; span.dataset.tk = tagKey(word);
-    const sp = document.createTextNode(' ');
-    r.insertNode(sp); r.insertNode(span);
-    r.setStartAfter(sp); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); savedRange = r.cloneRange();
+    const r = document.createRange(); r.setStart(node, a.start); r.setEnd(node, end);
+    edReplace(r, `<span class="tg" data-tk="${esc(tagKey(word))}">#${esc(word)}</span>&nbsp;`);
     markDirty();
   } else {
     const el = a.el, v = el.value, end = el.selectionStart;
@@ -135,9 +132,9 @@ tagPop.addEventListener('mousedown', e => e.preventDefault());
 tagPop.addEventListener('click', e => { const b = e.target.closest('[data-tg]'); if (b) tagAcChoose(+b.dataset.tg); });
 const TAG_TYPING = /(^|[\s([{,;:¡¿"'«])#([\p{L}\p{N}_\-/]{0,40})$/u;
 /* En el editor de notas */
-editor.addEventListener('input', () => {
+editor.addEventListener('input', e => {
   const sel = getSelection();
-  if (!sel.rangeCount || !sel.isCollapsed) { tagAcClose(); return; }
+  if (!sel.rangeCount || !sel.isCollapsed || /^history/.test(e.inputType || '')) { tagAcClose(); return; }
   const node = sel.anchorNode, off = sel.anchorOffset;
   if (!node || node.nodeType !== 3 || !editor.contains(node) || node.parentElement.closest('pre,code,a')) { tagAcClose(); return; }
   const before = node.nodeValue.slice(0, off);
@@ -152,22 +149,46 @@ editor.addEventListener('input', () => {
   const t = /(^|[\s([{,;:¡¿"'«])#([\p{L}_][\p{L}\p{N}_-]*(?:\/[\p{L}\p{N}_-]+)*)[\s ]$/u.exec(before);
   if (t && !node.parentElement.closest('.tg')) {
     const start = off - 1 - t[2].length - 1;
-    const r = document.createRange(); r.setStart(node, start); r.setEnd(node, off - 1);
-    const span = document.createElement('span'); span.className = 'tg';
-    r.surroundContents(span); span.dataset.tk = tagKey(span.textContent);
-    const after = span.nextSibling;
-    if (after && after.nodeType === 3) { const rr = document.createRange(); rr.setStart(after, Math.min(1, after.nodeValue.length)); rr.collapse(true); sel.removeAllRanges(); sel.addRange(rr); }
+    // se envuelve con execCommand para que Ctrl+Z pueda deshacerlo
+    const r = document.createRange(); r.setStart(node, start); r.setEnd(node, off);
+    const word = node.nodeValue.slice(start, off - 1), gap = node.nodeValue[off - 1];
+    edReplace(r, `<span class="tg" data-tk="${esc(tagKey(word))}">${esc(word)}</span>${gap === ' ' ? '&nbsp;' : esc(gap)}`);
     markDirty();
   }
 });
-editor.addEventListener('input', () => {
-  const sel = getSelection(), a = sel.rangeCount && sel.anchorNode, sp = a && (a.nodeType === 3 ? a.parentElement : a).closest('span.tg');
-  if (sp && editor.contains(sp)) { const k = tagKey(sp.textContent); if (sp.dataset.tk !== k) { sp.dataset.tk = k; try { tagStyleRefresh([k]); } catch {} } }
+/* Si al escribir dentro de una etiqueta resaltada deja de serlo (un espacio al final, por ejemplo),
+   el resaltado se recorta a la parte que sigue siendo etiqueta. Con execCommand, para poder deshacerlo. */
+const TAG_WHOLE = /^#[\p{L}_][\p{L}\p{N}_-]*(?:\/[\p{L}\p{N}_-]+)*/u;
+editor.addEventListener('input', e => {
+  if (e.isComposing || /^history/.test(e.inputType || '')) return;
+  const sel = getSelection(), a = sel.rangeCount && sel.isCollapsed && sel.anchorNode;
+  const sp = a && (a.nodeType === 3 ? a.parentElement : a).closest('span.tg');
+  if (!sp || !editor.contains(sp)) return;
+  const txt = sp.textContent, m = TAG_WHOLE.exec(txt);
+  if (m && m[0].length === txt.length) return;
+  let caret = txt.length;
+  if (a.nodeType === 3 && sp.contains(a)) { const r = document.createRange(); r.selectNodeContents(sp); r.setEnd(a, sel.anchorOffset); caret = r.toString().length; }
+  const keep = m ? m[0] : '', rest = txt.slice(keep.length);
+  const r = document.createRange(); r.selectNode(sp);
+  edReplace(r, (keep ? `<span class="tg" data-tk="${esc(tagKey(keep))}">${esc(keep)}</span>` : '') + esc(rest).replace(/^ | $/g, '&nbsp;'));
+  for (let i = txt.length - caret; i > 0; i--) sel.modify('move', 'backward', 'character');
+  markDirty();
 });
+/** Actualiza el color de las etiquetas del editor que han cambiado de nombre (se hace al guardar,
+    no a cada tecla, porque tocar el DOM mientras se escribe estropea el «deshacer» por palabras). */
+function tagRefreshEditorKeys() {
+  const fresh = [];
+  editor.querySelectorAll('span.tg').forEach(s => { const k = tagKey(s.textContent); if (s.dataset.tk !== k) { s.dataset.tk = k; fresh.push(k); } });
+  if (fresh.length) try { tagStyleRefresh(fresh); } catch {}
+}
 editor.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== editor) tagAcClose(); }, 150));
 /** Marca visualmente las etiquetas del editor (al abrir una nota). */
 function tagDecorateEditor() {
-  editor.querySelectorAll('span.tg').forEach(s => { if (!/^#[\p{L}_]/u.test(s.textContent)) s.replaceWith(...s.childNodes); });
+  editor.querySelectorAll('span.tg').forEach(s => {
+    const m = TAG_WHOLE.exec(s.textContent);
+    if (!m) { s.replaceWith(...s.childNodes); return; }
+    if (m[0].length < s.textContent.length && s.childNodes.length === 1 && s.firstChild.nodeType === 3) s.after(s.firstChild.splitText(m[0].length));
+  });
   const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.includes('#') && !n.parentElement.closest('pre,code,a,.tg') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
   const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
   nodes.forEach(t => {

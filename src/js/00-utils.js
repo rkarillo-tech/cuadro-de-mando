@@ -121,3 +121,13 @@ async function confirmDialog(msg, okLabel = 'Eliminar', danger = true) {
   return !!r;
 }
 
+
+/** Cambia el texto de un elemento sin sustituir su nodo de texto.
+    Sustituir nodos en la página mientras se escribe rompe el «Deshacer» del editor (Chrome deshace letra a letra). */
+function setText(el, t) {
+  if (!el) return;
+  t = String(t);
+  const c = el.firstChild;
+  if (c && c.nodeType === 3 && !c.nextSibling) { if (c.nodeValue !== t) c.nodeValue = t; }
+  else if (el.textContent !== t) el.textContent = t;
+}

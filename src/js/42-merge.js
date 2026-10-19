@@ -55,6 +55,26 @@ function mergeData(local, other) {
   return out;
 }
 
+/**
+ * Huella del CONTENIDO de una versión de los datos, sin la marca de tiempo general, sin los
+ * ajustes de pantalla y sin las fechas internas de cada elemento, y sin que importe el orden.
+ * Sirve para saber si dos dispositivos ya tienen exactamente lo mismo: si es así no hay que
+ * volver a escribir el archivo (si no, cada uno reescribiría el del otro sin parar).
+ */
+function dataSig(d) {
+  const o = d || {};
+  const one = (k, v) => {
+    if (v == null) return '';
+    if (k === 'tombstones') { const ks = plainObj(v) ? Object.keys(v).sort() : []; return ks.length ? k + '=' + ks.join(',') : ''; }
+    if (Array.isArray(v)) return v.length ? k + '=' + (isIdList(v) ? v.map(x => String(x.id) + '~' + trkHash(x)).sort().join(',') : trkHash(v)) : '';
+    if (plainObj(v)) { const ks = Object.keys(v).sort(); return ks.length ? k + '=' + ks.map(j => j + '~' + trkHash(v[j])).join(',') : ''; }
+    return k + '=' + trkHash(v);
+  };
+  return Object.keys(o).filter(k => k !== 'lastChange' && !VOLATILE_KEYS.has(k)).sort().map(k => one(k, o[k])).filter(Boolean).join('|');
+}
+/** ¿Las dos versiones tienen exactamente el mismo contenido? */
+const sameData = (a, b) => dataSig(a) === dataSig(b);
+
 /* ---------- Diferencias por sección ---------- */
 const DIFF_SECTIONS = [
   ['notes', '📝 Notas', x => x.title],
@@ -137,10 +157,13 @@ async function syncChoiceDialog(other, { mode = 'import', title, intro = '', oth
   return { choice: r.action, merged, diff: d };
 }
 /** Aplica la elección: guarda versión previa, sustituye los datos y recarga. */
-async function applySyncChoice(res, other, label) {
+async function applySyncChoice(res, other, label, { fileLc = 0 } = {}) {
   if (!res || !res.choice || res.choice === 'keep') return false;
   await histSnapshot('before', (res.choice === 'merge' ? 'Antes de combinar con ' : 'Antes de reemplazar con ') + label, { force: true });
-  await replaceAllData(res.choice === 'merge' ? res.merged : other);
+  const final = res.choice === 'merge' ? res.merged : other;
+  // Si el resultado es exactamente lo que ya hay en el archivo, se conserva su marca de tiempo
+  // (si no, se le devolvería como «cambio nuevo» y los dos dispositivos se reescribirían sin fin)
+  await replaceAllData(final, { lastChange: fileLc && sameData(final, other) ? fileLc : 0 });
   const d = res.diff;
   toast(res.choice === 'merge' ? `Combinado: +${d.mergeAdds} nuevos, ${d.mergeUpdates} actualizados${d.mergeDeletes ? `, ${d.mergeDeletes} borrados` : ''}. Recargando…` : 'Datos reemplazados. Recargando…', 'success', 3000);
   setTimeout(() => reloadSafe(), 700);

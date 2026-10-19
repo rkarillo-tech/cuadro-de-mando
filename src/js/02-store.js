@@ -255,10 +255,10 @@ async function openBackup(o, pass) {
 }
 /** Sustituye TODOS los datos por los de una copia y recarga.
     Se marca como el cambio más reciente: así el archivo vinculado no lo «pisa» al reabrir. */
-async function replaceAllData(data, { keepNote = null } = {}) {
+async function replaceAllData(data, { keepNote = null, lastChange = 0 } = {}) {
   const clean = {};
   for (const [k, v] of Object.entries(data || {})) if (!PLAIN_KEYS.has(k)) clean[k] = v;
-  clean.lastChange = Date.now();
+  clean.lastChange = +lastChange || Date.now();   // si el contenido ya es el del archivo, se conserva su marca
   if (data && (data.theme === 'light' || data.theme === 'dark' || data.theme === 'system')) ls.set('theme', data.theme);
   ls.set('migrated', true);
   clean.currentNote = keepNote || null;
@@ -269,6 +269,14 @@ async function replaceAllData(data, { keepNote = null } = {}) {
     Object.keys(MEM).forEach(k => ls.set(k, MEM[k]));
   }
   FROZEN = true; APP_READY = false;
+}
+
+/** Acepta la marca de tiempo del archivo cuando el contenido ya es idéntico (evita reescrituras en bucle). */
+function adoptLastChange(ts) {
+  ts = +ts || 0;
+  if (!ts || MEM.lastChange === ts) return;
+  MEM.lastChange = ts;
+  if (CRYPT) scheduleEncFlush(); else ls.set('lastChange', ts);
 }
 
 /* ---------- Migración desde versiones anteriores ---------- */
@@ -311,7 +319,7 @@ function migrateLegacy() {
   try { if (localStorage.getItem('theme') === 'light' && !ls.get('theme', null)) ls.set('theme', 'light'); } catch {}
   if (!(store.get('notes', []) || []).length && !(store.get('tasks', []) || []).length) {
     const now = Date.now();
-    store.set('notes', [{ id: uid(), title: 'Bienvenida', html: WELCOME_HTML, text: '', pinned: true, created: now, updated: now }]);
+    store.set('notes', [{ id: 'bienvenida', title: 'Bienvenida', html: WELCOME_HTML, text: '', pinned: true, created: now, updated: now }]);
   }
   ls.set('migrated', true);
 }

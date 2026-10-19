@@ -259,6 +259,21 @@ async function fsExternallyChanged() {
     return true;
   } catch { return false; }
 }
+/**
+ * Cortafuegos: la combinación automática recarga la página. Si eso se repitiera muchas veces
+ * seguidas (dos dispositivos reescribiéndose el archivo sin parar), se corta y se deja la
+ * decisión al usuario en vez de dejar la pestaña recargando sola.
+ */
+const SYNC_RELOADS = 'cdm-sync-reloads';
+function syncLoopOk() {
+  let a = [];
+  try { a = JSON.parse(sessionStorage.getItem(SYNC_RELOADS) || '[]'); } catch {}
+  const now = Date.now();
+  a = (Array.isArray(a) ? a : []).filter(t => now - t < 120000).concat(now);
+  try { sessionStorage.setItem(SYNC_RELOADS, JSON.stringify(a)); } catch {}
+  return a.length <= 4;
+}
+const syncLoopReset = () => { try { sessionStorage.removeItem(SYNC_RELOADS); } catch {} };
 /** Compara el archivo con los datos de este navegador. external = otro dispositivo lo ha modificado. */
 async function fsCheckNewer(external = false) {
   if ((fsBusy && !external) || fsAsking) return;
@@ -271,17 +286,34 @@ async function fsCheckNewer(external = false) {
     if (fileLc > mine + 1000 || (external && fileLc !== mine)) {
       const data = o.encrypted ? await askBackupPassword(o) : o.data;
       if (!data) { fsState = 'conflict'; renderFs(); return; }
+      flushNote();
+      const local = JSON.parse(JSON.stringify(MEM)), merged = mergeData(local, data);
+      // El archivo no trae nada nuevo: ni se recarga ni se pregunta. Si además el contenido ya es
+      // el mismo, se adopta su marca de tiempo; así los dos dispositivos dejan de reescribirlo
+      // una y otra vez (cada escritura parecía un cambio nuevo para el otro: bucle infinito).
+      if (sameData(merged, local)) {
+        const equal = sameData(local, data);
+        await fsRememberMtime(mtime, fileLc);
+        if (equal) adoptLastChange(fileLc);
+        fsAsking = false; fsLastCheck = Date.now(); fsErr = '';
+        if (!equal) await fsWrite();            // aquí hay cosas que al archivo le faltan
+        renderFs(); return;
+      }
       // Sin conflictos (nada cambiado en los dos sitios a la vez y nada que borrar): se combina solo
       if (fsSeenLc) {
-        flushNote();
-        const local = JSON.parse(JSON.stringify(MEM)), merged = mergeData(local, data), d = diffData(local, data, merged, fsSeenLc);
+        const d = diffData(local, data, merged, fsSeenLc);
         if (!d.mergeDeletes && !d.conflicts) {
+          if (!syncLoopOk()) {
+            fsState = 'conflict'; fsAsking = false; renderFs();
+            toast('La sincronización automática se repetía sin parar y se ha detenido. Pulsa el indicador de arriba para revisar los cambios.', 'danger', 9000);
+            return;
+          }
           fsSyncing = true; renderFsPill();
           await fsRememberMtime(mtime, fileLc);
           await histSnapshot('auto', 'Antes de sincronizar con «' + fsName() + '»', { force: true });
           const parts = [d.mergeAdds && `+${d.mergeAdds} nuevo${d.mergeAdds === 1 ? '' : 's'}`, d.mergeUpdates && `${d.mergeUpdates} actualizado${d.mergeUpdates === 1 ? '' : 's'}`].filter(Boolean);
           try { sessionStorage.setItem('cdm-sync-msg', '🔄 Sincronizado con otro dispositivo' + (parts.length ? ': ' + parts.join(', ') : '')); } catch {}
-          await replaceAllData(merged, { keepNote: currentNoteId });
+          await replaceAllData(merged, { keepNote: currentNoteId, lastChange: sameData(merged, data) ? fileLc : 0 });
           setTimeout(() => reloadSafe(), 150);
           return;
         }
@@ -292,7 +324,7 @@ async function fsCheckNewer(external = false) {
       });
       if (!res.choice) { fsState = 'conflict'; renderFs(); return; }
       if (res.choice === 'keep') { fsState = 'ok'; await fsRememberMtime(mtime, fileLc); fsAsking = false; await fsWrite(); }
-      else { await fsRememberMtime(mtime, fileLc); await applySyncChoice(res, data, 'el archivo «' + fsName() + '»'); return; }
+      else { await fsRememberMtime(mtime, fileLc); await applySyncChoice(res, data, 'el archivo «' + fsName() + '»', { fileLc }); return; }
     } else {
       await fsRememberMtime(mtime, fileLc);
       fsAsking = false; fsLastCheck = Date.now();
@@ -396,7 +428,7 @@ async function fsSyncNow({ quiet = false } = {}) {
 $('#syncPill').addEventListener('click', () => {
   if (!fsHandle || fsState === 'none' || fsState === 'unsupported') { showTab('settings'); setTimeout(() => { const c = $('#fsCard'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
   else if (fsState === 'perm') fsReconnect();
-  else if (fsState === 'conflict') fsCheckNewer(true);
+  else if (fsState === 'conflict') { syncLoopReset(); fsCheckNewer(true); }
   else fsSyncNow();
 });
 // Comprobación ligera cada minuto mientras la app está a la vista (solo mira la fecha del archivo)

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando 1.2.5 (2026-10-19) · productividad personal 100 % local, sin servidor
+  Cuadro de Mando 1.3.0 (2026-10-19) · productividad personal 100 % local, sin servidor
   https://github.com/rkarillo-tech/cuadro-de-mando
 
   MIT License
@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-yXiyENuY6fj7teXuQcvJ3EOblosM/xD7hd624LDakhc='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Lgp+GUwNXQrlW5rB3dD0Q8XYG/qvqM/xJM6i9vdwdBE='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -913,7 +913,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.2.5 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.3.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -1697,6 +1697,7 @@ details.bl-row summary.bl-h{cursor:pointer}
             </div>
           </div>
         </div>
+        <div class="row" id="lsExamples" style="margin-top:8px"></div>
         <div class="status-line ls-stats" id="lsStats"></div>
         <div class="seg" id="lsMode"><button data-m="pick" class="on">✅ Seleccionar y unir</button><button data-m="cmp">⚖️ Comparar con otra lista</button></div>
 
@@ -1734,6 +1735,14 @@ details.bl-row summary.bl-h{cursor:pointer}
         <textarea class="field" id="txIn" rows="10" placeholder="Pega aquí un texto para contarlo o transformarlo…"></textarea>
         <div class="small muted" id="txStats" style="margin:8px 0"></div>
         <div class="row" id="txBtns"></div>
+        <div class="row" id="txLorem" style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+          <span class="lbl" style="margin:0">Texto de relleno</span>
+          <input class="field" type="number" id="lorN" value="3" min="1" max="200" style="max-width:80px" title="Cuántos quieres">
+          <select class="field" id="lorUnit" style="max-width:150px"><option value="p">párrafos</option><option value="s">frases</option><option value="w">palabras</option><option value="li">líneas de lista</option></select>
+          <label class="check-row"><input type="checkbox" class="check" id="lorClassic" checked> Empezar por «Lorem ipsum»</label>
+          <button class="btn sm primary" id="lorGen">✨ Generar</button>
+          <button class="btn sm ghost" id="lorAdd" title="Añadir al final de lo que ya hay">＋ Añadir</button>
+        </div>
       </div>
     </section>
     <!-- ===================== ENCRIPTADOR ===================== -->
@@ -1959,7 +1968,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
         <div class="card" id="licCard">
           <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
-          <p>Cuadro de Mando 1.2.5 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p>Cuadro de Mando 1.3.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
           <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
           <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
 
@@ -3319,12 +3328,43 @@ function deleteTodo(id) {
   save.todos(); refreshTodoViews();
   toast(`Tarea «${t.text.slice(0, 40)}» eliminada`, 'info', 6000, { label: 'Deshacer', fn: () => { S.todos.splice(Math.min(i, S.todos.length), 0, t); save.todos(); refreshTodoViews(); } });
 }
-function todoToKanban(id) {
+/**
+ * Lleva una tarea al Kanban. Por defecto la mueve (deja de estar en Tareas) para no tener
+ * lo mismo en dos sitios; con keep = true se queda también como tarea, y entonces las dos
+ * copias son independientes: completar una no completa la otra.
+ */
+function todoToKanban(id, { keep = false } = {}) {
   const t = getTodo(id); if (!t) return;
-  S.tasks.push({ id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() });
-  S.todos = S.todos.filter(x => x.id !== id);
-  save.tasks(); save.todos(); renderBoard(); refreshTodoViews();
-  toast('Tarea pasada al Kanban', 'success', 5000, { label: 'Ver', fn: () => showTab('kanban') });
+  const card = { id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() };
+  S.tasks.push(card);
+  const i = S.todos.findIndex(x => x.id === id);
+  if (!keep) S.todos.splice(i, 1);
+  save.tasks(); if (!keep) save.todos();
+  renderBoard(); refreshTodoViews();
+  toast(keep ? 'Copiada al Kanban (sigue en Tareas)' : 'Tarea pasada al Kanban', 'success', 6000, {
+    label: 'Deshacer',
+    fn: () => {
+      S.tasks = S.tasks.filter(x => x.id !== card.id);
+      if (!keep && !getTodo(id)) S.todos.splice(Math.min(i, S.todos.length), 0, t);
+      save.tasks(); save.todos(); renderBoard(); refreshTodoViews();
+    }
+  });
+}
+/** Pregunta si mover o copiar antes de llevarla al Kanban. */
+async function todoToKanbanAsk(id) {
+  const t = getTodo(id); if (!t) return;
+  const r = await modal({
+    title: '📋 Pasar «' + (t.text.length > 40 ? t.text.slice(0, 40) + '…' : t.text) + '» al Kanban',
+    body: `<p class="small">La tarjeta se crea en la columna <b>Por hacer</b> con su fecha, etiquetas, prioridad y pasos.</p>
+      <p class="hint">Lo normal es <b>moverla</b>: así cada cosa está en un sitio y no tienes que acordarte de darla por hecha dos veces. <b>Copiarla</b> es útil si quieres seguir viéndola en tu lista del día mientras avanza en el tablero, pero las dos quedan sueltas: completar una no completa la otra.</p>`,
+    actions: [
+      { label: 'Cancelar', value: null, cls: 'ghost' },
+      { label: 'Copiar (dejarla en Tareas)', value: 'copy', cls: '' },
+      { label: '➡️ Mover al Kanban', value: 'move', cls: 'primary' }
+    ]
+  });
+  if (!r) return;
+  todoToKanban(id, { keep: r.action === 'copy' });
 }
 
 async function openTodo(id) {
@@ -3392,7 +3432,7 @@ async function openTodo(id) {
   if (!t.tags.length) delete t.tags;
   if (t.repeat && !t.due) t.due = todayKey();
   save.todos();
-  if (r.action === 'kanban') { todoToKanban(id); return; }
+  if (r.action === 'kanban') { todoToKanbanAsk(id); return; }
   refreshTodoViews();
 }
 
@@ -8991,8 +9031,8 @@ const DEV_HELP = {
   },
   text: {
     what: 'Contador y transformaciones rápidas de texto.',
-    uses: ['Contar caracteres o palabras para campos con límite (asuntos, SMS, resúmenes, redes sociales).', 'Convertir nombres a <code>camelCase</code>, <code>snake_case</code> o <code>CONSTANT_CASE</code> para código o columnas de base de datos.', 'Generar <i>slugs</i> para URL o nombres de fichero.', 'Limpiar listas: ordenar, quitar duplicados y líneas vacías, numerar.', 'Quitar tildes para sistemas antiguos que no las admiten.'],
-    how: ['Pega el texto: encima de los botones verás caracteres, palabras, líneas, bytes y tiempo de lectura.', 'Pulsa una transformación; las de formato de código se aplican línea a línea.', '<b>Deshacer</b> recupera el texto anterior.'],
+    uses: ['Contar caracteres o palabras para campos con límite (asuntos, SMS, resúmenes, redes sociales).', 'Generar texto de relleno («lorem ipsum») para maquetar una pantalla, un documento o probar un campo.', 'Convertir nombres a <code>camelCase</code>, <code>snake_case</code> o <code>CONSTANT_CASE</code> para código o columnas de base de datos.', 'Generar <i>slugs</i> para URL o nombres de fichero.', 'Limpiar listas: ordenar, quitar duplicados y líneas vacías, numerar.', 'Quitar tildes para sistemas antiguos que no las admiten.'],
+    how: ['Pega el texto: encima de los botones verás caracteres, palabras, líneas, bytes y tiempo de lectura.', 'Pulsa una transformación; las de formato de código se aplican línea a línea.', '<b>Deshacer</b> recupera el texto anterior.', 'Abajo del todo, <b>Texto de relleno</b> genera «lorem ipsum» para maquetar o para probar: eliges cuántos párrafos, frases, palabras o líneas de lista, y <b>＋ Añadir</b> lo pega a continuación de lo que ya hay.'],
     examples: [{ label: 'Cargar ejemplo', fn: () => { setVal('txIn', 'Fecha de Presentación\nNúmero de Expediente\nnombre del interesado\nFecha de Presentación\n\nImporte Total'); exampleLoaded('Prueba «Quitar duplicadas», «snake_case» o «Ordenar A→Z»'); } }]
   }
 };
@@ -9486,6 +9526,43 @@ $('#txBtns').addEventListener('click', e => {
 });
 $('#txIn').addEventListener('input', txStats);
 function initDevtools() { initDevHelp(); initRegex(); setTool(store.get('devTool', 'json')); }
+
+/* ---------- Texto de relleno (Lorem ipsum) ---------- */
+const LOREM_WORDS = ('lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum curabitur pretium tincidunt lacus gravida orci odio nullam varius turpis pharetra eros suscipit mauris aenean posuere vitae mattis sem integer euismod lacinia nibh libero molestie ligula facilisis vestibulum nisl porta congue').split(' ');
+const LOREM_START = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'.split(' ');
+const lorRnd = n => Math.floor(Math.random() * n);
+const lorCap = s => s.charAt(0).toUpperCase() + s.slice(1);
+/** n palabras; con «classic», las primeras son las del lorem ipsum de toda la vida. */
+function lorWords(n, classic) {
+  const out = classic ? LOREM_START.slice(0, n) : [];
+  while (out.length < n) out.push(LOREM_WORDS[lorRnd(LOREM_WORDS.length)]);
+  return out;
+}
+/** Una frase de entre 6 y 16 palabras, con alguna coma. */
+function lorSentence(classic) {
+  const n = 6 + lorRnd(11), w = lorWords(n, classic);
+  if (n > 9) w[Math.floor(n / 2)] += ',';
+  return lorCap(w.join(' ')) + '.';
+}
+const lorParagraph = classic => Array.from({ length: 3 + lorRnd(3) }, (_, i) => lorSentence(classic && i === 0)).join(' ');
+/** Texto de relleno: n párrafos (p), frases (s), palabras (w) o líneas de lista (li). */
+function loremText(n, unit, classic) {
+  n = Math.max(1, Math.min(200, Math.floor(+n) || 1));
+  if (unit === 'w') return lorCap(lorWords(n, classic).join(' ')) + '.';
+  if (unit === 's') return Array.from({ length: n }, (_, i) => lorSentence(classic && i === 0)).join(' ');
+  if (unit === 'li') return Array.from({ length: n }, (_, i) => '- ' + lorCap(lorWords(3 + lorRnd(5), classic && i === 0).join(' '))).join('\n');
+  return Array.from({ length: n }, (_, i) => lorParagraph(classic && i === 0)).join('\n\n');
+}
+function lorRun(add) {
+  const t = loremText($('#lorN').value, $('#lorUnit').value, $('#lorClassic').checked);
+  const ta = $('#txIn');
+  txPrev = ta.value;
+  ta.value = add && ta.value.trim() ? ta.value.replace(/\s*$/, '') + '\n\n' + t : t;
+  txStats();
+  toast('Texto de relleno generado', 'success', 1600);
+}
+$('#lorGen').addEventListener('click', () => lorRun(false));
+$('#lorAdd').addEventListener('click', () => lorRun(true));
 /* =====================================================================
    HERRAMIENTAS · LISTAS (separar, limpiar, seleccionar, unir y comparar)
    ===================================================================== */
@@ -9648,14 +9725,21 @@ lsRender();
 DEV_HELP.lists = {
   what: 'Convierte una lista de valores (pegada de Excel, de un correo, de una consulta…) en el formato que necesites: separada por <code>OR</code>, como <code>IN (…)</code> de SQL, JSON, regex… Además la limpia, te deja elegir qué valores usar y compara dos listas.',
   uses: ['Montar la condición de una consulta con muchos identificadores: <code>ID IN (\'A1\', \'B2\', …)</code>. Si pasan de 1000 (límite de Oracle), la parte sola en varios <code>IN</code> unidos con <code>OR</code>.', 'Preparar búsquedas con <code>OR</code> para un buscador, un filtro de correo o Jira.', 'Quitar duplicados y saber <b>cuáles</b> se repiten y cuántas veces.', 'Separar una lista en dos grupos (marcados y sin marcar) para tratarlos de forma distinta.', 'Cruzar dos extracciones: qué está solo en una, solo en la otra o en las dos.'],
-  how: ['Pega la lista. Se separa sola por líneas, tabuladores, punto y coma, comas o espacios (o elige el separador).', 'Ajusta la limpieza: espacios, vacíos, comillas, duplicados, orden y mayúsculas.', '<b>Seleccionar y unir</b>: desmarca los valores que no quieras; filtra para marcar o desmarcar muchos a la vez.', '<b>Comparar</b>: pega una segunda lista y obtén las diferencias y coincidencias.', 'Elige el <b>formato de salida</b> y copia el resultado.'],
+  how: ['<b>Pega la lista</b> en el cuadro de arriba, tal y como la tengas: una columna de Excel, valores con comas, un correo… Debajo del selector verás por dónde la ha separado («Detectado: saltos de línea»); si se equivoca, elígelo tú en <b>Separar por</b>.', '<b>Límpiala</b> con las casillas: quitar espacios sobrantes, líneas vacías, comillas o duplicados. En la barra gris verás cuántos valores hay, cuántos son distintos y cuáles se repiten.', '<b>Elige qué valores quieres</b> (pestaña ✅ Seleccionar y unir): todos vienen marcados; desmarca los que no te interesen, o usa el filtro con «Marcar filtrados». Lo marcado sale en el Grupo 1 y lo demás en el Grupo 2, por si quieres tratarlos aparte.', '<b>Elige el formato de salida</b> abajo: <i>SQL: IN</i>, <i>valor OR valor</i>, JSON, CSV, regex… Para SQL puedes poner el nombre de la columna y el máximo por <code>IN</code>.', '<b>Copia el resultado</b> con el botón 📋 del cuadro que quieras. Para cruzar dos listas, cambia a <b>⚖️ Comparar con otra lista</b> y pega la segunda.'],
   tip: 'Con «Ignorar mayúsculas y tildes», «Ávila», «AVILA» y «avila» cuentan como el mismo valor al quitar duplicados y al comparar.',
   examples: [
-    { label: 'IN de SQL con duplicados', fn: () => { setVal('lsIn', '28001\n28002\n28005\n28001\n28013\n  28002 \n\n28045'); setVal('lsPreset', 'sqlin', 'change'); setVal('lsCol', 'COD_POSTAL'); $('#lsDedupe').checked = true; lsRender(); exampleLoaded('Mira el aviso de repetidos y el resultado SQL'); } },
-    { label: 'Columna de Excel → OR', fn: () => { setVal('lsIn', 'Madrid\nSevilla\nValencia\nBilbao\nZaragoza'); setVal('lsPreset', 'or', 'change'); setVal('lsQuote', '"', 'change'); lsRender(); exampleLoaded('Desmarca alguna ciudad y mírala en el grupo 2'); } },
-    { label: 'Comparar dos listas', fn: () => { setVal('lsIn', 'EXP-001\nEXP-002\nEXP-003\nEXP-004'); $('#lsMode [data-m=cmp]').click(); setVal('lsInB', 'EXP-003, EXP-004, EXP-005'); setVal('lsPreset', 'lines', 'change'); lsRender(); exampleLoaded('Solo en A, solo en B y en las dos'); } }
+    { label: 'Excel → IN de SQL', fn: () => { $('#lsMode [data-m=pick]').click(); setVal('lsIn', '2026/0042\n2026/0043\n2026/0051\n2026/0042\n2026/0067\n  2026/0051 \n\n2026/0088'); setVal('lsPreset', 'sqlin', 'change'); setVal('lsCol', 'NUM_EXPEDIENTE'); $('#lsDedupe').checked = true; lsRender(); exampleLoaded('Columna pegada de Excel: abajo tienes el IN listo, sin los repetidos'); } },
+    { label: 'Buscar con OR', fn: () => { $('#lsMode [data-m=pick]').click(); setVal('lsIn', 'Madrid\nSevilla\nValencia\nBilbao\nZaragoza'); setVal('lsPreset', 'or', 'change'); setVal('lsQuote', '"', 'change'); lsRender(); exampleLoaded('Desmarca alguna ciudad y mírala en el grupo 2'); } },
+    { label: 'Comparar dos listas', fn: () => { setVal('lsIn', 'EXP-001\nEXP-002\nEXP-003\nEXP-004'); $('#lsMode [data-m=cmp]').click(); setVal('lsInB', 'EXP-003, EXP-004, EXP-005'); setVal('lsPreset', 'lines', 'change'); lsRender(); exampleLoaded('Solo en A (faltan en B), solo en B y en las dos'); } }
   ]
 };
+/* Los mismos ejemplos, a la vista en el propio panel (no todo el mundo abre la ayuda). */
+$('#lsExamples').innerHTML = '<span class="muted small">¿No sabes por dónde empezar? Prueba con un ejemplo:</span>'
+  + DEV_HELP.lists.examples.map((e, i) => `<button class="btn sm" data-lsx="${i}">✨ ${esc(e.label)}</button>`).join('');
+$('#lsExamples').addEventListener('click', e => {
+  const b = e.target.closest('[data-lsx]'); if (!b) return;
+  DEV_HELP.lists.examples[+b.dataset.lsx].fn();
+});
 /* =====================================================================
    REGEX · PROBAR, EXPLICAR, CONSTRUIR, INFERIR, BIBLIOTECA Y CÓDIGO
    ===================================================================== */

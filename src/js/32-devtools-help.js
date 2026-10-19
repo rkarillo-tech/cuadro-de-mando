@@ -93,8 +93,8 @@ const DEV_HELP = {
   },
   text: {
     what: 'Contador y transformaciones rápidas de texto.',
-    uses: ['Contar caracteres o palabras para campos con límite (asuntos, SMS, resúmenes, redes sociales).', 'Convertir nombres a <code>camelCase</code>, <code>snake_case</code> o <code>CONSTANT_CASE</code> para código o columnas de base de datos.', 'Generar <i>slugs</i> para URL o nombres de fichero.', 'Limpiar listas: ordenar, quitar duplicados y líneas vacías, numerar.', 'Quitar tildes para sistemas antiguos que no las admiten.'],
-    how: ['Pega el texto: encima de los botones verás caracteres, palabras, líneas, bytes y tiempo de lectura.', 'Pulsa una transformación; las de formato de código se aplican línea a línea.', '<b>Deshacer</b> recupera el texto anterior.'],
+    uses: ['Contar caracteres o palabras para campos con límite (asuntos, SMS, resúmenes, redes sociales).', 'Generar texto de relleno («lorem ipsum») para maquetar una pantalla, un documento o probar un campo.', 'Convertir nombres a <code>camelCase</code>, <code>snake_case</code> o <code>CONSTANT_CASE</code> para código o columnas de base de datos.', 'Generar <i>slugs</i> para URL o nombres de fichero.', 'Limpiar listas: ordenar, quitar duplicados y líneas vacías, numerar.', 'Quitar tildes para sistemas antiguos que no las admiten.'],
+    how: ['Pega el texto: encima de los botones verás caracteres, palabras, líneas, bytes y tiempo de lectura.', 'Pulsa una transformación; las de formato de código se aplican línea a línea.', '<b>Deshacer</b> recupera el texto anterior.', 'Abajo del todo, <b>Texto de relleno</b> genera «lorem ipsum» para maquetar o para probar: eliges cuántos párrafos, frases, palabras o líneas de lista, y <b>＋ Añadir</b> lo pega a continuación de lo que ya hay.'],
     examples: [{ label: 'Cargar ejemplo', fn: () => { setVal('txIn', 'Fecha de Presentación\nNúmero de Expediente\nnombre del interesado\nFecha de Presentación\n\nImporte Total'); exampleLoaded('Prueba «Quitar duplicadas», «snake_case» o «Ordenar A→Z»'); } }]
   }
 };

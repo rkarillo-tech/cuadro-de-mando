@@ -255,12 +255,43 @@ function deleteTodo(id) {
   save.todos(); refreshTodoViews();
   toast(`Tarea «${t.text.slice(0, 40)}» eliminada`, 'info', 6000, { label: 'Deshacer', fn: () => { S.todos.splice(Math.min(i, S.todos.length), 0, t); save.todos(); refreshTodoViews(); } });
 }
-function todoToKanban(id) {
+/**
+ * Lleva una tarea al Kanban. Por defecto la mueve (deja de estar en Tareas) para no tener
+ * lo mismo en dos sitios; con keep = true se queda también como tarea, y entonces las dos
+ * copias son independientes: completar una no completa la otra.
+ */
+function todoToKanban(id, { keep = false } = {}) {
   const t = getTodo(id); if (!t) return;
-  S.tasks.push({ id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() });
-  S.todos = S.todos.filter(x => x.id !== id);
-  save.tasks(); save.todos(); renderBoard(); refreshTodoViews();
-  toast('Tarea pasada al Kanban', 'success', 5000, { label: 'Ver', fn: () => showTab('kanban') });
+  const card = { id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() };
+  S.tasks.push(card);
+  const i = S.todos.findIndex(x => x.id === id);
+  if (!keep) S.todos.splice(i, 1);
+  save.tasks(); if (!keep) save.todos();
+  renderBoard(); refreshTodoViews();
+  toast(keep ? 'Copiada al Kanban (sigue en Tareas)' : 'Tarea pasada al Kanban', 'success', 6000, {
+    label: 'Deshacer',
+    fn: () => {
+      S.tasks = S.tasks.filter(x => x.id !== card.id);
+      if (!keep && !getTodo(id)) S.todos.splice(Math.min(i, S.todos.length), 0, t);
+      save.tasks(); save.todos(); renderBoard(); refreshTodoViews();
+    }
+  });
+}
+/** Pregunta si mover o copiar antes de llevarla al Kanban. */
+async function todoToKanbanAsk(id) {
+  const t = getTodo(id); if (!t) return;
+  const r = await modal({
+    title: '📋 Pasar «' + (t.text.length > 40 ? t.text.slice(0, 40) + '…' : t.text) + '» al Kanban',
+    body: `<p class="small">La tarjeta se crea en la columna <b>Por hacer</b> con su fecha, etiquetas, prioridad y pasos.</p>
+      <p class="hint">Lo normal es <b>moverla</b>: así cada cosa está en un sitio y no tienes que acordarte de darla por hecha dos veces. <b>Copiarla</b> es útil si quieres seguir viéndola en tu lista del día mientras avanza en el tablero, pero las dos quedan sueltas: completar una no completa la otra.</p>`,
+    actions: [
+      { label: 'Cancelar', value: null, cls: 'ghost' },
+      { label: 'Copiar (dejarla en Tareas)', value: 'copy', cls: '' },
+      { label: '➡️ Mover al Kanban', value: 'move', cls: 'primary' }
+    ]
+  });
+  if (!r) return;
+  todoToKanban(id, { keep: r.action === 'copy' });
 }
 
 async function openTodo(id) {
@@ -328,7 +359,7 @@ async function openTodo(id) {
   if (!t.tags.length) delete t.tags;
   if (t.repeat && !t.due) t.due = todayKey();
   save.todos();
-  if (r.action === 'kanban') { todoToKanban(id); return; }
+  if (r.action === 'kanban') { todoToKanbanAsk(id); return; }
   refreshTodoViews();
 }
 

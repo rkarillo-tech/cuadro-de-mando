@@ -54,8 +54,8 @@ with sync_playwright() as p:
     pg.click('#lsMode [data-m=pick]')
     fill('lsIn','x\ny\nx\nx'); pg.click('#lsStats a[data-ls=dups]'); pg.wait_for_timeout(150)
     ok('× 3' in pg.inner_text('#modal'),'lista de repetidos con veces'); pg.keyboard.press('Escape')
-    pg.click('.tool-pane[data-pane=lists] [data-example="0"]'); pg.wait_for_timeout(200)
-    ok('COD_POSTAL IN' in out('lsOut1'),'ejemplos de la ayuda')
+    pg.click('.tool-pane[data-pane=lists] [data-example="0"]'); pg.wait_for_timeout(300)
+    ok('NUM_EXPEDIENTE IN' in out('lsOut1'),'ejemplos de la ayuda')
     pg.screenshot(path=SC+'/listas.png', full_page=False)
     # ================= ETIQUETAS =================
     pg.evaluate("""()=>{const a=createNote('Acta comité','<div>Revisión del #proyecto/portal con #Reunión semanal</div><pre data-lang="c">#include stdio</pre><div><a href="https://x.org/#ancla">enlace</a></div>',false);

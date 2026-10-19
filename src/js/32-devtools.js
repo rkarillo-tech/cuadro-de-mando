@@ -451,3 +451,40 @@ $('#txBtns').addEventListener('click', e => {
 });
 $('#txIn').addEventListener('input', txStats);
 function initDevtools() { initDevHelp(); initRegex(); setTool(store.get('devTool', 'json')); }
+
+/* ---------- Texto de relleno (Lorem ipsum) ---------- */
+const LOREM_WORDS = ('lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum curabitur pretium tincidunt lacus gravida orci odio nullam varius turpis pharetra eros suscipit mauris aenean posuere vitae mattis sem integer euismod lacinia nibh libero molestie ligula facilisis vestibulum nisl porta congue').split(' ');
+const LOREM_START = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'.split(' ');
+const lorRnd = n => Math.floor(Math.random() * n);
+const lorCap = s => s.charAt(0).toUpperCase() + s.slice(1);
+/** n palabras; con «classic», las primeras son las del lorem ipsum de toda la vida. */
+function lorWords(n, classic) {
+  const out = classic ? LOREM_START.slice(0, n) : [];
+  while (out.length < n) out.push(LOREM_WORDS[lorRnd(LOREM_WORDS.length)]);
+  return out;
+}
+/** Una frase de entre 6 y 16 palabras, con alguna coma. */
+function lorSentence(classic) {
+  const n = 6 + lorRnd(11), w = lorWords(n, classic);
+  if (n > 9) w[Math.floor(n / 2)] += ',';
+  return lorCap(w.join(' ')) + '.';
+}
+const lorParagraph = classic => Array.from({ length: 3 + lorRnd(3) }, (_, i) => lorSentence(classic && i === 0)).join(' ');
+/** Texto de relleno: n párrafos (p), frases (s), palabras (w) o líneas de lista (li). */
+function loremText(n, unit, classic) {
+  n = Math.max(1, Math.min(200, Math.floor(+n) || 1));
+  if (unit === 'w') return lorCap(lorWords(n, classic).join(' ')) + '.';
+  if (unit === 's') return Array.from({ length: n }, (_, i) => lorSentence(classic && i === 0)).join(' ');
+  if (unit === 'li') return Array.from({ length: n }, (_, i) => '- ' + lorCap(lorWords(3 + lorRnd(5), classic && i === 0).join(' '))).join('\n');
+  return Array.from({ length: n }, (_, i) => lorParagraph(classic && i === 0)).join('\n\n');
+}
+function lorRun(add) {
+  const t = loremText($('#lorN').value, $('#lorUnit').value, $('#lorClassic').checked);
+  const ta = $('#txIn');
+  txPrev = ta.value;
+  ta.value = add && ta.value.trim() ? ta.value.replace(/\s*$/, '') + '\n\n' + t : t;
+  txStats();
+  toast('Texto de relleno generado', 'success', 1600);
+}
+$('#lorGen').addEventListener('click', () => lorRun(false));
+$('#lorAdd').addEventListener('click', () => lorRun(true));

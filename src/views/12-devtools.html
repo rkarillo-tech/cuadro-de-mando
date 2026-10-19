@@ -245,6 +245,7 @@
             </div>
           </div>
         </div>
+        <div class="row" id="lsExamples" style="margin-top:8px"></div>
         <div class="status-line ls-stats" id="lsStats"></div>
         <div class="seg" id="lsMode"><button data-m="pick" class="on">✅ Seleccionar y unir</button><button data-m="cmp">⚖️ Comparar con otra lista</button></div>
 
@@ -282,5 +283,13 @@
         <textarea class="field" id="txIn" rows="10" placeholder="Pega aquí un texto para contarlo o transformarlo…"></textarea>
         <div class="small muted" id="txStats" style="margin:8px 0"></div>
         <div class="row" id="txBtns"></div>
+        <div class="row" id="txLorem" style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+          <span class="lbl" style="margin:0">Texto de relleno</span>
+          <input class="field" type="number" id="lorN" value="3" min="1" max="200" style="max-width:80px" title="Cuántos quieres">
+          <select class="field" id="lorUnit" style="max-width:150px"><option value="p">párrafos</option><option value="s">frases</option><option value="w">palabras</option><option value="li">líneas de lista</option></select>
+          <label class="check-row"><input type="checkbox" class="check" id="lorClassic" checked> Empezar por «Lorem ipsum»</label>
+          <button class="btn sm primary" id="lorGen">✨ Generar</button>
+          <button class="btn sm ghost" id="lorAdd" title="Añadir al final de lo que ya hay">＋ Añadir</button>
+        </div>
       </div>
     </section>

@@ -56,7 +56,7 @@
               <option value="0">Nunca</option><option value="5">5 minutos</option><option value="15">15 minutos</option><option value="30">30 minutos</option><option value="60">1 hora</option>
             </select>
           </div>
-          <p class="hint">Con el bloqueo activado, todos los datos se guardan cifrados (AES-256-GCM) y hace falta la contraseña para abrir la app. La contraseña no se guarda en ningún sitio: si la olvidas, solo podrás recuperar los datos desde una copia de seguridad.</p>
+          <p class="hint">Con el bloqueo activado, todos los datos se guardan cifrados (AES-256-GCM) y hace falta la contraseña para abrir la app. La contraseña no se guarda en ningún sitio: si la olvidas, solo podrás recuperar los datos desde una copia de seguridad. Se pide al abrir la app; mientras la tengas abierta no vuelve a pedirla. El bloqueo se activa <b>en cada equipo por separado</b>, también si compartes un archivo vinculado.</p>
         </div>
 
         <div class="card" id="histCard">
@@ -91,7 +91,7 @@
           <div class="card-h"><h3>🗄️ Guardar en un archivo de tu disco</h3></div>
           <div class="status-line" id="fsStatus"></div>
           <div class="row" id="fsBtns"></div>
-          <p class="hint" id="fsHint"><b>Vincular nuevo archivo</b>: eliges dónde crear un .json (mejor en una carpeta de OneDrive o Dropbox) y la app lo reescribe sola tras cada cambio. <b>Abrir archivo existente</b>: para usar en este equipo un archivo que ya creaste en otro. Si el bloqueo está activado, el archivo se guarda cifrado; si no, en claro. Solo guarda la última versión (para volver atrás, usa el historial). Disponible en Chrome, Edge y Brave.</p>
+          <p class="hint" id="fsHint"><b>Vincular nuevo archivo</b>: eliges dónde crear un .json (mejor en una carpeta de OneDrive o Dropbox) y la app lo reescribe sola tras cada cambio. <b>Abrir archivo existente</b>: para usar en este equipo un archivo que ya creaste en otro. Si el bloqueo está activado, el archivo se guarda cifrado; si no, en claro. <b>El bloqueo es de cada equipo</b>: si cifras en uno, activa también el bloqueo en los demás con la misma contraseña (al abrir ahí el archivo te la pedirá y se ofrecerá a hacerlo solo). Mientras tanto, ese equipo no guardará nada en el archivo, para no dejarlo sin cifrar. Solo guarda la última versión (para volver atrás, usa el historial). Disponible en Chrome, Edge y Brave.</p>
         </div>
 
         <div class="card">

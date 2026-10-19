@@ -48,7 +48,8 @@ async function exportBackupDialog() {
   renderSettings(); renderNotices();
   toast(enc ? 'Copia cifrada descargada' : 'Copia de seguridad descargada (sin cifrar)', 'success');
 }
-async function askBackupPassword(o) {
+/** Pide la contraseña de una copia cifrada. Si se pasa «out», deja ahí la contraseña acertada. */
+async function askBackupPassword(o, out = null) {
   if (CRYPT && o.kdf && o.kdf.salt === CRYPT.salt) { try { return await openBackup(o, null); } catch {} }
   for (;;) {
     const r = await modal({
@@ -57,7 +58,7 @@ async function askBackupPassword(o) {
       actions: [{ label: 'Cancelar', value: null, cls: 'ghost' }, { label: 'Descifrar', value: 'ok', cls: 'primary' }]
     });
     if (!r) return null;
-    try { return await openBackup(o, r.data.p); } catch { toast('Contraseña incorrecta', 'danger'); }
+    try { const d = await openBackup(o, r.data.p); if (out) out.pass = r.data.p; return d; } catch { toast('Contraseña incorrecta', 'danger'); }
   }
 }
 async function importBackupFile(file, { fromLock = false } = {}) {
@@ -99,6 +100,7 @@ async function enableLockDialog() {
   flushNote();
   try {
     await enableLock(r.data.p1);
+    touchData();                       // para que los otros dispositivos se enteren
     renderSettings(); fileSyncSchedule();
     histRekey(null, CRYPT);
     toast('Bloqueo activado: tus datos ya se guardan cifrados', 'success', 4000);
@@ -123,6 +125,7 @@ async function changePasswordDialog() {
   if (!r) return;
   const oldC = CRYPT;
   await changeLockPassword(r.data.p1);
+  touchData();
   fileSyncSchedule();
   histRekey(oldC, CRYPT);
   toast('Contraseña cambiada', 'success');
@@ -132,6 +135,7 @@ async function disableLockDialog() {
   if (!(await confirmDialog('Los datos volverán a guardarse sin cifrar en este navegador. ¿Desactivar el bloqueo?', 'Desactivar', true))) return;
   const oldC = CRYPT;
   await disableLock();
+  touchData();
   renderSettings(); fileSyncSchedule();
   histRekey(oldC, null);
   toast('Bloqueo desactivado', 'info');
@@ -189,20 +193,27 @@ $('#lockForgot').addEventListener('click', async () => {
 /* ---------- Archivo en disco (File System Access API) ---------- */
 const FS_OK = typeof window.showSaveFilePicker === 'function' && window.isSecureContext;
 let fsHandle = null, fsState = FS_OK ? 'none' : 'unsupported', fsTimer = null, fsLastWrite = 0, fsErr = '', fsBusy = false;
-let fsSeenMtime = 0, fsSeenLc = 0, fsAsking = false, fsLastCheck = 0, fsSyncing = false;   // fecha de modificación del archivo la última vez que lo leímos o escribimos: si cambia, lo tocó otro dispositivo
+let fsSeenMtime = 0, fsSeenLc = 0, fsAsking = false, fsLastCheck = 0, fsSyncing = false;
+let fsEnc = null;   // ¿el archivo vinculado está cifrado? (null = aún no lo sabemos)   // fecha de modificación del archivo la última vez que lo leímos o escribimos: si cambia, lo tocó otro dispositivo
 function idbOpen() { return new Promise((res, rej) => { const r = indexedDB.open('cdm-fs', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
 async function idbReq(mode, fn) { const db = await idbOpen(); return new Promise((res, rej) => { const tx = db.transaction('kv', mode); const req = fn(tx.objectStore('kv')); tx.oncomplete = () => res(req && req.result); tx.onerror = () => rej(tx.error); }); }
 const idbGet = k => idbReq('readonly', s => s.get(k));
 const idbSet = (k, v) => idbReq('readwrite', s => s.put(v, k));
 const idbDel = k => idbReq('readwrite', s => s.delete(k));
 const fsName = () => fsHandle ? fsHandle.name : '';
+/** Anota si el archivo vinculado está cifrado (se consulta antes de escribir, para no descifrarlo). */
+async function fsRememberEnc(enc) { fsEnc = !!enc; try { await idbSet('seenEnc', fsEnc); } catch {} }
 const fsLinkedOk = () => fsState === 'ok';
 const fsNeedsPermission = () => fsState === 'perm';
 const FS_TYPES = [{ description: 'Datos del Cuadro de Mando', accept: { 'application/json': ['.json'] } }];
 
 async function fsInit() {
   if (!FS_OK) { renderFs(); return; }
-  try { fsHandle = await idbGet('sync'); fsSeenMtime = +(await idbGet('seenMtime')) || 0; fsSeenLc = +(await idbGet('seenLc')) || 0; } catch { fsHandle = null; }
+  try {
+    fsHandle = await idbGet('sync');
+    fsSeenMtime = +(await idbGet('seenMtime')) || 0; fsSeenLc = +(await idbGet('seenLc')) || 0;
+    const e = await idbGet('seenEnc'); fsEnc = e == null ? null : !!e;
+  } catch { fsHandle = null; }
   if (!fsHandle) { fsState = 'none'; renderFs(); return; }
   let p = 'prompt';
   try { p = await fsHandle.queryPermission({ mode: 'readwrite' }); } catch {}
@@ -223,11 +234,17 @@ async function fsWrite() {
   try {
     // ¿Lo ha cambiado otro dispositivo desde la última vez? Entonces no se pisa: se pregunta (y se puede combinar)
     if (await fsExternallyChanged()) { fsBusy = false; await fsCheckNewer(true); return; }
+    // El archivo está cifrado y aquí no hay bloqueo: no se sobrescribe en claro (deshacía el cifrado)
+    if (!CRYPT) {
+      if (fsEnc === null) { try { const f = await fsHandle.getFile(); await fsRememberEnc((JSON.parse(await f.text()) || {}).encrypted); } catch { await fsRememberEnc(false); } }
+      if (fsEnc) { fsState = 'enc'; fsBusy = false; renderFs(); return; }
+    }
     const obj = CRYPT ? await backupEncrypted(CRYPT.key, CRYPT.salt, CRYPT.iter) : backupPlain();
     const w = await fsHandle.createWritable();
     await w.write(JSON.stringify(obj));
     await w.close();
     await fsRememberMtime(0, obj.lastChange);
+    await fsRememberEnc(!!CRYPT);
     fsLastWrite = fsLastCheck = Date.now(); fsErr = '';
   } catch (e) {
     fsErr = (e && e.message) || 'Error al escribir';
@@ -274,6 +291,49 @@ function syncLoopOk() {
   return a.length <= 4;
 }
 const syncLoopReset = () => { try { sessionStorage.removeItem(SYNC_RELOADS); } catch {} };
+/**
+ * Tras descifrar el archivo con una contraseña: ofrece usar esa misma contraseña para el bloqueo
+ * de este equipo. Así este equipo no vuelve a dejar el archivo sin cifrar y, al compartir la misma
+ * clave (misma «sal»), ninguno de los dos tiene que teclearla cada vez que lee el archivo.
+ */
+async function fsOfferLockHere(pass, kdf, { ask = true } = {}) {
+  if (!pass || !kdf || !kdf.salt) return false;
+  const has = lockEnabled();
+  if (has && CRYPT.salt === kdf.salt) return false;         // ya comparten clave
+  if (!ask && !has) return fsLockHere(pass, kdf, null);     // lo acaba de pedir el usuario
+  const msg = has
+    ? 'El archivo está cifrado con una contraseña distinta a la de este equipo. ¿Quieres usar la del archivo también aquí? Así no te la volverá a pedir.'
+    : 'El archivo está cifrado, pero en este equipo los datos se guardan sin cifrar, así que al guardar lo dejaría sin cifrar. ¿Activas aquí el bloqueo con esa misma contraseña?';
+  if (!(await confirmDialog(msg, has ? 'Usar la del archivo' : 'Activar el bloqueo aquí', false))) return false;
+  return fsLockHere(pass, kdf, has ? CRYPT : null);
+}
+/** Activa (o realinea) el bloqueo de este equipo con la clave del archivo. */
+async function fsLockHere(pass, kdf, oldC) {
+  try {
+    flushNote();
+    if (oldC) await changeLockPassword(pass, kdf.salt, kdf.iter);
+    else await enableLock(pass, kdf.salt, kdf.iter);
+    histRekey(oldC, CRYPT);
+    renderSettings();
+    toast('🔒 Bloqueo activado en este equipo con la contraseña del archivo', 'success', 4000);
+    return true;
+  } catch (e) { toast('No se pudo activar el bloqueo: ' + ((e && e.message) || e), 'danger', 5000); return false; }
+}
+/** Pide la contraseña del archivo cifrado y activa aquí el bloqueo con ella. */
+async function fsFixEncrypted() {
+  if (!fsHandle) return;
+  let o = null;
+  try { o = (await fsRead(fsHandle)).o; } catch {}
+  if (!o || !o.encrypted) { await fsRememberEnc(false); fsState = 'ok'; renderFs(); return; }
+  const got = {};
+  const data = await askBackupPassword(o, got);
+  if (!data) return;
+  const done = await fsOfferLockHere(got.pass, o.kdf, { ask: false });
+  got.pass = '';
+  if (!done && !CRYPT) return;              // sigue sin bloqueo: no se toca el archivo
+  fsState = 'ok'; fsErr = ''; renderFs();
+  await fsCheckNewer(true);
+}
 /** Compara el archivo con los datos de este navegador. external = otro dispositivo lo ha modificado. */
 async function fsCheckNewer(external = false) {
   if ((fsBusy && !external) || fsAsking) return;
@@ -281,11 +341,17 @@ async function fsCheckNewer(external = false) {
   try {
     const { o, empty, mtime } = await fsRead(fsHandle);
     if (empty || !isBackup(o)) { fsAsking = false; await fsWrite(); return; }
+    await fsRememberEnc(o.encrypted);
     const fileLc = +o.lastChange || 0, mine = +MEM.lastChange || 0;
     external = external || (fsSeenLc && fileLc !== fsSeenLc);
     if (fileLc > mine + 1000 || (external && fileLc !== mine)) {
-      const data = o.encrypted ? await askBackupPassword(o) : o.data;
-      if (!data) { fsState = 'conflict'; renderFs(); return; }
+      const got = {};
+      const data = o.encrypted ? await askBackupPassword(o, got) : o.data;
+      if (!data) { fsState = o.encrypted && !CRYPT ? 'enc' : 'conflict'; renderFs(); return; }
+      if (got.pass) { await fsOfferLockHere(got.pass, o.kdf); got.pass = ''; }
+      // Sigue sin bloqueo en este equipo: no se traen aquí en claro unos datos que el archivo
+      // guarda cifrados (y tampoco podríamos escribir en él). Se avisa y se espera la contraseña.
+      if (o.encrypted && !CRYPT) { fsState = 'enc'; fsAsking = false; renderFs(); return; }
       flushNote();
       const local = JSON.parse(JSON.stringify(MEM)), merged = mergeData(local, data);
       // El archivo no trae nada nuevo: ni se recarga ni se pregunta. Si además el contenido ya es
@@ -346,6 +412,7 @@ async function fsLinkNew() {
   catch (e) { if (e.name !== 'AbortError') toast('No se pudo vincular: ' + e.message, 'danger', 5000); return; }
   fsHandle = h; fsState = 'ok'; fsSeenMtime = 0; fsSeenLc = 0;
   try { await idbSet('sync', h); await idbSet('seenMtime', 0); } catch {}
+  await fsRememberEnc(!!CRYPT);     // archivo nuevo: lo que mande sea este equipo
   flushNote();
   await fsWrite();
   toast(`Vinculado a «${h.name}»: cada cambio se guardará ahí automáticamente`, 'success', 4500);
@@ -370,15 +437,20 @@ async function fsOpenExisting() {
   fsHandle = h;
   try { await idbSet('sync', h); } catch {}
   if (r.action === 'file') {
-    const data = o.encrypted ? await askBackupPassword(o) : o.data;
-    if (!data) return;
+    await fsRememberEnc(o.encrypted);
+    const got = {};
+    const data = o.encrypted ? await askBackupPassword(o, got) : o.data;
+    if (!data) { fsState = o.encrypted && !CRYPT ? 'enc' : fsState; renderFs(); return; }
+    if (got.pass) { await fsOfferLockHere(got.pass, o.kdf); got.pass = ''; }
     const res = await syncChoiceDialog(data, { mode: 'import', title: `🗄️ Cargar «${h.name}»`, otherLabel: 'el archivo' });
     if (!res.choice) return;
     await fsRememberMtime((await h.getFile()).lastModified, +o.lastChange || 0);
     await applySyncChoice(res, data, 'el archivo «' + h.name + '»');
     return;
   }
-  fsState = 'ok'; fsSeenMtime = 0; fsSeenLc = 0; await fsWrite();
+  fsState = 'ok'; fsSeenMtime = 0; fsSeenLc = 0;
+  await fsRememberEnc(!!CRYPT);     // se sobrescribe a propósito con lo de este equipo
+  await fsWrite();
   toast(`Vinculado a «${h.name}»`, 'success');
 }
 async function fsReconnect() {
@@ -389,8 +461,8 @@ async function fsReconnect() {
 }
 async function fsUnlink() {
   fsHandle = null; fsState = FS_OK ? 'none' : 'unsupported'; clearTimeout(fsTimer); fsTimer = null;
-  fsSeenMtime = 0; fsSeenLc = 0;
-  try { await idbDel('sync'); await idbDel('seenMtime'); await idbDel('seenLc'); } catch {}
+  fsSeenMtime = 0; fsSeenLc = 0; fsEnc = null;
+  try { await idbDel('sync'); await idbDel('seenMtime'); await idbDel('seenLc'); await idbDel('seenEnc'); } catch {}
   renderFs(); renderNotices();
   toast('Archivo desvinculado. El archivo sigue en tu disco.', 'info');
 }
@@ -408,6 +480,7 @@ function renderFsPill() {
   }
   else if (fsState === 'perm') { pill.classList.add('warn'); txt = '⚠️ Reconectar'; tip = `El navegador necesita que vuelvas a autorizar «${fsName()}». Pulsa para reconectar.`; }
   else if (fsState === 'conflict') { pill.classList.add('warn'); txt = '⚠️ Revisar'; tip = 'Hay cambios de otro dispositivo que necesitan tu decisión. Pulsa para verlos.'; }
+  else if (fsState === 'enc') { pill.classList.add('warn'); txt = '🔒 Archivo cifrado'; tip = `«${fsName()}» está cifrado y aquí no hay bloqueo, así que no se guarda nada en él. Pulsa para introducir la contraseña.`; }
   else if (fsErr) { pill.classList.add('err'); txt = '⛔ Error al guardar'; tip = fsErr; }
   else if (fsSyncing) { txt = '🔄 Sincronizando…'; tip = 'Combinando los cambios de otro dispositivo'; }
   else if (fsTimer || fsBusy) { txt = '⏳ Guardando…'; tip = `Guardando en «${fsName()}»`; }
@@ -429,6 +502,7 @@ $('#syncPill').addEventListener('click', () => {
   if (!fsHandle || fsState === 'none' || fsState === 'unsupported') { showTab('settings'); setTimeout(() => { const c = $('#fsCard'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
   else if (fsState === 'perm') fsReconnect();
   else if (fsState === 'conflict') { syncLoopReset(); fsCheckNewer(true); }
+  else if (fsState === 'enc') fsFixEncrypted();
   else fsSyncNow();
 });
 // Comprobación ligera cada minuto mientras la app está a la vista (solo mira la fecha del archivo)
@@ -446,6 +520,7 @@ function renderFs() {
     case 'ok': st = fsErr ? `🔴 Error al guardar en «${esc(fsName())}»: ${esc(fsErr)}` : `🟢 Guardando en «${esc(fsName())}»${fsLastWrite ? ` · última escritura a las ${fmtTime(fsLastWrite)}` : ''}${CRYPT ? ' · cifrado' : ''}`; btns = '<button class="btn" data-fs="write">💾 Guardar ahora</button><button class="btn" data-fs="new">🔗 Cambiar de archivo</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;
     case 'perm': st = `🟡 El navegador necesita que vuelvas a autorizar «${esc(fsName())}»`; btns = '<button class="btn primary" data-fs="reconnect">Reconectar</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;
     case 'conflict': st = `🟡 Guardado en pausa: hay diferencias con «${esc(fsName())}»`; btns = '<button class="btn primary" data-fs="resolve">Resolver</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;
+    case 'enc': st = `🔒 «${esc(fsName())}» está cifrado y este navegador guarda los datos sin cifrar. <b>No se guarda nada en el archivo</b> para no dejarlo sin cifrar. Introduce la contraseña y se activará aquí el bloqueo con ella.`; btns = '<button class="btn primary" data-fs="enc">🔑 Introducir la contraseña</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;
   }
   $('#fsStatus').innerHTML = st;
   $('#fsBtns').innerHTML = btns;
@@ -453,7 +528,7 @@ function renderFs() {
 }
 $('#fsBtns').addEventListener('click', e => {
   const b = e.target.closest('[data-fs]'); if (!b) return;
-  ({ new: fsLinkNew, open: fsOpenExisting, write: async () => { flushNote(); await fsWrite(); toast(fsErr ? 'No se pudo guardar' : 'Guardado en el archivo', fsErr ? 'danger' : 'success', 1800); }, unlink: fsUnlink, reconnect: fsReconnect, resolve: fsCheckNewer })[b.dataset.fs]();
+  ({ new: fsLinkNew, open: fsOpenExisting, write: async () => { flushNote(); await fsWrite(); toast(fsErr ? 'No se pudo guardar' : 'Guardado en el archivo', fsErr ? 'danger' : 'success', 1800); }, unlink: fsUnlink, reconnect: fsReconnect, resolve: fsCheckNewer, enc: fsFixEncrypted })[b.dataset.fs]();
 });
 
 /* ---------- Datos ---------- */

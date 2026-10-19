@@ -103,4 +103,47 @@ with sync_playwright() as p:
     ok(A.evaluate("()=>{ syncLoopReset(); return syncLoopOk() }") is True, 'y al revisarlo a mano vuelve a empezar')
     A.screenshot(path=_sys.argv[1] + '/sync_dos_equipos.png')
 
+    # ===== Bloqueo con contraseña y archivo compartido =====
+    CLAVE = 'contrasena-larga'
+    enc = lambda: bool(json.loads(FILE['txt']).get('encrypted'))
+    A.evaluate("(async()=>{ await enableLock('%s'); touchData(); renderSettings(); fileSyncSchedule(); })(); 0" % CLAVE)
+    A.wait_for_timeout(2600)
+    ok(enc(), 'al activar el bloqueo, el archivo pasa a guardarse cifrado')
+    ok(B.evaluate("fsExternallyChanged()") is True, 'el otro equipo se entera de que el archivo ha cambiado')
+    B.evaluate("fsSyncNow(); 0"); B.wait_for_timeout(1600)
+    ok(B.is_visible('#modal') and 'cifrad' in B.inner_text('#modal'), 'y le pide la contraseña del archivo')
+    B.fill('#modal input[type=password]', CLAVE); B.click('.modal-foot .btn.primary'); B.wait_for_timeout(1400)
+    ok(B.is_visible('#modal') and 'bloqueo' in B.inner_text('#modal'), 'tras acertarla, ofrece activar el bloqueo también en este equipo')
+    B.click('.modal-foot .btn.primary'); B.wait_for_timeout(2600)
+    ok(B.evaluate("lockEnabled()") is True and B.evaluate("CRYPT && CRYPT.salt") == json.loads(FILE['txt'])['kdf']['salt'], 'queda bloqueado con la misma clave que el archivo (así no la pide cada vez)')
+    n0 = len(WRITES)
+    B.evaluate("createNote('Cifrada en B','<div>b</div>',false); 0"); B.wait_for_timeout(2800)
+    ok(enc() and len(WRITES) > n0, 'y lo que guarda el segundo equipo sigue yendo cifrado')
+    A.evaluate("(async()=>{ if (await fsExternallyChanged()) await fsCheckNewer(true); })(); 0"); A.wait_for_timeout(3000)
+    ok(not A.is_visible('#modal'), 'el primer equipo recibe los cambios sin volver a pedir la contraseña')
+    A.wait_for_timeout(1200)
+    if A.is_visible('#lockScreen'):
+        A.fill('#lockPass', CLAVE); A.keyboard.press('Enter'); A.wait_for_timeout(2200)
+    ok('Cifrada en B' in titles(A), 'y los recibe bien: ' + str(titles(A)))
+
+    # ===== Un equipo sin bloqueo no deja el archivo sin cifrar =====
+    C = device('C')
+    C.evaluate("createNote('Nota de C','<div>c</div>',false); 0"); C.wait_for_timeout(700)
+    C.evaluate("(async()=>{ fsSeenMtime=1; fsSeenLc=1; await fsCheckNewer(true); })(); 0"); C.wait_for_timeout(2000)
+    ok(C.is_visible('#modal'), 'un equipo nuevo sin bloqueo pide la contraseña del archivo cifrado')
+    C.fill('#modal input[type=password]', CLAVE); C.click('.modal-foot .btn.primary'); C.wait_for_timeout(1400)
+    C.click('.modal-foot .btn.ghost'); C.wait_for_timeout(2000)       # dice que no al bloqueo
+    if C.is_visible('#modal'): C.keyboard.press('Escape'); C.wait_for_timeout(300)
+    n0 = len(WRITES)
+    C.evaluate("createNote('Otra de C','<div>c</div>',false); 0"); C.wait_for_timeout(3000)
+    ok(enc() and len(WRITES) == n0, 'si no activa el bloqueo, NO escribe en el archivo ni lo deja sin cifrar')
+    ok(C.evaluate("fsState") == 'enc' and 'cifrado' in C.inner_text('#syncPill'), 'el semáforo avisa: «Archivo cifrado»: ' + C.inner_text('#syncPill'))
+    C.screenshot(path=_sys.argv[1] + '/sync_cifrado.png')
+    C.click('#syncPill'); C.wait_for_timeout(1500)
+    ok(C.is_visible('#modal'), 'pulsando el semáforo se puede introducir la contraseña')
+    C.fill('#modal input[type=password]', CLAVE); C.click('.modal-foot .btn.primary'); C.wait_for_timeout(3000)
+    ok(C.evaluate("lockEnabled()") is True, 'y entonces sí queda bloqueado')
+    C.wait_for_timeout(2500)
+    ok(enc(), 'el archivo sigue cifrado en todo momento')
+
     print('ERRORS', [e for e in errs if 'Failed to load resource' not in e])

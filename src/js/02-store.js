@@ -196,11 +196,14 @@ async function unlockWith(pass) {
 const lockMeta = () => ls.get('lock', { enabled: false });
 const lockEnabled = () => !!(CRYPT && lockMeta().enabled);
 
-async function enableLock(pass) {
-  const salt = randBytes(16);
-  const key = await deriveKey(pass, salt, ITER);
-  const meta = { ...lockMeta(), enabled: true, salt: b64enc(salt), iter: ITER };
-  CRYPT = { key, salt: meta.salt, iter: ITER };
+async function enableLock(pass, saltB64 = null, iter = ITER) {
+  // con saltB64 se reutiliza la «sal» del archivo vinculado: así los dos equipos comparten
+  // exactamente la misma clave y ninguno tiene que pedir la contraseña al leerlo
+  const salt = saltB64 ? b64dec(saltB64) : randBytes(16);
+  iter = +iter || ITER;
+  const key = await deriveKey(pass, salt, iter);
+  const meta = { ...lockMeta(), enabled: true, salt: saltB64 || b64enc(salt), iter };
+  CRYPT = { key, salt: meta.salt, iter };
   ls.set('lock', meta);
   await flushEnc();
   if (!ls.raw('enc')) throw new Error('No se pudo escribir el bloque cifrado');
@@ -214,11 +217,12 @@ async function disableLock() {
   ls.del('enc');
   ls.set('lock', { ...lockMeta(), enabled: false, salt: undefined, iter: undefined });
 }
-async function changeLockPassword(pass) {
-  const salt = randBytes(16);
-  const key = await deriveKey(pass, salt, ITER);
-  CRYPT = { key, salt: b64enc(salt), iter: ITER };
-  ls.set('lock', { ...lockMeta(), enabled: true, salt: CRYPT.salt, iter: ITER });
+async function changeLockPassword(pass, saltB64 = null, iter = ITER) {
+  const salt = saltB64 ? b64dec(saltB64) : randBytes(16);
+  iter = +iter || ITER;
+  const key = await deriveKey(pass, salt, iter);
+  CRYPT = { key, salt: saltB64 || b64enc(salt), iter };
+  ls.set('lock', { ...lockMeta(), enabled: true, salt: CRYPT.salt, iter });
   await flushEnc();
 }
 async function verifyLockPassword(pass) {
@@ -271,6 +275,11 @@ async function replaceAllData(data, { keepNote = null, lastChange = 0 } = {}) {
   FROZEN = true; APP_READY = false;
 }
 
+/** Marca que algo ha cambiado (p. ej. el cifrado) para que los demás dispositivos lo detecten. */
+function touchData() {
+  MEM.lastChange = Date.now();
+  if (CRYPT) scheduleEncFlush(); else ls.set('lastChange', MEM.lastChange);
+}
 /** Acepta la marca de tiempo del archivo cuando el contenido ya es idéntico (evita reescrituras en bucle). */
 function adoptLastChange(ts) {
   ts = +ts || 0;

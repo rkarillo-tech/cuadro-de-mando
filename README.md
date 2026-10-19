@@ -7,7 +7,10 @@ funciona **sin conexión a internet y sin servidor**, y tus datos **nunca salen 
 ### ⬇️ [Descargar la última versión](https://github.com/rkarillo-tech/cuadro-de-mando/releases/latest/download/CuadroDeMando.html)
 
 > Guarda el archivo donde quieras y ábrelo con Chrome, Edge, Firefox o Safari. No hay que instalar nada.
+> También puedes usarlo directamente desde [rkarillo-tech.github.io/cuadro-de-mando](https://rkarillo-tech.github.io/cuadro-de-mando/), que siempre tiene la última versión.
 > Todas las versiones, con sus novedades, están en [Releases](https://github.com/rkarillo-tech/cuadro-de-mando/releases).
+
+📖 **[Guía para sacarle el máximo partido](GUIA.md)**: cómo encaja cada sección, casos prácticos de principio a fin, sincronización entre equipos y chuleta de atajos.
 
 ## Qué puedes hacer
 

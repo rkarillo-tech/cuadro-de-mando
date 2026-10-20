@@ -93,6 +93,22 @@
           <div class="row" id="fsBtns"></div>
           <p class="hint" id="fsHint"><b>Vincular nuevo archivo</b>: eliges dónde crear un .json (mejor en una carpeta de OneDrive o Dropbox) y la app lo reescribe sola tras cada cambio. <b>Abrir archivo existente</b>: para usar en este equipo un archivo que ya creaste en otro. Si el bloqueo está activado, el archivo se guarda cifrado; si no, en claro. <b>El bloqueo es de cada equipo</b>: si cifras en uno, activa también el bloqueo en los demás con la misma contraseña (al abrir ahí el archivo te la pedirá y se ofrecerá a hacerlo solo). Mientras tanto, ese equipo no guardará nada en el archivo, para no dejarlo sin cifrar. Solo guarda la última versión (para volver atrás, usa el historial). Disponible en Chrome, Edge y Brave.</p>
         </div>
+        <div class="card" id="cpCard">
+          <div class="card-h"><h3>💾 Copias automáticas con fecha</h3></div>
+          <div class="status-line" id="cpStatus"></div>
+          <div class="row" id="cpBtns"></div>
+          <div class="form-grid" id="cpOpts" hidden style="margin-top:10px">
+            <div><label class="lbl" for="cpEvery">Hacer una copia</label>
+              <select class="field" id="cpEvery">
+                <option value="open">Cada vez que abro la app</option>
+                <option value="day">Una vez al día</option>
+                <option value="week">Una vez a la semana</option>
+              </select></div>
+            <div><label class="lbl" for="cpKeep">Copias que se conservan</label><input class="field" type="number" id="cpKeep" min="1" max="365" value="10"></div>
+          </div>
+          <p class="hint">El archivo vinculado guarda <b>solo la última versión</b>: si algo se estropea ahí, se estropea para todos los dispositivos. Esto es lo otro: una copia <b>con fecha</b> en la carpeta que elijas, y se van borrando las más antiguas. Elige una carpeta <b>distinta</b> de la del archivo vinculado (otro disco u otra nube): así te cubre también si esa carpeta falla. Si el bloqueo está activado, las copias se guardan cifradas con tu contraseña. Disponible en Chrome, Edge y Brave de ordenador.</p>
+        </div>
+
 
         <div class="card">
           <div class="card-h"><h3>🎨 Personalización</h3></div>

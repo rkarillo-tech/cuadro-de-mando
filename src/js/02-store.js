@@ -10,7 +10,7 @@
   Claves que siempre van en claro: tema, metadatos del bloqueo, bloque cifrado y marca de migración.
 */
 const PREFIX = 'cdm.';
-const PLAIN_KEYS = new Set(['theme', 'lock', 'enc', 'migrated']);
+const PLAIN_KEYS = new Set(['theme', 'lock', 'enc', 'migrated', 'autoBackup']);
 const VOLATILE_KEYS = new Set(['lastTab', 'currentNote', 'pomoState', 'calFilters', 'todoView', 'ttRunning', 'devTool', 'bmSort', 'ttLastProject', 'dlPrefs', 'devHelpOpen', 'rxTab', 'mmViews', 'mmCur', 'mapsMode', 'notesMode']);
 const LEGACY_KEYS = ['allNotes', 'kanbanData', 'calcHistory', 'encryptedStorage', 'dashboardStats'];
 let MEM = {};

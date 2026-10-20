@@ -287,7 +287,10 @@ Cuatro capas, cada una contra un riesgo distinto (todo está en Ajustes):
 | 🔒 Bloqueo | Cifra todo en el navegador y pide contraseña al abrir | Que alguien use tu equipo | Activarlo una vez |
 | 🕘 Historial | Versiones automáticas al abrir, cada 30 min y antes de importar o restaurar | Tus propios errores | Nada; «Guardar versión ahora» antes de un cambio grande |
 | 🗄️ Archivo en disco | Un `.json` que se reescribe solo tras cada cambio | Perder el navegador o el equipo | Vincularlo una vez, mejor en una carpeta de la nube |
+| 💾 Copias automáticas | Una copia con fecha en la carpeta que elijas, conservando las N últimas | Que se estropee o se borre el archivo vinculado | Elegir la carpeta una vez |
 | 💾 Copia exportada | Una foto fija, cifrada o no | Casi todo, si la guardas fuera | Exportarla cada mes |
+
+**Copias automáticas con fecha** (Ajustes → 💾 Copias automáticas): el archivo vinculado guarda **solo la última versión**, así que si algo se estropea ahí, se estropea para todos los dispositivos. Esta capa es la que te deja volver atrás: eliges una carpeta y la aplicación va dejando `cuadro-de-mando-2026-10-20.json` con la frecuencia que digas (cada vez que abres, una vez al día o una vez a la semana), borrando las más antiguas cuando pasan del número que quieras conservar. Elige una carpeta **distinta** de la del archivo vinculado. Si el bloqueo está activado, las copias van cifradas. Disponible en Chrome, Edge y Brave de ordenador.
 
 **Varios dispositivos: combinar sin perder nada**
 

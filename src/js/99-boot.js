@@ -20,7 +20,7 @@ function startApp() {
   const start = TABS.some(t => t.id === hash) ? hash : (S.prefs.start && S.prefs.start !== 'last' ? S.prefs.start : store.get('lastTab', 'dashboard'));
   showTab(start);
   updateClock(); setInterval(updateClock, 15000);
-  ttTick(); renderSecurity(); histInit().catch(() => {}).then(fsInit);
+  ttTick(); renderSecurity(); histInit().catch(() => {}).then(fsInit).then(() => { try { cpInit(); } catch (e) { console.warn(e); } });
   if (!window.crypto || !crypto.subtle) toast('Aviso: este navegador no permite el cifrado en este contexto', 'warning', 6000);
 }
 /**

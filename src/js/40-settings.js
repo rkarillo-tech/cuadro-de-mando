@@ -526,7 +526,8 @@ function renderFs() {
     case 'enc': st = `🔒 «${esc(fsName())}» está cifrado y este navegador guarda los datos sin cifrar. <b>No se guarda nada en el archivo</b> para no dejarlo sin cifrar. Introduce la contraseña y se activará aquí el bloqueo con ella.`; btns = '<button class="btn primary" data-fs="enc">🔑 Introducir la contraseña</button><button class="btn ghost" data-fs="unlink">Desvincular</button>'; break;
   }
   $('#fsStatus').innerHTML = st;
-  $('#fsBtns').innerHTML = btns;
+  const fb = $('#fsBtns');
+  if (fb.innerHTML !== btns) fb.innerHTML = btns;
   renderProtect();
 }
 $('#fsBtns').addEventListener('click', e => {
@@ -591,6 +592,7 @@ function renderSettings() {
   $('#setTheme').value = themePref;
   $('#setStart').value = S.prefs.start || 'last';
   renderFs();
+  try { renderCp(); } catch {}
   renderDataUsage();
   renderHistory();
   renderProtect();

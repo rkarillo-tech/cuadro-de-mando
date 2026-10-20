@@ -2,6 +2,7 @@
    INICIO (DASHBOARD)
    ===================================================================== */
 function renderDashboard() {
+  try { if (document.activeElement !== $('#dashBloc')) blocRefresh(); } catch {}
   const h = new Date().getHours();
   const greet = h < 6 ? 'Buenas noches' : h < 13 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches';
   const name = store.get('userName', '');

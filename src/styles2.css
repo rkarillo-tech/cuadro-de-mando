@@ -304,6 +304,15 @@ mark.rx:nth-of-type(2n){background:rgba(76,179,245,.35)}
 .editor a.wl:hover{background:var(--accent);color:#fff}
 .editor a.wl.missing{background:transparent;border:1px dashed var(--accent);opacity:.8}
 .editor a.wl.broken{background:transparent;border:1px dashed var(--danger);color:var(--danger);text-decoration:line-through}
+.bloc-pop{width:330px;max-width:calc(100vw - 24px);padding:10px;display:none;flex-direction:column;gap:8px}
+.bloc-pop.open{display:flex}
+.bloc-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bloc-pop textarea{resize:vertical;min-height:120px;font-size:.95rem}
+.bloc-btns{justify-content:flex-end;gap:6px;flex-wrap:nowrap}
+#blocBtn{position:relative}
+#blocBtn .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+/* Estos dos se usan dentro de los diálogos, así que van por encima de ellos */
+.wl-pop,#tagPop{z-index:430}
 .wl-pop{min-width:240px;max-width:340px;max-height:320px;overflow:auto}
 .wl-pop button.on{background:var(--accent-soft);color:var(--accent)}
 .backlinks{border-top:1px solid var(--border);padding-top:10px;display:grid;gap:8px;font-size:.85rem}

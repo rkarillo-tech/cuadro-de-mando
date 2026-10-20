@@ -15,6 +15,7 @@ function startApp() {
   APP_READY = true;
   if (P.running && Date.now() >= P.endAt) { P.running = false; P.remaining = 0; pomoComplete(); }
   pomoRender(); renderPomoToday(); pgGenerate();
+  try { blocRefresh(); } catch {}
   document.body.classList.remove('booting');
   const hash = (location.hash || '').slice(1);
   const start = TABS.some(t => t.id === hash) ? hash : (S.prefs.start && S.prefs.start !== 'last' ? S.prefs.start : store.get('lastTab', 'dashboard'));
@@ -42,6 +43,7 @@ function refreshApp() {
   renderBoard(); renderCalcHist(); calcRender(); renderVault(); renderPgHist();
   fillPomoSettings(); fillPomoTasks(); pomoRender(); renderPomoToday();
   try { tagStyleRefresh(); } catch {}
+  try { blocRefresh(); } catch {}
   renderFsPill(); updateClock();
   showTab(currentTab);          // repinta la pestaña que estés viendo
 }

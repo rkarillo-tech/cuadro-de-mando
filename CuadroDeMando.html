@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando 1.4.0 (2026-10-20) · productividad personal 100 % local, sin servidor
+  Cuadro de Mando 1.5.0 (2026-10-20) · productividad personal 100 % local, sin servidor
   https://github.com/rkarillo-tech/cuadro-de-mando
 
   MIT License
@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/P0aHB6OtgF5tNXpTd73gLY5Um/3iFXZpyRpQ8NNs8s='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s8A1B83MJIFRJfGgrsnPaRzTZELYC2HOhHSGcb+5ED8='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -635,6 +635,15 @@ mark.rx:nth-of-type(2n){background:rgba(76,179,245,.35)}
 .editor a.wl:hover{background:var(--accent);color:#fff}
 .editor a.wl.missing{background:transparent;border:1px dashed var(--accent);opacity:.8}
 .editor a.wl.broken{background:transparent;border:1px dashed var(--danger);color:var(--danger);text-decoration:line-through}
+.bloc-pop{width:330px;max-width:calc(100vw - 24px);padding:10px;display:none;flex-direction:column;gap:8px}
+.bloc-pop.open{display:flex}
+.bloc-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bloc-pop textarea{resize:vertical;min-height:120px;font-size:.95rem}
+.bloc-btns{justify-content:flex-end;gap:6px;flex-wrap:nowrap}
+#blocBtn{position:relative}
+#blocBtn .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+/* Estos dos se usan dentro de los diálogos, así que van por encima de ellos */
+.wl-pop,#tagPop{z-index:430}
 .wl-pop{min-width:240px;max-width:340px;max-height:320px;overflow:auto}
 .wl-pop button.on{background:var(--accent-soft);color:var(--accent)}
 .backlinks{border-top:1px solid var(--border);padding-top:10px;display:grid;gap:8px;font-size:.85rem}
@@ -913,7 +922,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.4.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.5.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -929,6 +938,7 @@ details.bl-row summary.bl-h{cursor:pointer}
         <button class="search-btn" id="searchBtn" title="Buscar y ejecutar acciones (Ctrl+K)">🔍 <span class="lbl-txt">Buscar…</span><span class="kbd-hint"><kbd>Ctrl</kbd><kbd>K</kbd></span></button>
         <span class="muted small" id="clock"></span>
         <button class="btn" id="lockNowBtn" title="Bloquear ahora y pedir la contraseña (Alt+L)" hidden>🔒<span class="lbl-txt"> Bloquear</span></button>
+        <button class="btn icon" id="blocBtn" title="Bloc rápido (Alt+B)">🗒️<span class="dot" id="blocDot" hidden></span></button>
         <button class="btn icon" id="helpBtn" title="Atajos de teclado">⌨️</button>
         <button class="btn icon" id="themeBtn" title="Cambiar tema">☀️</button>
       </div>
@@ -954,6 +964,15 @@ details.bl-row summary.bl-h{cursor:pointer}
             <button class="btn" id="quickNoteBtn">📝 Nota</button>
             <button class="btn" id="quickKanbanBtn">📋 Kanban</button>
             <button class="btn primary" id="quickTodoBtn">☑️ Tarea</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>🗒️ Bloc rápido</h3><span class="muted small">se guarda solo</span></div>
+          <textarea class="field" id="dashBloc" rows="4" placeholder="Apunta aquí lo que sea: un teléfono, una idea, lo que te acaban de decir… Se guarda solo y lo tienes en todos tus dispositivos."></textarea>
+          <div class="row" style="margin-top:8px;justify-content:flex-end">
+            <button class="btn sm ghost" data-bloc2="clear">🗑️ Vaciar</button>
+            <button class="btn sm" data-bloc2="note">📝 A nota</button>
+            <button class="btn sm" data-bloc2="todo">☑️ A tareas</button>
           </div>
         </div>
         <div class="card">
@@ -1984,7 +2003,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
         <div class="card" id="licCard">
           <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
-          <p>Cuadro de Mando 1.4.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p>Cuadro de Mando 1.5.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
           <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
           <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
 
@@ -2970,6 +2989,7 @@ document.addEventListener('keydown', e => {
    INICIO (DASHBOARD)
    ===================================================================== */
 function renderDashboard() {
+  try { if (document.activeElement !== $('#dashBloc')) blocRefresh(); } catch {}
   const h = new Date().getHours();
   const greet = h < 6 ? 'Buenas noches' : h < 13 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches';
   const name = store.get('userName', '');
@@ -11895,6 +11915,104 @@ $('#cpKeep').addEventListener('change', e => { cpSave({ keep: Math.max(1, Math.m
 // Si la app se queda abierta días, se comprueba de vez en cuando
 setInterval(() => { if (!document.hidden) cpMaybe(); }, 3600000);
 /* =====================================================================
+   BLOC RÁPIDO · un post-it siempre a mano
+   =====================================================================
+   Un texto corto que se guarda solo y viaja con los datos (archivo vinculado
+   y copias incluidos). Se abre desde el botón 🗒️ de la barra o con Alt+B, y
+   en Inicio se ve la misma caja. Cuando lo escrito ya vale, se convierte en
+   una nota o en tareas de una vez.
+*/
+const blocGet = () => String(store.get('scratch', '') || '');
+const blocSaveSoon = debounce(v => { store.set('scratch', v); blocMark(); }, 500);
+const blocPop = document.createElement('div');
+blocPop.className = 'popover bloc-pop'; blocPop.id = 'blocPop';
+blocPop.innerHTML = `<div class="bloc-head"><b>🗒️ Bloc rápido</b><span class="muted small" id="blocSaved"></span></div>
+  <textarea class="field" id="blocPad" rows="8" placeholder="Apunta aquí lo que sea: un teléfono, una idea, lo que te acaban de decir…&#10;&#10;Se guarda solo y lo tienes en todos tus dispositivos."></textarea>
+  <div class="row bloc-btns">
+    <button type="button" class="btn sm" data-bloc="note" title="Crear una nota con lo escrito y vaciar el bloc">📝 A nota</button>
+    <button type="button" class="btn sm" data-bloc="todo" title="Crear una tarea por cada línea y vaciar el bloc">☑️ A tareas</button>
+    <button type="button" class="btn sm ghost" data-bloc="copy" title="Copiar al portapapeles">📋</button>
+    <button type="button" class="btn sm ghost" data-bloc="clear" title="Vaciar el bloc">🗑️</button>
+  </div>`;
+document.body.append(blocPop);
+
+/** Mantiene a la vez la caja flotante y la de Inicio. */
+function blocRefresh(from) {
+  const v = blocGet();
+  [$('#blocPad'), $('#dashBloc')].forEach(t => { if (t && t !== from && t.value !== v) t.value = v; });
+  const dot = $('#blocDot'); if (dot) dot.hidden = !v.trim();
+  blocMark();
+}
+function blocMark() {
+  const el = $('#blocSaved'); if (!el) return;
+  const n = blocGet().trim();
+  setText(el, n ? `${n.split('\n').filter(Boolean).length} línea${n.split('\n').filter(Boolean).length === 1 ? '' : 's'} · se guarda solo` : 'se guarda solo');
+}
+function blocType(e) {
+  const v = e.target.value;
+  blocSaveSoon(v);
+  [$('#blocPad'), $('#dashBloc')].forEach(t => { if (t && t !== e.target) t.value = v; });
+  const dot = $('#blocDot'); if (dot) dot.hidden = !v.trim();
+}
+function blocOpen() {
+  blocRefresh();
+  openPopover(blocPop, $('#blocBtn'));
+  setTimeout(() => { const t = $('#blocPad'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }, 40);
+}
+function blocToggle() { blocPop.classList.contains('open') ? closePopovers() : blocOpen(); }
+/** Convierte lo escrito en una nota o en tareas; el bloc se vacía y se puede deshacer. */
+function blocConvert(kind) {
+  const text = blocGet().trim();
+  if (!text) { toast('El bloc está vacío', 'warning', 2000); return; }
+  const undo = () => { store.set('scratch', text); blocRefresh(); };
+  if (kind === 'todo') {
+    const lineas = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const ids = lineas.map(l => { const t = addTodoFromText(l, 'inbox'); return t && t.id; }).filter(Boolean);
+    store.set('scratch', ''); blocRefresh();
+    toast(`${ids.length} ${ids.length === 1 ? 'tarea creada' : 'tareas creadas'}`, 'success', 6000, {
+      label: 'Deshacer',
+      fn: () => { S.todos = S.todos.filter(t => !ids.includes(t.id)); save.todos(); refreshTodoViews(); undo(); }
+    });
+  } else {
+    const [first, ...rest] = text.split('\n');
+    const titulo = first.trim().slice(0, 80) || 'Bloc rápido';
+    const cuerpo = (rest.length ? rest : []).map(l => l.trim() ? `<div>${esc(l)}</div>` : '<div><br></div>').join('') || '<div><br></div>';
+    const n = createNote(titulo, cuerpo, false);
+    store.set('scratch', ''); blocRefresh();
+    toast(`Nota «${n.title}» creada`, 'success', 6000, {
+      label: 'Deshacer',
+      fn: () => { S.notes = S.notes.filter(x => x.id !== n.id); save.notes(); renderNotesView(); undo(); }
+    });
+  }
+  renderDashboard();
+}
+async function blocClear() {
+  const text = blocGet();
+  if (!text.trim()) return;
+  if (text.trim().length > 120 && !(await confirmDialog('Se borrará lo que hay en el bloc rápido. ¿Seguro?', 'Vaciar'))) return;
+  store.set('scratch', ''); blocRefresh();
+  toast('Bloc vaciado', 'info', 6000, { label: 'Deshacer', fn: () => { store.set('scratch', text); blocRefresh(); } });
+}
+blocPop.addEventListener('click', e => {
+  const b = e.target.closest('[data-bloc]'); if (!b) return;
+  ({ note: () => blocConvert('note'), todo: () => blocConvert('todo'), copy: () => copyText(blocGet(), 'Bloc copiado'), clear: blocClear })[b.dataset.bloc]();
+});
+blocPop.addEventListener('input', e => { if (e.target.id === 'blocPad') blocType(e); });
+blocPop.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closePopovers(); $('#blocBtn').focus(); } });
+$('#blocBtn').addEventListener('click', blocToggle);
+document.addEventListener('keydown', e => {
+  if (e.altKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyB') { e.preventDefault(); blocToggle(); }
+});
+/* La misma caja, en Inicio */
+const dashBloc = $('#dashBloc');
+if (dashBloc) {
+  dashBloc.addEventListener('input', blocType);
+  dashBloc.closest('.card').addEventListener('click', e => {
+    const b = e.target.closest('[data-bloc2]'); if (!b) return;
+    ({ note: () => blocConvert('note'), todo: () => blocConvert('todo'), clear: blocClear })[b.dataset.bloc2]();
+  });
+}
+/* =====================================================================
    ARRANQUE
    ===================================================================== */
 function startApp() {
@@ -11911,6 +12029,7 @@ function startApp() {
   APP_READY = true;
   if (P.running && Date.now() >= P.endAt) { P.running = false; P.remaining = 0; pomoComplete(); }
   pomoRender(); renderPomoToday(); pgGenerate();
+  try { blocRefresh(); } catch {}
   document.body.classList.remove('booting');
   const hash = (location.hash || '').slice(1);
   const start = TABS.some(t => t.id === hash) ? hash : (S.prefs.start && S.prefs.start !== 'last' ? S.prefs.start : store.get('lastTab', 'dashboard'));
@@ -11938,6 +12057,7 @@ function refreshApp() {
   renderBoard(); renderCalcHist(); calcRender(); renderVault(); renderPgHist();
   fillPomoSettings(); fillPomoTasks(); pomoRender(); renderPomoToday();
   try { tagStyleRefresh(); } catch {}
+  try { blocRefresh(); } catch {}
   renderFsPill(); updateClock();
   showTab(currentTab);          // repinta la pestaña que estés viendo
 }

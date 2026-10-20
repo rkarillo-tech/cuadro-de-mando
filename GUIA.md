@@ -128,6 +128,15 @@ Y si lo que te piden es cruzar dos ficheros («de estos 300, ¿cuáles ya están
 
 En **Herramientas → Texto**, además de contar caracteres y palabras y de las transformaciones (slug, camelCase, snake_case, ordenar, quitar duplicadas…), tienes abajo un **generador de texto de relleno**: eliges cuántos párrafos, frases, palabras o líneas de lista, si empieza por el clásico «Lorem ipsum dolor sit amet…», y pulsas **✨ Generar** (lo sustituye) o **＋ Añadir** (lo pega detrás de lo que ya hay).
 
+## Bloc rápido: un post-it siempre a mano
+
+Para lo que no quieres clasificar todavía (un teléfono que te dictan, una idea a medias, lo que te acaban de decir por el pasillo) tienes el **bloc rápido**: el botón 🗒️ de la barra superior (o **Alt + B**) abre una caja pequeña sobre la pantalla en la que estés.
+
+- Lo que escribes **se guarda solo** y viaja con el resto de tus datos: lo verás también en el móvil y en el otro equipo, y entra en las copias.
+- La misma caja está en **Inicio**, como tarjeta: es el mismo texto, escribas donde escribas.
+- Cuando lo apuntado ya merece un sitio: **📝 A nota** (la primera línea es el título y el resto, el contenido) o **☑️ A tareas** (una tarea por línea, con el lenguaje natural de siempre: «Llamar a Ana el viernes»). El bloc se vacía y el aviso lleva **Deshacer**.
+- El botón muestra un punto cuando hay algo apuntado, para que no se te olvide.
+
 ## Conexiones entre notas: el mapa de tu conocimiento
 
 El grafo (🧠 Mapas → 🕸️ Conexiones entre notas) dibuja cada nota como un punto y cada enlace como una línea. Sirve para **ver lo que no se ve en una lista**.
@@ -314,6 +323,7 @@ Cuatro capas, cada una contra un riesgo distinto (todo está en Ajustes):
 | En toda la app | Alt + 1…9 | Ir a Inicio, Tareas, Kanban, Calendario, Notas, Mapas, Marcadores, Pomodoro, Horas |
 | En toda la app | Alt + N / Alt + T | Nueva nota / nueva tarea |
 | En toda la app | Alt + L | Bloquear (con el bloqueo activado) |
+| En toda la app | Alt + B | Abrir o cerrar el bloc rápido |
 | Notas | `[[` | Enlazar con otra nota |
 | Notas | Ctrl + Shift + X | Casilla de tarea |
 | Notas | Ctrl + K | Enlace web |

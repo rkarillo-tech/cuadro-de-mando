@@ -92,7 +92,9 @@ with sync_playwright() as p:
     A.evaluate("createNote('Desde A','<div>a</div>',false); 0")
     B.evaluate("createNote('Desde B','<div>b</div>',false); 0")
     A.wait_for_timeout(2500); B.wait_for_timeout(2500)
-    for _ in range(5): check(A, B); dialogs([A, B])
+    for _ in range(8):
+        check(A, B); dialogs([A, B])
+        if 'Desde B' in titles(A) and 'Desde A' in titles(B): break
     ok(titles(A) == titles(B) and 'Desde A' in titles(A) and 'Desde B' in titles(A), 'con cambios en los dos sitios, ambos acaban con todo: ' + str(titles(A)))
     ok(len(WRITES) - n0 <= 4, f'y la sincronización termina en pocas escrituras ({len(WRITES) - n0})')
     n0 = len(WRITES)

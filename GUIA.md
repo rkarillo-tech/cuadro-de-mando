@@ -135,6 +135,7 @@ Para lo que no quieres clasificar todavía (un teléfono que te dictan, una idea
 - Lo que escribes **se guarda solo** y viaja con el resto de tus datos: lo verás también en el móvil y en el otro equipo, y entra en las copias.
 - La misma caja está en **Inicio**, como tarjeta: es el mismo texto, escribas donde escribas.
 - Cuando lo apuntado ya merece un sitio: **📝 A nota** (la primera línea es el título y el resto, el contenido) o **☑️ A tareas** (una tarea por línea, con el lenguaje natural de siempre: «Llamar a Ana el viernes»). El bloc se vacía y el aviso lleva **Deshacer**.
+- **Cuentas al vuelo**: escribe una operación y `=` y el resultado aparece detrás. Funciona con decimales en coma, miles con punto, paréntesis y porcentajes: `3*12,5=` → `37,5`, `cena 12,50+8=` → `20,5`, `120+21%=` → `145,2`. Si lo de delante no es una cuenta (un «total 20 =», una fecha o un código como `2026/0042`), no toca nada, y el resultado se quita con Ctrl+Z.
 - El botón muestra un punto cuando hay algo apuntado, para que no se te olvide.
 
 ## Conexiones entre notas: el mapa de tu conocimiento

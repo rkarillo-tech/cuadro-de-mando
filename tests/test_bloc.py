@@ -51,6 +51,27 @@ with sync_playwright() as p:
     pg.click('#blocBtn'); pg.wait_for_timeout(400)
     ok(pg.input_value('#blocPad') == 'Comprar pan\nRevisar la factura', 'y lo que escribes en Inicio sale también en el bloc flotante')
 
+    # ===== Cuentas dentro del bloc =====
+    def cuenta(txt):
+        pg.evaluate("store.set('scratch',''); blocRefresh(); 0")
+        pg.click('#blocPad'); pg.keyboard.press('Control+a')
+        pg.type('#blocPad', txt, delay=20); pg.wait_for_timeout(300)
+        return pg.input_value('#blocPad')
+    ok(cuenta('5*5=') == '5*5= 25', 'una cuenta sencilla se resuelve al escribir «=»')
+    ok(cuenta('cena 12,50+8=') == 'cena 12,50+8= 20,5', 'admite comas decimales y texto delante')
+    ok(cuenta('1.234,5*2=') == '1.234,5*2= 2469', 'admite miles escritos con punto')
+    ok(cuenta('12.345,5*2=') == '12.345,5*2= 24.691', 'y devuelve el resultado en formato español')
+    ok(cuenta('(2+3)*4=') == '(2+3)*4= 20', 'admite paréntesis')
+    ok(cuenta('120+21%=') == '120+21%= 145,2', 'y porcentajes')
+    ok(cuenta('total 20=') == 'total 20=', 'si no hay operación, no toca nada')
+    ok(cuenta('21/10/2026=') == '21/10/2026=', 'una fecha no se calcula')
+    ok(cuenta('2026/0042=') == '2026/0042=', 'un código con ceros delante tampoco')
+    ok(cuenta('100/3=') == '100/3= 33,3333333333', 'pero una división normal sí')
+    pg.keyboard.press('Control+z'); pg.wait_for_timeout(250)
+    ok('33,33' not in pg.input_value('#blocPad'), 'el resultado se puede deshacer con Ctrl+Z')
+    pg.wait_for_timeout(700)      # que termine el guardado automático de lo tecleado
+    pg.evaluate("([v])=>{ store.set('scratch', v); blocRefresh(); }", ['Comprar pan\nRevisar la factura']); pg.wait_for_timeout(300)
+
     # ===== Convertir en tareas =====
     pg.click('#blocPop [data-bloc=todo]'); pg.wait_for_timeout(700)
     ok(pg.evaluate("S.todos.filter(t=>['Comprar pan','Revisar la factura'].includes(t.text)).length") == 2, 'cada línea se convierte en una tarea')

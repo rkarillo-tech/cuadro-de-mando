@@ -11,7 +11,7 @@ const blocSaveSoon = debounce(v => { store.set('scratch', v); blocMark(); }, 500
 const blocPop = document.createElement('div');
 blocPop.className = 'popover bloc-pop'; blocPop.id = 'blocPop';
 blocPop.innerHTML = `<div class="bloc-head"><b>🗒️ Bloc rápido</b><span class="muted small" id="blocSaved"></span></div>
-  <textarea class="field" id="blocPad" rows="8" placeholder="Apunta aquí lo que sea: un teléfono, una idea, lo que te acaban de decir…&#10;&#10;Se guarda solo y lo tienes en todos tus dispositivos."></textarea>
+  <textarea class="field" id="blocPad" rows="8" placeholder="Apunta aquí lo que sea: un teléfono, una idea, lo que te acaban de decir…&#10;&#10;Se guarda solo y lo tienes en todos tus dispositivos. Escribe una cuenta y «=» (3*12,5=) y te da el resultado."></textarea>
   <div class="row bloc-btns">
     <button type="button" class="btn sm" data-bloc="note" title="Crear una nota con lo escrito y vaciar el bloc">📝 A nota</button>
     <button type="button" class="btn sm" data-bloc="todo" title="Crear una tarea por cada línea y vaciar el bloc">☑️ A tareas</button>
@@ -32,7 +32,35 @@ function blocMark() {
   const n = blocGet().trim();
   setText(el, n ? `${n.split('\n').filter(Boolean).length} línea${n.split('\n').filter(Boolean).length === 1 ? '' : 's'} · se guarda solo` : 'se guarda solo');
 }
+/*
+  Cuentas en el propio bloc: al escribir «=» al final de lo tecleado, se resuelve la
+  operación que haya justo delante y el resultado se escribe a continuación. Si lo de
+  delante no es una cuenta, no pasa nada. Se deshace con Ctrl+Z como cualquier texto.
+*/
+const BLOC_COLA = /[-+*/%().,\d\s]+$/;
+function blocCalc(ta) {
+  const pos = ta.selectionStart;
+  if (pos !== ta.selectionEnd || ta.value[pos - 1] !== '=') return false;
+  const linea = ta.value.slice(0, pos - 1).split('\n').pop();
+  const m = BLOC_COLA.exec(linea);
+  if (!m) return false;
+  let e = m[0].trim();
+  if (!/\d/.test(e) || !/[-+*/%]/.test(e)) return false;              // hace falta un número y una operación
+  if (/^\d{1,4}\s*[/-]\s*\d{1,4}\s*[/-]\s*\d{1,4}$/.test(e)) return false;   // una fecha (21/10/2026) no es una cuenta
+  if (/^\d+\s*\/\s*0\d+$/.test(e)) return false;                            // ni un código con ceros delante (2026/0042)
+  if (e.includes(',')) e = e.replace(/\./g, '').replace(/,/g, '.');   // 1.234,5 → 1234.5
+  let v;
+  try { v = calcEval(e); } catch { return false; }
+  if (typeof v !== 'number' || !isFinite(v)) return false;
+  const txt = ' ' + Number(fmtNum(v)).toLocaleString('es-ES', { maximumFractionDigits: 10 });
+  ta.focus();
+  let ok = false;
+  try { ok = document.execCommand('insertText', false, txt); } catch {}   // así Ctrl+Z lo deshace
+  if (!ok) { ta.setRangeText(txt, pos, pos, 'end'); ta.dispatchEvent(new Event('input', { bubbles: true })); }
+  return true;
+}
 function blocType(e) {
+  if (e.inputType === 'insertText' && e.data === '=' && blocCalc(e.target)) return;   // el resultado dispara otro input
   const v = e.target.value;
   blocSaveSoon(v);
   [$('#blocPad'), $('#dashBloc')].forEach(t => { if (t && t !== e.target) t.value = v; });

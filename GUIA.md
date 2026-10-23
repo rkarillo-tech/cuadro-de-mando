@@ -201,6 +201,22 @@ El truco es no parar: Tab, escribes, Enter, escribes… Primero vuelca todo y de
 
 **Kanban**: tarjetas con prioridad, fecha, etiquetas, **subtareas** y **descripción**. Se arrastran entre columnas.
 
+**Cuánto se ve de cada tarjeta.** En la barra del tablero eliges la vista:
+
+- **Compacta**: solo el título y lo imprescindible (prioridad, fecha, subtareas hechas y etiquetas). Para ver muchas tarjetas de golpe o trabajar en el móvil.
+- **Normal**: añade un extracto de la descripción, con las subtareas plegadas.
+- **Detalle**: descripción completa y subtareas desplegadas. Para revisar un proyecto a fondo.
+
+Cada equipo recuerda la suya: puedes tener compacta en el móvil y detalle en el portátil.
+
+**Del Kanban a Tareas o a una nota.** Abre la tarjeta y pulsa **📤 Enviar a…**:
+
+- **Mover a Tareas**: cuando ya no necesita etapas y basta con hacerla y tacharla. Se lleva fecha, etiquetas, prioridad y subtareas (como pasos) y desaparece del tablero.
+- **Copiar a Tareas**: igual, pero la tarjeta se queda. Las dos van por su cuenta.
+- **Volcar en una nota**: crea una nota con la descripción y las subtareas como casillas, hereda las etiquetas y la deja enlazada en la tarjeta. Para cuando lo que crece es el contenido, no el trabajo.
+
+Los tres avisan con **Deshacer**.
+
 **De Tareas al Kanban.** Cuando una tarea deja de ser «hazlo y táchalo» y pasa a tener estados, ábrela y pulsa **📋 Pasar a Kanban**. La aplicación pregunta qué quieres:
 
 - **Mover** (lo recomendado): la tarjeta se crea en «Por hacer» con su fecha, etiquetas, prioridad y pasos convertidos en subtareas, y la tarea desaparece de la lista. Así cada cosa vive en un sitio y no tienes que acordarte de darla por hecha dos veces.

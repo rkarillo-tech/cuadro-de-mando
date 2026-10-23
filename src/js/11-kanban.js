@@ -10,6 +10,9 @@ const PRIO = {
 };
 const openSubs = new Set();
 let dragId = null;
+/* Cuánto detalle se ve en cada tarjeta: compacta (solo lo justo), normal o detalle. */
+const KB_DENS = { compact: 'Compacta', normal: 'Normal', full: 'Detalle' };
+let kbDens = 'normal';
 
 function dueInfo(t) {
   if (!t.due) return null;
@@ -27,9 +30,11 @@ function cardHtml(t) {
   const di = dueInfo(t);
   const ci = COLS.findIndex(c => c.id === t.col);
   const p = PRIO[t.priority] || PRIO.media;
+  const corto = kbDens === 'compact', largo = kbDens === 'full';
+  const tope = largo ? 600 : 160;
   return `<div class="kb-card p-${t.priority || 'media'}${t.col === 'done' ? ' done' : ''}" draggable="true" data-id="${esc(t.id)}" tabindex="0">
     <div class="ttl">${tagHighlight(esc(t.title))}</div>
-    ${t.desc ? `<div class="small muted desc">${tagHighlight(esc(t.desc.slice(0, 160))).replace(/\[\[([^\[\]\n]+)\]\]/g, '<span class="wl-mini">$1</span>')}${t.desc.length > 160 ? '…' : ''}</div>` : ''}
+    ${t.desc && !corto ? `<div class="small muted desc">${tagHighlight(esc(t.desc.slice(0, tope))).replace(/\[\[([^\[\]\n]+)\]\]/g, '<span class="wl-mini">$1</span>')}${t.desc.length > tope ? '…' : ''}</div>` : ''}
     <div class="kb-meta">
       <span class="badge ${p.cls}">${p.label}</span>
       ${di ? `<span class="badge ${di.cls}">${di.label}</span>` : ''}
@@ -37,8 +42,8 @@ function cardHtml(t) {
       ${t.pomodoros ? `<span class="badge" title="Pomodoros dedicados">🍅 ${t.pomodoros}</span>` : ''}
       ${tagUniq(t.tags || []).map(g => `<span class="badge tg-mini tg-pill" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
     </div>
-    ${subs.length ? `<div class="progress"><span style="width:${Math.round(doneN / subs.length * 100)}%"></span></div>
-    <details class="subs"${openSubs.has(t.id) ? ' open' : ''}><summary>Subtareas</summary>${subs.map(s => `<label class="check-row"><input type="checkbox" class="check" data-sub="${esc(s.id)}"${s.done ? ' checked' : ''}><span class="${s.done ? 'muted strike' : ''}">${esc(s.text)}</span></label>`).join('')}</details>` : ''}
+    ${subs.length && !corto ? `<div class="progress"><span style="width:${Math.round(doneN / subs.length * 100)}%"></span></div>
+    <details class="subs"${openSubs.has(t.id) || largo ? ' open' : ''}><summary>Subtareas</summary>${subs.map(s => `<label class="check-row"><input type="checkbox" class="check" data-sub="${esc(s.id)}"${s.done ? ' checked' : ''}><span class="${s.done ? 'muted strike' : ''}">${esc(s.text)}</span></label>`).join('')}</details>` : ''}
     <div class="kb-actions">
       ${ci > 0 ? `<button class="btn icon sm ghost" data-kb="left" title="Mover a «${COLS[ci - 1].name}»">◀</button>` : ''}
       ${ci < COLS.length - 1 ? `<button class="btn icon sm ghost" data-kb="right" title="Mover a «${COLS[ci + 1].name}»">▶</button>` : ''}
@@ -58,7 +63,10 @@ function renderBoard() {
     || (t.desc || '').toLowerCase().includes(q)
     || (t.tags || []).some(g => g.toLowerCase().includes(q))
     || (t.subtasks || []).some(s => s.text.toLowerCase().includes(q)));
-  $('#kbBoard').innerHTML = COLS.map(c => {
+  const board = $('#kbBoard');
+  board.className = 'kb-board dens-' + kbDens;
+  $$('#kbDens [data-d]').forEach(b => b.classList.toggle('on', b.dataset.d === kbDens));
+  board.innerHTML = COLS.map(c => {
     const all = S.tasks.filter(t => t.col === c.id);
     const items = all.filter(match);
     return `<div class="kb-col">
@@ -72,6 +80,12 @@ function renderBoard() {
   }).join('');
 }
 onShow.kanban = renderBoard;
+$('#kbDens').addEventListener('click', e => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  kbDens = KB_DENS[b.dataset.d] ? b.dataset.d : 'normal';
+  store.set('kbDens', kbDens);
+  renderBoard();
+});
 
 function moveTask(id, col, beforeId = null) {
   const i = S.tasks.findIndex(t => t.id === id); if (i < 0) return;
@@ -99,6 +113,71 @@ async function quickSubtask(id) {
   openSubs.add(id); save.tasks(); renderBoard();
 }
 
+/**
+ * Lleva una tarjeta a Tareas. Por defecto la mueve (deja de estar en el tablero);
+ * con keep = true se queda también la tarjeta, y entonces las dos van por su cuenta.
+ */
+function taskToTodo(id, { keep = false } = {}) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const todo = {
+    id: uid(), listId: 'inbox', text: t.title.slice(0, 300), done: t.col === 'done',
+    due: t.due || '', important: t.priority === 'alta', repeat: '', notes: t.desc || '',
+    tags: (t.tags || []).slice(), steps: (t.subtasks || []).map(s => ({ id: uid(), text: s.text, done: s.done })),
+    created: Date.now(), order: Math.min(0, ...S.todos.filter(x => x.listId === 'inbox').map(x => x.order ?? 0)) - 1
+  };
+  S.todos.push(todo);
+  const i = S.tasks.indexOf(t);
+  if (!keep) S.tasks.splice(i, 1);
+  save.todos(); if (!keep) save.tasks();
+  renderBoard(); refreshTodoViews();
+  toast(keep ? 'Copiada a Tareas (sigue en el tablero)' : 'Tarjeta pasada a Tareas', 'success', 6000, {
+    label: 'Deshacer',
+    fn: () => {
+      S.todos = S.todos.filter(x => x.id !== todo.id);
+      if (!keep && !S.tasks.some(x => x.id === t.id)) S.tasks.splice(Math.min(i, S.tasks.length), 0, t);
+      save.todos(); save.tasks(); renderBoard(); refreshTodoViews();
+    }
+  });
+}
+/** Vuelca la tarjeta en una nota (descripción, subtareas como casillas y etiquetas) y la enlaza. */
+function taskToNote(id) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const linea = x => `<div>${esc(x)}</div>`;
+  const cuerpo = [
+    (t.desc || '').trim() ? (t.desc || '').split('\n').map(l => l.trim() ? linea(l) : '<div><br></div>').join('') : '',
+    (t.subtasks || []).length ? '<h3>Subtareas</h3>' + t.subtasks.map(sb => `<div><input type="checkbox" class="chk"${sb.done ? ' checked' : ''}>&nbsp;${esc(sb.text)}</div>`).join('') : '',
+    '<h3>Notas</h3><div><br></div>'
+  ].filter(Boolean).join('');
+  const n = createNote(t.title.slice(0, 120) || 'Tarjeta', cuerpo, false);
+  if ((t.tags || []).length) { n.tags = tagUniq(t.tags); }
+  const ref = `📝 [[${n.title}]]`;
+  if (!(t.desc || '').includes(ref)) t.desc = ((t.desc || '').trim() ? t.desc.replace(/\s+$/, '') + '\n' : '') + ref;
+  save.notes(); save.tasks(); renderBoard();
+  toast(`Nota «${n.title}» creada y enlazada a la tarjeta`, 'success', 7000, {
+    label: 'Ver nota',
+    fn: () => { showTab('notes'); openNote(n.id); }
+  });
+}
+/** Pregunta qué hacer con la tarjeta: a Tareas (moviendo o copiando) o volcarla en una nota. */
+async function taskSendAsk(id) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const r = await modal({
+    title: '📤 Enviar «' + (t.title.length > 40 ? t.title.slice(0, 40) + '…' : t.title) + '»',
+    body: `<p class="small">La tarjeta lleva consigo su fecha, etiquetas, prioridad y subtareas.</p>
+      <p class="hint"><b>A Tareas</b> es para cuando ya no necesita etapas y basta con hacerla y tacharla: <b>mover</b> la quita del tablero (lo normal) y <b>copiar</b> la deja en los dos sitios, sueltas entre sí.<br>
+      <b>Volcar en una nota</b> crea una nota con la descripción y las subtareas como casillas, y la deja enlazada en la tarjeta: para cuando lo que crece es el contenido, no el trabajo.</p>`,
+    actions: [
+      { label: 'Cancelar', value: null, cls: 'ghost' },
+      { label: '📝 Volcar en una nota', value: 'note', cls: '' },
+      { label: '☑️ Copiar a Tareas', value: 'copy', cls: '' },
+      { label: '➡️ Mover a Tareas', value: 'move', cls: 'primary' }
+    ]
+  });
+  if (!r) return;
+  if (r.action === 'note') taskToNote(id);
+  else taskToTodo(id, { keep: r.action === 'copy' });
+}
+
 async function openTask(id, col = 'todo') {
   const existing = id ? S.tasks.find(t => t.id === id) : null;
   if (id && !existing) return;
@@ -119,6 +198,7 @@ async function openTask(id, col = 'todo') {
     </div>`;
   const actions = [
     ...(existing ? [{ label: '🗑️ Eliminar', value: 'delete', cls: 'danger left' }] : []),
+    ...(existing ? [{ label: '📤 Enviar a…', value: 'send', cls: '' }] : []),
     { label: 'Cancelar', value: null, cls: 'ghost' },
     { label: existing ? 'Guardar' : 'Crear tarea', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('title').value.trim() ? null : 'Escribe un título para la tarea' }
   ];
@@ -145,6 +225,16 @@ async function openTask(id, col = 'todo') {
   if (!r) return;
   if (r.action === 'delete') { deleteTask(existing.id); return; }
   const d = r.data;
+  if (r.action === 'send') {      // se guarda lo editado y luego se pregunta a dónde va
+    Object.assign(existing, {
+      title: d.title.trim() || existing.title, desc: (d.desc || '').trim(), priority: d.priority,
+      due: d.due || '', tags: tagsFromField(d.tags),
+      subtasks: draft.subtasks.map(sb => ({ ...sb, text: sb.text.trim() })).filter(sb => sb.text)
+    });
+    save.tasks(); renderBoard();
+    taskSendAsk(existing.id);
+    return;
+  }
   Object.assign(draft, {
     title: d.title.trim(), desc: (d.desc || '').trim(), priority: d.priority, due: d.due || '',
     tags: tagsFromField(d.tags)
@@ -195,6 +285,7 @@ board.addEventListener('change', e => {
 });
 board.addEventListener('toggle', e => {
   if (!e.target.matches || !e.target.matches('details.subs')) return;
+  if (kbDens === 'full') return;      // en «Detalle» van abiertas por la vista, no porque las abras tú
   const id = e.target.closest('.kb-card').dataset.id;
   e.target.open ? openSubs.add(id) : openSubs.delete(id);
 }, true);

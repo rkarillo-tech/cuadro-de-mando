@@ -195,6 +195,17 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
 .subs{margin-top:8px}
 .subs summary{cursor:pointer;font-size:.8rem;color:var(--muted);user-select:none}
 .subs .check-row{padding:3px 0;font-size:.85rem}
+/* Densidad del tablero */
+.kb-board.dens-compact .kb-list{gap:6px}
+.kb-board.dens-compact .kb-card{padding:8px 10px;border-radius:8px}
+.kb-board.dens-compact .kb-card .ttl{margin-bottom:4px;font-size:.92rem}
+.kb-board.dens-compact .kb-meta{gap:4px}
+.kb-board.dens-compact .kb-meta .badge{font-size:.68rem;padding:0 5px}
+.kb-board.dens-compact .kb-actions{height:0;margin:0;overflow:hidden}
+.kb-board.dens-compact .kb-card:hover .kb-actions,.kb-board.dens-compact .kb-card:focus-within .kb-actions{height:auto;margin-top:4px;overflow:visible}
+@media (hover:none){.kb-board.dens-compact .kb-actions{height:auto;margin-top:4px;overflow:visible}}
+.kb-board.dens-full .kb-card{padding:14px}
+.kb-board.dens-full .kb-card .desc{margin-bottom:10px}
 .kb-actions{display:flex;gap:2px;justify-content:flex-end;margin-top:6px;opacity:0;transition:opacity .15s}
 .kb-card:hover .kb-actions,.kb-card:focus-within .kb-actions{opacity:1}
 @media (hover:none){.kb-actions{opacity:1}}

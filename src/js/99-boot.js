@@ -4,6 +4,8 @@
 function startApp() {
   loadState();
   initNotes(); initPomo(); initCalc(); initTime(); initDeadlines();
+  const kd = store.get('kbDens', 'normal');
+  kbDens = KB_DENS[kd] ? kd : 'normal';
   const tv = store.get('todoView', 'today');
   todoView = typeof tv === 'string' ? tv : 'today';
   calFilters = { ...CAL_FILTER_DEF, ...(store.get('calFilters', {}) || {}) };
@@ -33,6 +35,8 @@ function startApp() {
 function refreshApp() {
   loadState();
   initNotes(); initPomo(); initCalc(); initTime();
+  const kd = store.get('kbDens', 'normal');
+  kbDens = KB_DENS[kd] ? kd : 'normal';
   const tv = store.get('todoView', 'today');
   todoView = typeof tv === 'string' ? tv : 'today';
   calFilters = { ...CAL_FILTER_DEF, ...(store.get('calFilters', {}) || {}) };

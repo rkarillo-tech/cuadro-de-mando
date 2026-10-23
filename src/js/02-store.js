@@ -11,7 +11,7 @@
 */
 const PREFIX = 'cdm.';
 const PLAIN_KEYS = new Set(['theme', 'lock', 'enc', 'migrated', 'autoBackup']);
-const VOLATILE_KEYS = new Set(['lastTab', 'currentNote', 'pomoState', 'calFilters', 'todoView', 'ttRunning', 'devTool', 'bmSort', 'ttLastProject', 'dlPrefs', 'devHelpOpen', 'rxTab', 'mmViews', 'mmCur', 'mapsMode', 'notesMode']);
+const VOLATILE_KEYS = new Set(['lastTab', 'currentNote', 'pomoState', 'calFilters', 'todoView', 'ttRunning', 'devTool', 'bmSort', 'ttLastProject', 'dlPrefs', 'devHelpOpen', 'rxTab', 'mmViews', 'mmCur', 'mapsMode', 'notesMode', 'kbDens']);
 const LEGACY_KEYS = ['allNotes', 'kanbanData', 'calcHistory', 'encryptedStorage', 'dashboardStats'];
 let MEM = {};
 let CRYPT = null;          // { key, salt, iter } cuando el bloqueo está activo y desbloqueado

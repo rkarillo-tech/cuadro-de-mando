@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando 1.5.1 (2026-10-21) · productividad personal 100 % local, sin servidor
+  Cuadro de Mando 1.6.0 (2026-10-23) · productividad personal 100 % local, sin servidor
   https://github.com/rkarillo-tech/cuadro-de-mando
 
   MIT License
@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zfA/zF3ecAccRuWsyZjgy9mDk8K8FAm0oGiTbaTY9zQ='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WGDEmRQX0/c0txFsf9SPjcGh8YkqAj0m2c3/uwCL4RU='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -235,6 +235,17 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
 .subs{margin-top:8px}
 .subs summary{cursor:pointer;font-size:.8rem;color:var(--muted);user-select:none}
 .subs .check-row{padding:3px 0;font-size:.85rem}
+/* Densidad del tablero */
+.kb-board.dens-compact .kb-list{gap:6px}
+.kb-board.dens-compact .kb-card{padding:8px 10px;border-radius:8px}
+.kb-board.dens-compact .kb-card .ttl{margin-bottom:4px;font-size:.92rem}
+.kb-board.dens-compact .kb-meta{gap:4px}
+.kb-board.dens-compact .kb-meta .badge{font-size:.68rem;padding:0 5px}
+.kb-board.dens-compact .kb-actions{height:0;margin:0;overflow:hidden}
+.kb-board.dens-compact .kb-card:hover .kb-actions,.kb-board.dens-compact .kb-card:focus-within .kb-actions{height:auto;margin-top:4px;overflow:visible}
+@media (hover:none){.kb-board.dens-compact .kb-actions{height:auto;margin-top:4px;overflow:visible}}
+.kb-board.dens-full .kb-card{padding:14px}
+.kb-board.dens-full .kb-card .desc{margin-bottom:10px}
 .kb-actions{display:flex;gap:2px;justify-content:flex-end;margin-top:6px;opacity:0;transition:opacity .15s}
 .kb-card:hover .kb-actions,.kb-card:focus-within .kb-actions{opacity:1}
 @media (hover:none){.kb-actions{opacity:1}}
@@ -922,7 +933,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.5.1 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.6.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -1032,6 +1043,11 @@ details.bl-row summary.bl-h{cursor:pointer}
           <option value="baja">Prioridad baja</option>
         </select>
         <span class="tagf" data-tagf="kanban"></span>
+        <div class="seg" id="kbDens" title="Cuánto detalle se ve en cada tarjeta">
+          <button data-d="compact" title="Más tarjetas a la vista">▪ Compacta</button>
+          <button data-d="normal" class="on">▫ Normal</button>
+          <button data-d="full" title="Descripción completa y subtareas desplegadas">▤ Detalle</button>
+        </div>
         <button class="btn primary" id="kbNewBtn">＋ Nueva tarea</button>
       </div>
       <div class="kb-board" id="kbBoard"></div>
@@ -2003,7 +2019,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
         <div class="card" id="licCard">
           <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
-          <p>Cuadro de Mando 1.5.1 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p>Cuadro de Mando 1.6.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
           <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
           <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
 
@@ -2318,7 +2334,7 @@ function fuzzyScore(q, text) {
 */
 const PREFIX = 'cdm.';
 const PLAIN_KEYS = new Set(['theme', 'lock', 'enc', 'migrated', 'autoBackup']);
-const VOLATILE_KEYS = new Set(['lastTab', 'currentNote', 'pomoState', 'calFilters', 'todoView', 'ttRunning', 'devTool', 'bmSort', 'ttLastProject', 'dlPrefs', 'devHelpOpen', 'rxTab', 'mmViews', 'mmCur', 'mapsMode', 'notesMode']);
+const VOLATILE_KEYS = new Set(['lastTab', 'currentNote', 'pomoState', 'calFilters', 'todoView', 'ttRunning', 'devTool', 'bmSort', 'ttLastProject', 'dlPrefs', 'devHelpOpen', 'rxTab', 'mmViews', 'mmCur', 'mapsMode', 'notesMode', 'kbDens']);
 const LEGACY_KEYS = ['allNotes', 'kanbanData', 'calcHistory', 'encryptedStorage', 'dashboardStats'];
 let MEM = {};
 let CRYPT = null;          // { key, salt, iter } cuando el bloqueo está activo y desbloqueado
@@ -3624,6 +3640,9 @@ const PRIO = {
 };
 const openSubs = new Set();
 let dragId = null;
+/* Cuánto detalle se ve en cada tarjeta: compacta (solo lo justo), normal o detalle. */
+const KB_DENS = { compact: 'Compacta', normal: 'Normal', full: 'Detalle' };
+let kbDens = 'normal';
 
 function dueInfo(t) {
   if (!t.due) return null;
@@ -3641,9 +3660,11 @@ function cardHtml(t) {
   const di = dueInfo(t);
   const ci = COLS.findIndex(c => c.id === t.col);
   const p = PRIO[t.priority] || PRIO.media;
+  const corto = kbDens === 'compact', largo = kbDens === 'full';
+  const tope = largo ? 600 : 160;
   return `<div class="kb-card p-${t.priority || 'media'}${t.col === 'done' ? ' done' : ''}" draggable="true" data-id="${esc(t.id)}" tabindex="0">
     <div class="ttl">${tagHighlight(esc(t.title))}</div>
-    ${t.desc ? `<div class="small muted desc">${tagHighlight(esc(t.desc.slice(0, 160))).replace(/\[\[([^\[\]\n]+)\]\]/g, '<span class="wl-mini">$1</span>')}${t.desc.length > 160 ? '…' : ''}</div>` : ''}
+    ${t.desc && !corto ? `<div class="small muted desc">${tagHighlight(esc(t.desc.slice(0, tope))).replace(/\[\[([^\[\]\n]+)\]\]/g, '<span class="wl-mini">$1</span>')}${t.desc.length > tope ? '…' : ''}</div>` : ''}
     <div class="kb-meta">
       <span class="badge ${p.cls}">${p.label}</span>
       ${di ? `<span class="badge ${di.cls}">${di.label}</span>` : ''}
@@ -3651,8 +3672,8 @@ function cardHtml(t) {
       ${t.pomodoros ? `<span class="badge" title="Pomodoros dedicados">🍅 ${t.pomodoros}</span>` : ''}
       ${tagUniq(t.tags || []).map(g => `<span class="badge tg-mini tg-pill" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
     </div>
-    ${subs.length ? `<div class="progress"><span style="width:${Math.round(doneN / subs.length * 100)}%"></span></div>
-    <details class="subs"${openSubs.has(t.id) ? ' open' : ''}><summary>Subtareas</summary>${subs.map(s => `<label class="check-row"><input type="checkbox" class="check" data-sub="${esc(s.id)}"${s.done ? ' checked' : ''}><span class="${s.done ? 'muted strike' : ''}">${esc(s.text)}</span></label>`).join('')}</details>` : ''}
+    ${subs.length && !corto ? `<div class="progress"><span style="width:${Math.round(doneN / subs.length * 100)}%"></span></div>
+    <details class="subs"${openSubs.has(t.id) || largo ? ' open' : ''}><summary>Subtareas</summary>${subs.map(s => `<label class="check-row"><input type="checkbox" class="check" data-sub="${esc(s.id)}"${s.done ? ' checked' : ''}><span class="${s.done ? 'muted strike' : ''}">${esc(s.text)}</span></label>`).join('')}</details>` : ''}
     <div class="kb-actions">
       ${ci > 0 ? `<button class="btn icon sm ghost" data-kb="left" title="Mover a «${COLS[ci - 1].name}»">◀</button>` : ''}
       ${ci < COLS.length - 1 ? `<button class="btn icon sm ghost" data-kb="right" title="Mover a «${COLS[ci + 1].name}»">▶</button>` : ''}
@@ -3672,7 +3693,10 @@ function renderBoard() {
     || (t.desc || '').toLowerCase().includes(q)
     || (t.tags || []).some(g => g.toLowerCase().includes(q))
     || (t.subtasks || []).some(s => s.text.toLowerCase().includes(q)));
-  $('#kbBoard').innerHTML = COLS.map(c => {
+  const board = $('#kbBoard');
+  board.className = 'kb-board dens-' + kbDens;
+  $$('#kbDens [data-d]').forEach(b => b.classList.toggle('on', b.dataset.d === kbDens));
+  board.innerHTML = COLS.map(c => {
     const all = S.tasks.filter(t => t.col === c.id);
     const items = all.filter(match);
     return `<div class="kb-col">
@@ -3686,6 +3710,12 @@ function renderBoard() {
   }).join('');
 }
 onShow.kanban = renderBoard;
+$('#kbDens').addEventListener('click', e => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  kbDens = KB_DENS[b.dataset.d] ? b.dataset.d : 'normal';
+  store.set('kbDens', kbDens);
+  renderBoard();
+});
 
 function moveTask(id, col, beforeId = null) {
   const i = S.tasks.findIndex(t => t.id === id); if (i < 0) return;
@@ -3713,6 +3743,71 @@ async function quickSubtask(id) {
   openSubs.add(id); save.tasks(); renderBoard();
 }
 
+/**
+ * Lleva una tarjeta a Tareas. Por defecto la mueve (deja de estar en el tablero);
+ * con keep = true se queda también la tarjeta, y entonces las dos van por su cuenta.
+ */
+function taskToTodo(id, { keep = false } = {}) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const todo = {
+    id: uid(), listId: 'inbox', text: t.title.slice(0, 300), done: t.col === 'done',
+    due: t.due || '', important: t.priority === 'alta', repeat: '', notes: t.desc || '',
+    tags: (t.tags || []).slice(), steps: (t.subtasks || []).map(s => ({ id: uid(), text: s.text, done: s.done })),
+    created: Date.now(), order: Math.min(0, ...S.todos.filter(x => x.listId === 'inbox').map(x => x.order ?? 0)) - 1
+  };
+  S.todos.push(todo);
+  const i = S.tasks.indexOf(t);
+  if (!keep) S.tasks.splice(i, 1);
+  save.todos(); if (!keep) save.tasks();
+  renderBoard(); refreshTodoViews();
+  toast(keep ? 'Copiada a Tareas (sigue en el tablero)' : 'Tarjeta pasada a Tareas', 'success', 6000, {
+    label: 'Deshacer',
+    fn: () => {
+      S.todos = S.todos.filter(x => x.id !== todo.id);
+      if (!keep && !S.tasks.some(x => x.id === t.id)) S.tasks.splice(Math.min(i, S.tasks.length), 0, t);
+      save.todos(); save.tasks(); renderBoard(); refreshTodoViews();
+    }
+  });
+}
+/** Vuelca la tarjeta en una nota (descripción, subtareas como casillas y etiquetas) y la enlaza. */
+function taskToNote(id) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const linea = x => `<div>${esc(x)}</div>`;
+  const cuerpo = [
+    (t.desc || '').trim() ? (t.desc || '').split('\n').map(l => l.trim() ? linea(l) : '<div><br></div>').join('') : '',
+    (t.subtasks || []).length ? '<h3>Subtareas</h3>' + t.subtasks.map(sb => `<div><input type="checkbox" class="chk"${sb.done ? ' checked' : ''}>&nbsp;${esc(sb.text)}</div>`).join('') : '',
+    '<h3>Notas</h3><div><br></div>'
+  ].filter(Boolean).join('');
+  const n = createNote(t.title.slice(0, 120) || 'Tarjeta', cuerpo, false);
+  if ((t.tags || []).length) { n.tags = tagUniq(t.tags); }
+  const ref = `📝 [[${n.title}]]`;
+  if (!(t.desc || '').includes(ref)) t.desc = ((t.desc || '').trim() ? t.desc.replace(/\s+$/, '') + '\n' : '') + ref;
+  save.notes(); save.tasks(); renderBoard();
+  toast(`Nota «${n.title}» creada y enlazada a la tarjeta`, 'success', 7000, {
+    label: 'Ver nota',
+    fn: () => { showTab('notes'); openNote(n.id); }
+  });
+}
+/** Pregunta qué hacer con la tarjeta: a Tareas (moviendo o copiando) o volcarla en una nota. */
+async function taskSendAsk(id) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const r = await modal({
+    title: '📤 Enviar «' + (t.title.length > 40 ? t.title.slice(0, 40) + '…' : t.title) + '»',
+    body: `<p class="small">La tarjeta lleva consigo su fecha, etiquetas, prioridad y subtareas.</p>
+      <p class="hint"><b>A Tareas</b> es para cuando ya no necesita etapas y basta con hacerla y tacharla: <b>mover</b> la quita del tablero (lo normal) y <b>copiar</b> la deja en los dos sitios, sueltas entre sí.<br>
+      <b>Volcar en una nota</b> crea una nota con la descripción y las subtareas como casillas, y la deja enlazada en la tarjeta: para cuando lo que crece es el contenido, no el trabajo.</p>`,
+    actions: [
+      { label: 'Cancelar', value: null, cls: 'ghost' },
+      { label: '📝 Volcar en una nota', value: 'note', cls: '' },
+      { label: '☑️ Copiar a Tareas', value: 'copy', cls: '' },
+      { label: '➡️ Mover a Tareas', value: 'move', cls: 'primary' }
+    ]
+  });
+  if (!r) return;
+  if (r.action === 'note') taskToNote(id);
+  else taskToTodo(id, { keep: r.action === 'copy' });
+}
+
 async function openTask(id, col = 'todo') {
   const existing = id ? S.tasks.find(t => t.id === id) : null;
   if (id && !existing) return;
@@ -3733,6 +3828,7 @@ async function openTask(id, col = 'todo') {
     </div>`;
   const actions = [
     ...(existing ? [{ label: '🗑️ Eliminar', value: 'delete', cls: 'danger left' }] : []),
+    ...(existing ? [{ label: '📤 Enviar a…', value: 'send', cls: '' }] : []),
     { label: 'Cancelar', value: null, cls: 'ghost' },
     { label: existing ? 'Guardar' : 'Crear tarea', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('title').value.trim() ? null : 'Escribe un título para la tarea' }
   ];
@@ -3759,6 +3855,16 @@ async function openTask(id, col = 'todo') {
   if (!r) return;
   if (r.action === 'delete') { deleteTask(existing.id); return; }
   const d = r.data;
+  if (r.action === 'send') {      // se guarda lo editado y luego se pregunta a dónde va
+    Object.assign(existing, {
+      title: d.title.trim() || existing.title, desc: (d.desc || '').trim(), priority: d.priority,
+      due: d.due || '', tags: tagsFromField(d.tags),
+      subtasks: draft.subtasks.map(sb => ({ ...sb, text: sb.text.trim() })).filter(sb => sb.text)
+    });
+    save.tasks(); renderBoard();
+    taskSendAsk(existing.id);
+    return;
+  }
   Object.assign(draft, {
     title: d.title.trim(), desc: (d.desc || '').trim(), priority: d.priority, due: d.due || '',
     tags: tagsFromField(d.tags)
@@ -3809,6 +3915,7 @@ board.addEventListener('change', e => {
 });
 board.addEventListener('toggle', e => {
   if (!e.target.matches || !e.target.matches('details.subs')) return;
+  if (kbDens === 'full') return;      // en «Detalle» van abiertas por la vista, no porque las abras tú
   const id = e.target.closest('.kb-card').dataset.id;
   e.target.open ? openSubs.add(id) : openSubs.delete(id);
 }, true);
@@ -12046,6 +12153,8 @@ if (dashBloc) {
 function startApp() {
   loadState();
   initNotes(); initPomo(); initCalc(); initTime(); initDeadlines();
+  const kd = store.get('kbDens', 'normal');
+  kbDens = KB_DENS[kd] ? kd : 'normal';
   const tv = store.get('todoView', 'today');
   todoView = typeof tv === 'string' ? tv : 'today';
   calFilters = { ...CAL_FILTER_DEF, ...(store.get('calFilters', {}) || {}) };
@@ -12075,6 +12184,8 @@ function startApp() {
 function refreshApp() {
   loadState();
   initNotes(); initPomo(); initCalc(); initTime();
+  const kd = store.get('kbDens', 'normal');
+  kbDens = KB_DENS[kd] ? kd : 'normal';
   const tv = store.get('todoView', 'today');
   todoView = typeof tv === 'string' ? tv : 'today';
   calFilters = { ...CAL_FILTER_DEF, ...(store.get('calFilters', {}) || {}) };

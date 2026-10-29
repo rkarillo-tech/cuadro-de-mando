@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-yWDdswWzKnzwb2iW8wO5HKQHP+Z0dmW0sYrl0UAmV1k='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nB7M5pB8HrR/728jnudpQbdbQrf9mEUGCpQJ/iH9j0Q='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -3462,8 +3462,8 @@ async function openTodo(id) {
       <button type="button" class="btn sm" data-q="0">Hoy</button><button type="button" class="btn sm" data-q="1">Mañana</button><button type="button" class="btn sm" data-q="week">Próx. lunes</button><button type="button" class="btn sm ghost" data-q="none">Sin fecha</button>
       <label class="check-row" style="margin-left:auto"><input type="checkbox" class="check" name="important"${draft.important ? ' checked' : ''}> ⭐ Importante</label>
     </div>
-    ${alarmTaskFieldHtml(draft.alarm)}
     ${tagFieldHtml('tags', draft.tags || [], { src: 'text,notes' })}
+    ${alarmTaskFieldHtml(draft.alarm)}
     <div><label class="lbl">Pasos <span id="stProg"></span></label>
       <div id="stList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="stNew" placeholder="Nuevo paso y Enter" data-noenter><button type="button" class="btn" id="stAdd">Añadir</button></div>
@@ -3855,8 +3855,8 @@ async function openTask(id, col = 'todo') {
       <div><label class="lbl">Prioridad</label><select class="field" name="priority">${Object.entries(PRIO).map(([k, p]) => `<option value="${k}"${k === draft.priority ? ' selected' : ''}>${p.label}</option>`).join('')}</select></div>
       <div><label class="lbl">Fecha límite</label><input type="date" class="field" name="due" value="${esc(draft.due)}"></div>
     </div>
-    ${alarmTaskFieldHtml(draft.alarm)}
     ${tagFieldHtml('tags', draft.tags || [], { src: 'title,desc' })}
+    ${alarmTaskFieldHtml(draft.alarm)}
     <div><label class="lbl">Subtareas <span id="subProg"></span></label>
       <div id="subList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="subNew" placeholder="Nueva subtarea y Enter" data-noenter><button type="button" class="btn" id="subAdd">Añadir</button></div>

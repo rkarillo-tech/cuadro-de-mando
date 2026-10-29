@@ -310,8 +310,8 @@ async function openTodo(id) {
       <button type="button" class="btn sm" data-q="0">Hoy</button><button type="button" class="btn sm" data-q="1">Mañana</button><button type="button" class="btn sm" data-q="week">Próx. lunes</button><button type="button" class="btn sm ghost" data-q="none">Sin fecha</button>
       <label class="check-row" style="margin-left:auto"><input type="checkbox" class="check" name="important"${draft.important ? ' checked' : ''}> ⭐ Importante</label>
     </div>
-    ${alarmTaskFieldHtml(draft.alarm)}
     ${tagFieldHtml('tags', draft.tags || [], { src: 'text,notes' })}
+    ${alarmTaskFieldHtml(draft.alarm)}
     <div><label class="lbl">Pasos <span id="stProg"></span></label>
       <div id="stList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="stNew" placeholder="Nuevo paso y Enter" data-noenter><button type="button" class="btn" id="stAdd">Añadir</button></div>

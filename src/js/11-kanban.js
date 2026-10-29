@@ -193,8 +193,8 @@ async function openTask(id, col = 'todo') {
       <div><label class="lbl">Prioridad</label><select class="field" name="priority">${Object.entries(PRIO).map(([k, p]) => `<option value="${k}"${k === draft.priority ? ' selected' : ''}>${p.label}</option>`).join('')}</select></div>
       <div><label class="lbl">Fecha límite</label><input type="date" class="field" name="due" value="${esc(draft.due)}"></div>
     </div>
-    ${alarmTaskFieldHtml(draft.alarm)}
     ${tagFieldHtml('tags', draft.tags || [], { src: 'title,desc' })}
+    ${alarmTaskFieldHtml(draft.alarm)}
     <div><label class="lbl">Subtareas <span id="subProg"></span></label>
       <div id="subList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="subNew" placeholder="Nueva subtarea y Enter" data-noenter><button type="button" class="btn" id="subAdd">Añadir</button></div>

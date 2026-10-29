@@ -35,7 +35,7 @@ function calDayItems(key, opts = {}) {
   const out = [];
   if (f.holidays) S.holidays.filter(h => h.date === key).forEach(h => out.push({ kind: 'holiday', icon: '🎉', title: h.name, color: 'var(--danger)', time: '', id: h.id }));
   if (f.events) S.events.forEach(ev => {
-    if (eventDates(ev, key, key).length) out.push({ kind: 'event', icon: ev.repeat ? '🔁' : '📅', title: ev.title, time: ev.allDay ? '' : ev.start + (ev.end && ev.end !== ev.start ? '–' + ev.end : ''), sort: ev.allDay ? '' : ev.start, color: safeColor(ev.color), id: ev.id });
+    if (eventDates(ev, key, key).length) out.push({ kind: 'event', icon: ev.repeat ? '🔁' : '📅', title: ev.title + (ev.alarm ? ' ⏰' : ''), time: ev.allDay ? '' : ev.start + (ev.end && ev.end !== ev.start ? '–' + ev.end : ''), sort: ev.allDay ? '' : ev.start, color: safeColor(ev.color), id: ev.id });
   });
   if (f.kanban) S.tasks.filter(t => t.due === key && t.col !== 'done').forEach(t => out.push({ kind: 'kanban', icon: '📋', title: t.title, color: PRIO[t.priority]?.color || 'var(--warning)', id: t.id }));
   if (f.todos) S.todos.filter(t => !t.done && t.due === key).forEach(t => out.push({ kind: 'todo', icon: '☑️', title: t.text, color: 'var(--info)', id: t.id }));
@@ -83,7 +83,8 @@ function calShift(n) { const d = new Date(calY, calM + n, 1); calY = d.getFullYe
 async function openEvent(id, date) {
   const ex = id ? S.events.find(e => e.id === id) : null;
   if (id && !ex) return;
-  const d = ex ? clone(ex) : { id: uid(), title: '', date: date || calSel || todayKey(), allDay: true, start: '09:00', end: '10:00', color: COLORS[0], repeat: '', until: '', notes: '', created: Date.now() };
+  const d = ex ? clone(ex) : { id: uid(), title: '', date: date || calSel || todayKey(), allDay: true, start: '09:00', end: '10:00', color: COLORS[0], repeat: '', until: '', alarm: '', notes: '', created: Date.now() };
+  const al = alarmParts(d.alarm);
   const body = `
     <div><label class="lbl">Título</label><input class="field" type="text" name="title" value="${esc(d.title)}" maxlength="200" placeholder="Reunión, cita, entrega…"></div>
     <div class="form-grid">
@@ -95,6 +96,14 @@ async function openEvent(id, date) {
     <div class="form-grid">
       <div><label class="lbl">Repetir</label><select class="field" name="repeat">${Object.entries(REPEAT_LABELS).map(([k, v]) => `<option value="${k}"${k === (d.repeat || '') ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
       <div><label class="lbl">Hasta (opcional)</label><input type="date" class="field" name="until" value="${esc(d.until || '')}"></div>
+    </div>
+    <div class="form-grid">
+      <div><label class="lbl">Aviso</label><select class="field" name="alarm">${Object.entries(ALARM_LABELS).map(([k, v]) => `<option value="${k}"${k === al.preset ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
+      <div id="evAlarmWhen"${al.preset === 'custom' ? '' : ' hidden'}><label class="lbl">Día y hora del aviso</label>
+        <div class="row" style="gap:6px;flex-wrap:nowrap">
+          <select class="field" name="alarmDay" style="flex:1;min-width:0">${ALARM_DAYS.map(([k, v]) => `<option value="${k}"${String(k) === String(al.day) ? ' selected' : ''}>${v}</option>`).join('')}</select>
+          <input type="time" class="field" name="alarmTime" value="${esc(al.time)}" style="width:9.5em;flex:none">
+        </div></div>
     </div>
     <div><label class="lbl">Color</label>${swatchesHtml('color', safeColor(d.color))}</div>
     <div><label class="lbl">Notas</label><textarea class="field" name="notes" rows="3">${esc(d.notes || '')}</textarea></div>
@@ -109,12 +118,16 @@ async function openEvent(id, date) {
         if (!f.elements.namedItem('title').value.trim()) return 'Escribe un título';
         if (!isValidDay(f.elements.namedItem('date').value)) return 'Elige una fecha';
         if (!f.elements.namedItem('allDay').checked && f.elements.namedItem('end').value && f.elements.namedItem('end').value < f.elements.namedItem('start').value) return 'La hora de fin es anterior a la de inicio';
+        if (f.elements.namedItem('alarm').value === 'custom' && !/^\d{1,2}:\d{2}$/.test(f.elements.namedItem('alarmTime').value)) return 'Elige la hora del aviso';
         return null;
       } }
     ],
     onOpen: form => {
       const sync = () => { const on = form.elements.namedItem('allDay').checked; ['start', 'end'].forEach(n => form.elements.namedItem(n).disabled = on); };
       form.elements.namedItem('allDay').addEventListener('change', sync); sync();
+      const alSel = form.elements.namedItem('alarm');
+      const alSync = () => { form.querySelector('#evAlarmWhen').hidden = alSel.value !== 'custom'; };
+      alSel.addEventListener('change', alSync); alSync();
       tagFieldInit(form);
     }
   });
@@ -125,9 +138,11 @@ async function openEvent(id, date) {
     return;
   }
   const f = r.data;
-  Object.assign(d, { title: f.title.trim(), date: f.date, allDay: !!f.allDay, start: f.start || d.start, end: f.end || d.end, repeat: f.repeat || '', until: f.until || '', color: safeColor(f.color), notes: (f.notes || '').trim(), tags: tagsFromField(f.tags) });
-  if (!d.tags.length) delete d.tags;
+  Object.assign(d, { title: f.title.trim(), date: f.date, allDay: !!f.allDay, start: f.start || d.start, end: f.end || d.end, repeat: f.repeat || '', until: f.until || '', alarm: alarmValue(f.alarm, f.alarmDay, f.alarmTime), color: safeColor(f.color), notes: (f.notes || '').trim(), tags: tagsFromField(f.tags) });
   if (ex) Object.assign(ex, d); else S.events.push(d);
+  const obj = ex || d;                                   // quitar el aviso o las etiquetas los borra del evento
+  if (!obj.alarm) delete obj.alarm;
+  if (!(obj.tags || []).length) delete obj.tags;
   save.events(); calGoto(d.date);
   if (!ex) toast('Evento creado', 'success', 1500);
 }
@@ -140,16 +155,18 @@ function buildIcs(includeTasks) {
   const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Cuadro de Mando//ES', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const RR = { daily: 'FREQ=DAILY', weekly: 'FREQ=WEEKLY', monthly: 'FREQ=MONTHLY', yearly: 'FREQ=YEARLY', weekdays: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR' };
-  const ve = (id, date, allDay, start, end, title, notes, repeat, until) => {
+  const ve = (id, date, allDay, start, end, title, notes, repeat, until, alarm) => {
     L.push('BEGIN:VEVENT', `UID:${id}@cuadro-de-mando`, `DTSTAMP:${stamp}`);
     if (allDay) { L.push(`DTSTART;VALUE=DATE:${icsD(date)}`, `DTEND;VALUE=DATE:${icsD(dayKey(addDays(parseDay(date), 1)))}`); }
     else { L.push(`DTSTART:${icsD(date)}T${start.replace(':', '')}00`, `DTEND:${icsD(date)}T${(end || start).replace(':', '')}00`); }
     if (repeat && RR[repeat]) L.push(`RRULE:${RR[repeat]}${until ? ';UNTIL=' + icsD(until) + (allDay ? '' : 'T235959') : ''}`);
     L.push(icsFold('SUMMARY:' + icsEsc(title)));
     if (notes) L.push(icsFold('DESCRIPTION:' + icsEsc(notes)));
+    const trg = alarm ? icsTrigger(alarm, date, allDay, start) : '';
+    if (trg) L.push('BEGIN:VALARM', 'ACTION:DISPLAY', icsFold('DESCRIPTION:' + icsEsc(title)), trg, 'END:VALARM');
     L.push('END:VEVENT');
   };
-  S.events.forEach(e => ve(e.id, e.date, e.allDay, e.start, e.end, e.title, e.notes, e.repeat, e.until));
+  S.events.forEach(e => ve(e.id, e.date, e.allDay, e.start, e.end, e.title, e.notes, e.repeat, e.until, e.alarm));
   if (includeTasks) {
     S.tasks.filter(t => t.due && t.col !== 'done').forEach(t => ve('k' + t.id, t.due, true, '', '', '📋 ' + t.title, t.desc, '', ''));
     S.todos.filter(t => t.due && !t.done).forEach(t => ve('t' + t.id, t.due, true, '', '', '☑️ ' + t.text, t.notes, '', ''));
@@ -159,11 +176,14 @@ function buildIcs(includeTasks) {
 }
 function parseIcs(text) {
   const lines = text.replace(/\r?\n[ \t]/g, '').split(/\r?\n/);
-  const evs = []; let cur = null;
+  const evs = []; let cur = null, enAlarma = false;
   for (const line of lines) {
     if (line === 'BEGIN:VEVENT') { cur = {}; continue; }
-    if (line === 'END:VEVENT') { if (cur) evs.push(cur); cur = null; continue; }
+    if (line === 'END:VEVENT') { if (cur) evs.push(cur); cur = null; enAlarma = false; continue; }
     if (!cur) continue;
+    if (/^BEGIN:VALARM$/i.test(line)) { enAlarma = true; continue; }
+    if (/^END:VALARM$/i.test(line)) { enAlarma = false; continue; }
+    if (enAlarma) { if (/^TRIGGER/i.test(line) && !cur.TRIGGER) cur.TRIGGER = { val: line.slice(line.indexOf(':') + 1), params: line.slice(0, line.indexOf(':')).toUpperCase() }; continue; }
     const i = line.indexOf(':'); if (i < 0) continue;
     const [name, ...params] = line.slice(0, i).split(';');
     cur[name.toUpperCase()] = { val: line.slice(i + 1), params: params.join(';').toUpperCase() };
@@ -190,7 +210,10 @@ function parseIcs(text) {
       else if (f === 'YEARLY') repeat = 'yearly';
       if (r.UNTIL) { const u = dt({ val: r.UNTIL }); if (u) until = u.date; }
     }
-    return { id: uid(), title: unesc((e.SUMMARY && e.SUMMARY.val) || 'Sin título').slice(0, 200), date: s.date, allDay: s.allDay, start: s.time || '09:00', end: en && !en.allDay && en.date === s.date ? en.time : (s.time || '10:00'), color: COLORS[1], repeat, until, notes: unesc((e.DESCRIPTION && e.DESCRIPTION.val) || '').slice(0, 2000), created: Date.now() };
+    const ev = { id: uid(), title: unesc((e.SUMMARY && e.SUMMARY.val) || 'Sin título').slice(0, 200), date: s.date, allDay: s.allDay, start: s.time || '09:00', end: en && !en.allDay && en.date === s.date ? en.time : (s.time || '10:00'), color: COLORS[1], repeat, until, notes: unesc((e.DESCRIPTION && e.DESCRIPTION.val) || '').slice(0, 2000), created: Date.now() };
+    const av = e.TRIGGER ? alarmFromTrigger(e.TRIGGER, ev, dt) : '';
+    if (av) ev.alarm = av;
+    return ev;
   }).filter(Boolean);
 }
 async function exportIcs() {

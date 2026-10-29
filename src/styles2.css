@@ -568,3 +568,17 @@ details.bl-row summary.bl-h{cursor:pointer}
 .df-list.bad li::marker{color:var(--danger)}
 .df-list.good li::marker{color:var(--success)}
 @media (max-width:600px){.df-table td:nth-child(2),.df-table td:nth-child(3),.df-table th:nth-child(2),.df-table th:nth-child(3){width:44px}}
+
+/* Avisos de eventos: el cartel que se queda hasta que lo cierras */
+.avisos{position:fixed;left:254px;bottom:20px;width:340px;max-width:calc(100vw - 36px);z-index:480;display:flex;flex-direction:column;gap:8px}
+.aviso-top{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px 8px;box-shadow:var(--shadow)}
+.aviso{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--c,var(--accent));border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;animation:avIn .22s ease}
+@keyframes avIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.aviso-h{display:flex;align-items:flex-start;gap:6px}
+.aviso-h b{font-size:.95rem;line-height:1.3}
+.aviso-notes{white-space:pre-wrap;color:var(--muted);max-height:4.4em;overflow:hidden}
+.aviso-btns{gap:6px;flex-wrap:nowrap}
+.aviso-btns .field{padding:5px 7px;font-size:.8rem;width:auto;flex:none}
+@media (max-width:900px){.avisos{left:18px}}
+@media (max-width:760px){.avisos{left:8px;right:8px;width:auto;bottom:calc(64px + env(safe-area-inset-bottom))}}
+@media print{.avisos{display:none}}

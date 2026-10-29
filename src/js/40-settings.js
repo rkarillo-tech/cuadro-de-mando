@@ -593,6 +593,7 @@ function renderSettings() {
   $('#setStart').value = S.prefs.start || 'last';
   renderFs();
   try { renderCp(); } catch {}
+  try { renderAv(); } catch {}
   renderDataUsage();
   renderHistory();
   renderProtect();

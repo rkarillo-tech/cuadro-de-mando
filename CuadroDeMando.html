@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando 1.6.0 (2026-10-23) · productividad personal 100 % local, sin servidor
+  Cuadro de Mando 1.7.0 (2026-10-29) · productividad personal 100 % local, sin servidor
   https://github.com/rkarillo-tech/cuadro-de-mando
 
   MIT License
@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WGDEmRQX0/c0txFsf9SPjcGh8YkqAj0m2c3/uwCL4RU='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-pv14w24lIMAkZPuh2wso5xhE0gq9oiSVa2/Upc/64PA='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -911,6 +911,20 @@ details.bl-row summary.bl-h{cursor:pointer}
 .df-list.good li::marker{color:var(--success)}
 @media (max-width:600px){.df-table td:nth-child(2),.df-table td:nth-child(3),.df-table th:nth-child(2),.df-table th:nth-child(3){width:44px}}
 
+/* Avisos de eventos: el cartel que se queda hasta que lo cierras */
+.avisos{position:fixed;left:254px;bottom:20px;width:340px;max-width:calc(100vw - 36px);z-index:480;display:flex;flex-direction:column;gap:8px}
+.aviso-top{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px 8px;box-shadow:var(--shadow)}
+.aviso{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--c,var(--accent));border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;animation:avIn .22s ease}
+@keyframes avIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.aviso-h{display:flex;align-items:flex-start;gap:6px}
+.aviso-h b{font-size:.95rem;line-height:1.3}
+.aviso-notes{white-space:pre-wrap;color:var(--muted);max-height:4.4em;overflow:hidden}
+.aviso-btns{gap:6px;flex-wrap:nowrap}
+.aviso-btns .field{padding:5px 7px;font-size:.8rem;width:auto;flex:none}
+@media (max-width:900px){.avisos{left:18px}}
+@media (max-width:760px){.avisos{left:8px;right:8px;width:auto;bottom:calc(64px + env(safe-area-inset-bottom))}}
+@media print{.avisos{display:none}}
+
 </style>
 </head>
 <body class="booting">
@@ -933,7 +947,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.6.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.7.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -1998,6 +2012,19 @@ details.bl-row summary.bl-h{cursor:pointer}
         </div>
 
 
+        <div class="card" id="avCard">
+          <div class="card-h"><h3>⏰ Avisos de eventos</h3></div>
+          <div class="status-line" id="avStatus"></div>
+          <div class="row" style="margin-top:4px">
+            <button class="btn" id="avPerm" hidden>🔔 Permitir notificaciones del navegador</button>
+            <label class="check-row" style="margin:0"><input type="checkbox" class="check" id="avSound" checked> Sonido al avisar</label>
+          </div>
+          <label class="lbl" style="margin-top:12px">Próximos avisos (30 días)</label>
+          <div class="list" id="avNext"></div>
+          <p class="hint">El aviso se pone en cada evento, en el campo <b>Aviso</b>: a su hora, un rato antes, o <b>a una hora concreta</b> (el mismo día o días antes). Cuando llega, aparece un cartel abajo a la izquierda que <b>se queda ahí hasta que lo cierres</b> o lo pospongas. Como la app no tiene servidor ni nada corriendo por detrás, los avisos solo suenan <b>con la aplicación abierta</b> (aunque sea en otra pestaña); si estaba cerrada, el aviso te espera y lo ves al abrirla (hasta 36 horas después). Lo que cierras o pospones es de <b>este equipo</b>: así el aviso te salta igual en el otro portátil.</p>
+        </div>
+
+
         <div class="card">
           <div class="card-h"><h3>🎨 Personalización</h3></div>
           <div class="form-grid">
@@ -2019,7 +2046,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
         <div class="card" id="licCard">
           <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
-          <p>Cuadro de Mando 1.6.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p>Cuadro de Mando 1.7.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
           <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
           <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
 
@@ -2334,7 +2361,7 @@ function fuzzyScore(q, text) {
 */
 const PREFIX = 'cdm.';
 const PLAIN_KEYS = new Set(['theme', 'lock', 'enc', 'migrated', 'autoBackup']);
-const VOLATILE_KEYS = new Set(['lastTab', 'currentNote', 'pomoState', 'calFilters', 'todoView', 'ttRunning', 'devTool', 'bmSort', 'ttLastProject', 'dlPrefs', 'devHelpOpen', 'rxTab', 'mmViews', 'mmCur', 'mapsMode', 'notesMode', 'kbDens']);
+const VOLATILE_KEYS = new Set(['lastTab', 'currentNote', 'pomoState', 'calFilters', 'todoView', 'ttRunning', 'devTool', 'bmSort', 'ttLastProject', 'dlPrefs', 'devHelpOpen', 'rxTab', 'mmViews', 'mmCur', 'mapsMode', 'notesMode', 'kbDens', 'alarmSeen', 'alarmSnooze']);
 const LEGACY_KEYS = ['allNotes', 'kanbanData', 'calcHistory', 'encryptedStorage', 'dashboardStats'];
 let MEM = {};
 let CRYPT = null;          // { key, salt, iter } cuando el bloqueo está activo y desbloqueado
@@ -3990,7 +4017,7 @@ function calDayItems(key, opts = {}) {
   const out = [];
   if (f.holidays) S.holidays.filter(h => h.date === key).forEach(h => out.push({ kind: 'holiday', icon: '🎉', title: h.name, color: 'var(--danger)', time: '', id: h.id }));
   if (f.events) S.events.forEach(ev => {
-    if (eventDates(ev, key, key).length) out.push({ kind: 'event', icon: ev.repeat ? '🔁' : '📅', title: ev.title, time: ev.allDay ? '' : ev.start + (ev.end && ev.end !== ev.start ? '–' + ev.end : ''), sort: ev.allDay ? '' : ev.start, color: safeColor(ev.color), id: ev.id });
+    if (eventDates(ev, key, key).length) out.push({ kind: 'event', icon: ev.repeat ? '🔁' : '📅', title: ev.title + (ev.alarm ? ' ⏰' : ''), time: ev.allDay ? '' : ev.start + (ev.end && ev.end !== ev.start ? '–' + ev.end : ''), sort: ev.allDay ? '' : ev.start, color: safeColor(ev.color), id: ev.id });
   });
   if (f.kanban) S.tasks.filter(t => t.due === key && t.col !== 'done').forEach(t => out.push({ kind: 'kanban', icon: '📋', title: t.title, color: PRIO[t.priority]?.color || 'var(--warning)', id: t.id }));
   if (f.todos) S.todos.filter(t => !t.done && t.due === key).forEach(t => out.push({ kind: 'todo', icon: '☑️', title: t.text, color: 'var(--info)', id: t.id }));
@@ -4038,7 +4065,8 @@ function calShift(n) { const d = new Date(calY, calM + n, 1); calY = d.getFullYe
 async function openEvent(id, date) {
   const ex = id ? S.events.find(e => e.id === id) : null;
   if (id && !ex) return;
-  const d = ex ? clone(ex) : { id: uid(), title: '', date: date || calSel || todayKey(), allDay: true, start: '09:00', end: '10:00', color: COLORS[0], repeat: '', until: '', notes: '', created: Date.now() };
+  const d = ex ? clone(ex) : { id: uid(), title: '', date: date || calSel || todayKey(), allDay: true, start: '09:00', end: '10:00', color: COLORS[0], repeat: '', until: '', alarm: '', notes: '', created: Date.now() };
+  const al = alarmParts(d.alarm);
   const body = `
     <div><label class="lbl">Título</label><input class="field" type="text" name="title" value="${esc(d.title)}" maxlength="200" placeholder="Reunión, cita, entrega…"></div>
     <div class="form-grid">
@@ -4050,6 +4078,14 @@ async function openEvent(id, date) {
     <div class="form-grid">
       <div><label class="lbl">Repetir</label><select class="field" name="repeat">${Object.entries(REPEAT_LABELS).map(([k, v]) => `<option value="${k}"${k === (d.repeat || '') ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
       <div><label class="lbl">Hasta (opcional)</label><input type="date" class="field" name="until" value="${esc(d.until || '')}"></div>
+    </div>
+    <div class="form-grid">
+      <div><label class="lbl">Aviso</label><select class="field" name="alarm">${Object.entries(ALARM_LABELS).map(([k, v]) => `<option value="${k}"${k === al.preset ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
+      <div id="evAlarmWhen"${al.preset === 'custom' ? '' : ' hidden'}><label class="lbl">Día y hora del aviso</label>
+        <div class="row" style="gap:6px;flex-wrap:nowrap">
+          <select class="field" name="alarmDay" style="flex:1;min-width:0">${ALARM_DAYS.map(([k, v]) => `<option value="${k}"${String(k) === String(al.day) ? ' selected' : ''}>${v}</option>`).join('')}</select>
+          <input type="time" class="field" name="alarmTime" value="${esc(al.time)}" style="width:9.5em;flex:none">
+        </div></div>
     </div>
     <div><label class="lbl">Color</label>${swatchesHtml('color', safeColor(d.color))}</div>
     <div><label class="lbl">Notas</label><textarea class="field" name="notes" rows="3">${esc(d.notes || '')}</textarea></div>
@@ -4064,12 +4100,16 @@ async function openEvent(id, date) {
         if (!f.elements.namedItem('title').value.trim()) return 'Escribe un título';
         if (!isValidDay(f.elements.namedItem('date').value)) return 'Elige una fecha';
         if (!f.elements.namedItem('allDay').checked && f.elements.namedItem('end').value && f.elements.namedItem('end').value < f.elements.namedItem('start').value) return 'La hora de fin es anterior a la de inicio';
+        if (f.elements.namedItem('alarm').value === 'custom' && !/^\d{1,2}:\d{2}$/.test(f.elements.namedItem('alarmTime').value)) return 'Elige la hora del aviso';
         return null;
       } }
     ],
     onOpen: form => {
       const sync = () => { const on = form.elements.namedItem('allDay').checked; ['start', 'end'].forEach(n => form.elements.namedItem(n).disabled = on); };
       form.elements.namedItem('allDay').addEventListener('change', sync); sync();
+      const alSel = form.elements.namedItem('alarm');
+      const alSync = () => { form.querySelector('#evAlarmWhen').hidden = alSel.value !== 'custom'; };
+      alSel.addEventListener('change', alSync); alSync();
       tagFieldInit(form);
     }
   });
@@ -4080,9 +4120,11 @@ async function openEvent(id, date) {
     return;
   }
   const f = r.data;
-  Object.assign(d, { title: f.title.trim(), date: f.date, allDay: !!f.allDay, start: f.start || d.start, end: f.end || d.end, repeat: f.repeat || '', until: f.until || '', color: safeColor(f.color), notes: (f.notes || '').trim(), tags: tagsFromField(f.tags) });
-  if (!d.tags.length) delete d.tags;
+  Object.assign(d, { title: f.title.trim(), date: f.date, allDay: !!f.allDay, start: f.start || d.start, end: f.end || d.end, repeat: f.repeat || '', until: f.until || '', alarm: alarmValue(f.alarm, f.alarmDay, f.alarmTime), color: safeColor(f.color), notes: (f.notes || '').trim(), tags: tagsFromField(f.tags) });
   if (ex) Object.assign(ex, d); else S.events.push(d);
+  const obj = ex || d;                                   // quitar el aviso o las etiquetas los borra del evento
+  if (!obj.alarm) delete obj.alarm;
+  if (!(obj.tags || []).length) delete obj.tags;
   save.events(); calGoto(d.date);
   if (!ex) toast('Evento creado', 'success', 1500);
 }
@@ -4095,16 +4137,18 @@ function buildIcs(includeTasks) {
   const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Cuadro de Mando//ES', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const RR = { daily: 'FREQ=DAILY', weekly: 'FREQ=WEEKLY', monthly: 'FREQ=MONTHLY', yearly: 'FREQ=YEARLY', weekdays: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR' };
-  const ve = (id, date, allDay, start, end, title, notes, repeat, until) => {
+  const ve = (id, date, allDay, start, end, title, notes, repeat, until, alarm) => {
     L.push('BEGIN:VEVENT', `UID:${id}@cuadro-de-mando`, `DTSTAMP:${stamp}`);
     if (allDay) { L.push(`DTSTART;VALUE=DATE:${icsD(date)}`, `DTEND;VALUE=DATE:${icsD(dayKey(addDays(parseDay(date), 1)))}`); }
     else { L.push(`DTSTART:${icsD(date)}T${start.replace(':', '')}00`, `DTEND:${icsD(date)}T${(end || start).replace(':', '')}00`); }
     if (repeat && RR[repeat]) L.push(`RRULE:${RR[repeat]}${until ? ';UNTIL=' + icsD(until) + (allDay ? '' : 'T235959') : ''}`);
     L.push(icsFold('SUMMARY:' + icsEsc(title)));
     if (notes) L.push(icsFold('DESCRIPTION:' + icsEsc(notes)));
+    const trg = alarm ? icsTrigger(alarm, date, allDay, start) : '';
+    if (trg) L.push('BEGIN:VALARM', 'ACTION:DISPLAY', icsFold('DESCRIPTION:' + icsEsc(title)), trg, 'END:VALARM');
     L.push('END:VEVENT');
   };
-  S.events.forEach(e => ve(e.id, e.date, e.allDay, e.start, e.end, e.title, e.notes, e.repeat, e.until));
+  S.events.forEach(e => ve(e.id, e.date, e.allDay, e.start, e.end, e.title, e.notes, e.repeat, e.until, e.alarm));
   if (includeTasks) {
     S.tasks.filter(t => t.due && t.col !== 'done').forEach(t => ve('k' + t.id, t.due, true, '', '', '📋 ' + t.title, t.desc, '', ''));
     S.todos.filter(t => t.due && !t.done).forEach(t => ve('t' + t.id, t.due, true, '', '', '☑️ ' + t.text, t.notes, '', ''));
@@ -4114,11 +4158,14 @@ function buildIcs(includeTasks) {
 }
 function parseIcs(text) {
   const lines = text.replace(/\r?\n[ \t]/g, '').split(/\r?\n/);
-  const evs = []; let cur = null;
+  const evs = []; let cur = null, enAlarma = false;
   for (const line of lines) {
     if (line === 'BEGIN:VEVENT') { cur = {}; continue; }
-    if (line === 'END:VEVENT') { if (cur) evs.push(cur); cur = null; continue; }
+    if (line === 'END:VEVENT') { if (cur) evs.push(cur); cur = null; enAlarma = false; continue; }
     if (!cur) continue;
+    if (/^BEGIN:VALARM$/i.test(line)) { enAlarma = true; continue; }
+    if (/^END:VALARM$/i.test(line)) { enAlarma = false; continue; }
+    if (enAlarma) { if (/^TRIGGER/i.test(line) && !cur.TRIGGER) cur.TRIGGER = { val: line.slice(line.indexOf(':') + 1), params: line.slice(0, line.indexOf(':')).toUpperCase() }; continue; }
     const i = line.indexOf(':'); if (i < 0) continue;
     const [name, ...params] = line.slice(0, i).split(';');
     cur[name.toUpperCase()] = { val: line.slice(i + 1), params: params.join(';').toUpperCase() };
@@ -4145,7 +4192,10 @@ function parseIcs(text) {
       else if (f === 'YEARLY') repeat = 'yearly';
       if (r.UNTIL) { const u = dt({ val: r.UNTIL }); if (u) until = u.date; }
     }
-    return { id: uid(), title: unesc((e.SUMMARY && e.SUMMARY.val) || 'Sin título').slice(0, 200), date: s.date, allDay: s.allDay, start: s.time || '09:00', end: en && !en.allDay && en.date === s.date ? en.time : (s.time || '10:00'), color: COLORS[1], repeat, until, notes: unesc((e.DESCRIPTION && e.DESCRIPTION.val) || '').slice(0, 2000), created: Date.now() };
+    const ev = { id: uid(), title: unesc((e.SUMMARY && e.SUMMARY.val) || 'Sin título').slice(0, 200), date: s.date, allDay: s.allDay, start: s.time || '09:00', end: en && !en.allDay && en.date === s.date ? en.time : (s.time || '10:00'), color: COLORS[1], repeat, until, notes: unesc((e.DESCRIPTION && e.DESCRIPTION.val) || '').slice(0, 2000), created: Date.now() };
+    const av = e.TRIGGER ? alarmFromTrigger(e.TRIGGER, ev, dt) : '';
+    if (av) ev.alarm = av;
+    return ev;
   }).filter(Boolean);
 }
 async function exportIcs() {
@@ -7381,7 +7431,7 @@ function pomoRender() {
   const filled = P.mode === 'long' && P.cycle > 0 ? every : P.cycle % every;
   const dots = Array.from({ length: every }, (_, i) => `<i class="${i < filled ? 'on' : ''}"></i>`).join('');
   if ($('#pomoDots').innerHTML !== dots) $('#pomoDots').innerHTML = dots;
-  const t = P.running ? `${txt} · ${POMO_MODES[P.mode].label}` : 'Cuadro de Mando';
+  const t = (avBadge ? `⏰ (${avBadge}) ` : '') + (P.running ? `${txt} · ${POMO_MODES[P.mode].label}` : 'Cuadro de Mando');
   if (t !== lastTitle) { document.title = t; lastTitle = t; }
 }
 function renderPomoToday() {
@@ -11444,6 +11494,7 @@ function renderSettings() {
   $('#setStart').value = S.prefs.start || 'last';
   renderFs();
   try { renderCp(); } catch {}
+  try { renderAv(); } catch {}
   renderDataUsage();
   renderHistory();
   renderProtect();
@@ -12148,6 +12199,331 @@ if (dashBloc) {
   });
 }
 /* =====================================================================
+   AVISOS DE EVENTOS · la alarma que se queda en pantalla
+   =====================================================================
+   Cada evento puede llevar un aviso: a su hora, un rato antes, o a una hora
+   concreta que elijas (el mismo día o días antes). Cuando llega el momento, el
+   aviso aparece abajo a la izquierda y SE QUEDA AHÍ hasta que lo cierres o lo
+   pospongas: así queda constancia aunque no estuvieras mirando. Si el navegador
+   tiene permiso, además salta una notificación del sistema y suena un aviso.
+
+   Importante y honesto: la app no tiene servidor ni proceso en segundo plano, así
+   que los avisos solo suenan con la aplicación abierta (aunque sea en otra
+   pestaña). Si estaba cerrada, el aviso te espera y lo ves al volver a abrirla
+   (hasta 36 horas después).
+
+   Lo que ya has cerrado o pospuesto es de CADA equipo (no viaja en el archivo
+   compartido): así el aviso te salta igual en el portátil de casa aunque ese día
+   lo cerraras en el del trabajo.
+*/
+const ALARM_LABELS = {
+  '': 'Sin aviso',
+  at: 'A la hora del evento',
+  '5m': '5 minutos antes',
+  '10m': '10 minutos antes',
+  '15m': '15 minutos antes',
+  '30m': '30 minutos antes',
+  '1h': '1 hora antes',
+  '2h': '2 horas antes',
+  '1d': '1 día antes',
+  custom: 'A una hora concreta…'
+};
+const ALARM_OFFSETS = { at: 0, '5m': 5, '10m': 10, '15m': 15, '30m': 30, '1h': 60, '2h': 120, '1d': 1440 };
+const ALARM_DAYS = [[0, 'El mismo día'], [-1, 'El día antes'], [-2, 'Dos días antes'], [-3, 'Tres días antes'], [-7, 'Una semana antes']];
+const ALARM_RE = /^(-\d{1,2})?@(\d{1,2}):(\d{2})$/;
+const AV_BASE_HORA = '09:00';            // de qué hora se cuentan los avisos en eventos de todo el día
+const AV_VENTANA = 36 * 3600e3;          // un aviso más viejo que esto ya no se muestra
+const AV_DEF = { sound: true };
+const AV_SNOOZES = [[5, '5 min'], [10, '10 min'], [30, '30 min'], [60, '1 hora']];
+
+const avPrefs = () => ({ ...AV_DEF, ...(plainObj(store.get('avisos', null)) ? store.get('avisos', {}) : {}) });
+const avMap = k => { const v = store.get(k, null); return plainObj(v) ? v : {}; };
+const avSetMap = (k, v) => store.set(k, v);
+
+/** Separa el valor guardado en el evento en las piezas que pide el formulario. */
+function alarmParts(a) {
+  const s = String(a || '');
+  const m = ALARM_RE.exec(s);
+  if (m) return { preset: 'custom', day: Number(m[1] || 0), time: pad(+m[2]) + ':' + m[3] };
+  return { preset: ALARM_OFFSETS[s] != null ? s : '', day: 0, time: AV_BASE_HORA };
+}
+/** Compone el valor a guardar a partir de lo elegido en el formulario. */
+function alarmValue(preset, day, time) {
+  if (preset !== 'custom') return ALARM_OFFSETS[preset] != null ? preset : '';
+  const m = /^(\d{1,2}):(\d{2})$/.exec(String(time || ''));
+  if (!m) return '';
+  const d = Number(day) || 0;
+  return (d ? String(d) : '') + '@' + pad(+m[1]) + ':' + m[2];
+}
+/** Texto corto para enseñar el aviso configurado («20:00 del día antes»). */
+function alarmLabel(a) {
+  const s = String(a || '');
+  if (!s) return '';
+  if (ALARM_OFFSETS[s] != null) return ALARM_LABELS[s];
+  const m = ALARM_RE.exec(s);
+  if (!m) return '';
+  const dia = (ALARM_DAYS.find(([k]) => k === Number(m[1] || 0)) || [0, 'El mismo día'])[1];
+  return `${pad(+m[2])}:${m[3]} · ${dia.toLowerCase()}`;
+}
+/** Momento exacto (en milisegundos) del aviso para la repetición que cae en «key». */
+function alarmAt(ev, key) {
+  if (!ev || !ev.alarm || !isValidDay(key)) return 0;
+  const m = ALARM_RE.exec(String(ev.alarm));
+  if (m) {
+    const d = addDays(parseDay(key), Number(m[1] || 0));
+    d.setHours(+m[2], +m[3], 0, 0);
+    return d.getTime();
+  }
+  const off = ALARM_OFFSETS[ev.alarm];
+  if (off == null) return 0;
+  const hm = /^(\d{1,2}):(\d{2})$/.exec(ev.allDay ? AV_BASE_HORA : (ev.start || AV_BASE_HORA)) || [0, 9, '00'];
+  const base = parseDay(key);
+  base.setHours(+hm[1], +hm[2], 0, 0);
+  return base.getTime() - off * 60000;
+}
+
+/* ---------- .ics: el aviso también se exporta e importa ---------- */
+function icsTrigger(alarm, date, allDay, start) {
+  const p = alarmParts(alarm);
+  if (p.preset === 'custom') {
+    const at = alarmAt({ alarm, allDay, start }, date);
+    if (!at) return '';
+    return 'TRIGGER;VALUE=DATE-TIME:' + new Date(at).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  }
+  const mins = ALARM_OFFSETS[p.preset];
+  if (mins == null) return '';
+  if (!mins) return 'TRIGGER:-PT0M';
+  if (mins % 1440 === 0) return `TRIGGER:-P${mins / 1440}D`;
+  if (mins % 60 === 0) return `TRIGGER:-PT${mins / 60}H`;
+  return `TRIGGER:-PT${mins}M`;
+}
+/** Traduce el TRIGGER de un .ics ajeno al aviso más parecido de los nuestros. */
+function alarmFromTrigger(trg, ev, dt) {
+  const val = String((trg && trg.val) || '').trim();
+  const dur = /^-?P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/i.exec(val);
+  if (dur && /^-|^P/.test(val)) {
+    const mins = (+dur[1] || 0) * 10080 + (+dur[2] || 0) * 1440 + (+dur[3] || 0) * 60 + (+dur[4] || 0) + Math.round((+dur[5] || 0) / 60);
+    if (val[0] !== '-' && mins) return '';                       // avisos DESPUÉS del evento: no los tenemos
+    const cerca = Object.entries(ALARM_OFFSETS).find(([, v]) => v === mins);
+    if (cerca) return cerca[0];
+    const base = parseDay(ev.date);
+    const hm = /^(\d{1,2}):(\d{2})$/.exec(ev.allDay ? AV_BASE_HORA : ev.start) || [0, 9, '00'];
+    base.setHours(+hm[1], +hm[2], 0, 0);
+    const d = new Date(base.getTime() - mins * 60000);
+    return alarmValue('custom', -diffDays(dayKey(d), ev.date), pad(d.getHours()) + ':' + pad(d.getMinutes()));
+  }
+  const abs = dt && dt(trg);
+  if (abs && !abs.allDay) return alarmValue('custom', -diffDays(abs.date, ev.date), abs.time);
+  return '';
+}
+
+/* ---------- Qué avisos toca enseñar ---------- */
+/** Todos los avisos (pasados y futuros) que caen en el rango de días indicado. */
+function avScan(desde, hasta) {
+  const out = [];
+  (S.events || []).forEach(ev => {
+    if (!ev.alarm) return;
+    eventDates(ev, desde, hasta).forEach(key => {
+      const at = alarmAt(ev, key);
+      if (at) out.push({ ev, day: key, at, key: ev.id + '|' + key });
+    });
+  });
+  return out.sort((a, b) => a.at - b.at);
+}
+const avRange = (atras, adelante) => avScan(dayKey(addDays(new Date(), -atras)), dayKey(addDays(new Date(), adelante)));
+/** Los que ya han sonado y ni se han cerrado ni se han pospuesto. */
+function avDue() {
+  const now = Date.now(), visto = avMap('alarmSeen'), tarde = avMap('alarmSnooze');
+  const due = avRange(3, 8).filter(a => {
+    const momento = tarde[a.key] > a.at ? tarde[a.key] : a.at;
+    return momento <= now && now - momento < AV_VENTANA && !visto[a.key];
+  });
+  // De un evento que se repite, solo el aviso más reciente: no tiene sentido amontonar los de días pasados.
+  const ultimo = new Map();
+  due.forEach(a => { const o = ultimo.get(a.ev.id); if (!o || a.at > o.at) ultimo.set(a.ev.id, a); });
+  return [...ultimo.values()].sort((a, b) => a.at - b.at);
+}
+/** Los próximos, para la lista de Ajustes. */
+const avNext = () => avRange(0, 32).filter(a => a.at > Date.now());
+
+/** «hace 5 min», «ahora mismo», «hace 2 h». */
+function avAgo(at) {
+  const m = Math.round((Date.now() - at) / 60000);
+  if (m < 1) return 'ahora mismo';
+  if (m < 60) return `hace ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `hace ${h} h`;
+  return `hace ${Math.floor(h / 24)} día${h < 48 ? '' : 's'}`;
+}
+/** «en 10 min», «mañana a las 9:00». */
+function avIn(at) {
+  const m = Math.round((at - Date.now()) / 60000);
+  if (m < 60) return `en ${Math.max(1, m)} min`;
+  const d = new Date(at), hoy = dayKey(), k = dayKey(d);
+  const hora = pad(d.getHours()) + ':' + pad(d.getMinutes());
+  if (k === hoy) return `hoy a las ${hora}`;
+  if (k === dayKey(addDays(new Date(), 1))) return `mañana a las ${hora}`;
+  return `${fmtDayLabel(k)} a las ${hora}`;
+}
+const avWhenEvent = ev => ev.allDay ? 'todo el día' : (ev.start || '') + (ev.end && ev.end !== ev.start ? '–' + ev.end : '');
+
+/* ---------- El panel que se queda en pantalla ---------- */
+const avWrap = document.createElement('div');
+avWrap.className = 'avisos'; avWrap.id = 'avisos'; avWrap.hidden = true;
+document.body.append(avWrap);
+let avBadge = 0, avHtml = '';
+const AV_SONADOS = new Set();
+
+function avItemHtml(a) {
+  const ev = a.ev;
+  const cuando = a.day === dayKey() ? 'hoy' : a.day === dayKey(addDays(new Date(), 1)) ? 'mañana' : fmtDayLabel(a.day);
+  return `<div class="aviso" style="--c:${safeColor(ev.color)}">
+    <div class="aviso-h"><b class="grow ellipsis">⏰ ${esc(ev.title)}</b><button type="button" class="btn icon sm ghost" data-av-close="${esc(a.key)}" title="Cerrar este aviso" aria-label="Cerrar aviso">✕</button></div>
+    <div class="small muted">${esc(cap(cuando))} · ${esc(avWhenEvent(ev))} · aviso ${esc(avAgo(a.at))}</div>
+    ${ev.notes ? `<div class="aviso-notes small">${esc(ev.notes.slice(0, 200))}</div>` : ''}
+    <div class="row aviso-btns">
+      <button type="button" class="btn sm" data-av-go="${esc(a.key)}">📅 Ver en el calendario</button>
+      <select class="field sm" data-av-snooze="${esc(a.key)}" title="Volver a avisar más tarde"><option value="">Posponer…</option>${AV_SNOOZES.map(([m, l]) => `<option value="${m}">${l}</option>`).join('')}</select>
+    </div>
+  </div>`;
+}
+function avRender(due) {
+  const list = due || avDue();
+  const html = list.length
+    ? (list.length > 1 ? `<div class="aviso-top"><b class="grow">⏰ ${list.length} avisos</b><button type="button" class="btn sm ghost" data-av-all="1">Cerrar todos</button></div>` : '') + list.map(avItemHtml).join('')
+    : '';
+  if (html !== avHtml) { avHtml = html; avWrap.innerHTML = html; }
+  avWrap.hidden = !list.length;
+  avSetBadge(list.length);
+}
+/** El número en el título de la pestaña, para verlo sin tener la app delante. */
+function avSetBadge(n) {
+  if (n === avBadge) return;
+  avBadge = n;
+  try { lastTitle = ''; pomoRender(); } catch { document.title = (n ? `⏰ (${n}) ` : '') + 'Cuadro de Mando'; }
+}
+function avBeep() {
+  if (!avPrefs().sound) return;
+  ensureAudio();
+  if (!audioCtx) return;
+  try {
+    const t0 = audioCtx.currentTime;
+    [0, 0.34].forEach(d => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'triangle'; o.frequency.value = 784;
+      g.gain.setValueAtTime(0.0001, t0 + d);
+      g.gain.exponentialRampToValueAtTime(0.28, t0 + d + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 0.3);
+      o.connect(g).connect(audioCtx.destination);
+      o.start(t0 + d); o.stop(t0 + d + 0.32);
+    });
+  } catch {}
+}
+function avSystem(a) {
+  try {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    new Notification('⏰ ' + a.ev.title, { body: `${cap(avWhenEvent(a.ev) || 'hoy')} · ${fmtLongDay(a.day)}`, tag: a.key });
+  } catch {}
+}
+/** Se llama cada poco: lo que acaba de sonar avisa (sonido y notificación) y el panel se repinta. */
+function avCheck() {
+  if (!APP_READY) return;
+  const lock = $('#lockScreen');
+  if (lock && !lock.hidden) { avWrap.hidden = true; return; }   // con la app bloqueada no se enseña nada
+  const due = avDue();
+  const nuevos = due.filter(a => !AV_SONADOS.has(a.key));
+  nuevos.forEach(a => { AV_SONADOS.add(a.key); avSystem(a); });
+  if (nuevos.length) avBeep();
+  avRender(due);
+  if (currentTab === 'settings') renderAv();
+}
+function avClose(key) {
+  const v = avMap('alarmSeen'); v[key] = Date.now(); avSetMap('alarmSeen', v);
+  avRender();
+}
+function avCloseAll() {
+  const v = avMap('alarmSeen'), now = Date.now();
+  avDue().forEach(a => { v[a.key] = now; });
+  avSetMap('alarmSeen', v); avRender();
+  toast('Avisos cerrados', 'info', 2000);
+}
+function avSnooze(key, mins) {
+  const v = avMap('alarmSnooze'); v[key] = Date.now() + mins * 60000; avSetMap('alarmSnooze', v);
+  AV_SONADOS.delete(key);
+  avRender();
+  toast(`Te vuelvo a avisar en ${mins === 60 ? '1 hora' : mins + ' min'}`, 'success', 2500);
+}
+/** Limpia los apuntes de avisos ya cerrados que no hacen falta (y los de eventos borrados). */
+function avPrune() {
+  const limite = Date.now() - 60 * 864e5, ids = new Set((S.events || []).map(e => e.id));
+  ['alarmSeen', 'alarmSnooze'].forEach(k => {
+    const v = avMap(k); let toca = false;
+    Object.keys(v).forEach(key => {
+      const [id, day] = key.split('|');
+      if (!ids.has(id) || (+v[key] || 0) < limite || (isValidDay(day) && parseDay(day).getTime() < limite)) { delete v[key]; toca = true; }
+    });
+    if (toca) avSetMap(k, v);
+  });
+}
+/** Al arrancar: lo que sonó hace demasiado se da por visto, para no asustar con avisos de hace semanas. */
+function avInit() {
+  avPrune();
+  const now = Date.now(), v = avMap('alarmSeen'); let toca = false;
+  avRange(400, 8).forEach(a => { if (a.at <= now && now - a.at >= AV_VENTANA && !v[a.key]) { v[a.key] = now; toca = true; } });
+  if (toca) avSetMap('alarmSeen', v);
+  avCheck();
+}
+
+avWrap.addEventListener('click', e => {
+  const c = e.target.closest('[data-av-close]'); if (c) return avClose(c.dataset.avClose);
+  if (e.target.closest('[data-av-all]')) return avCloseAll();
+  const g = e.target.closest('[data-av-go]');
+  if (g) {
+    const a = avDue().find(x => x.key === g.dataset.avGo);
+    if (a) { showTab('calendar'); calGoto(a.day); }
+  }
+});
+avWrap.addEventListener('change', e => {
+  const s = e.target.closest('[data-av-snooze]'); if (!s || !s.value) return;
+  const key = s.dataset.avSnooze, mins = Number(s.value); s.value = '';
+  avSnooze(key, mins);
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) avCheck(); });
+setInterval(() => { try { avCheck(); } catch (e) { console.warn(e); } }, 20000);
+
+/* ---------- Ajustes ---------- */
+function renderAv() {
+  const card = $('#avCard'); if (!card) return;
+  const p = avPrefs();
+  const sound = $('#avSound'); if (sound && sound.checked !== !!p.sound) sound.checked = !!p.sound;
+  const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+  const estado = {
+    granted: '<b>Notificaciones del sistema activadas.</b> Además del aviso en pantalla, el navegador te lo enseñará aunque estés en otra pestaña.',
+    denied: '<b>El navegador ha bloqueado las notificaciones del sistema.</b> El aviso en pantalla funciona igual; si las quieres, permítelas en los ajustes del sitio del navegador.',
+    default: 'El aviso en pantalla funciona siempre. Si además quieres que el navegador te lo notifique, concede el permiso.',
+    unsupported: 'Este navegador no admite notificaciones del sistema: el aviso en pantalla funciona igual.'
+  }[perm];
+  const st = $('#avStatus'); if (st) st.innerHTML = estado;
+  const btn = $('#avPerm'); if (btn) btn.hidden = perm !== 'default';
+  const prox = avNext().slice(0, 8);
+  const html = prox.length
+    ? prox.map(a => `<div class="agenda-item" style="--c:${safeColor(a.ev.color)}"><span class="agenda-bar"></span><span class="time">${esc(avIn(a.at))}</span><span class="grow" style="min-width:0"><span class="ellipsis" style="display:block">⏰ ${esc(a.ev.title)}</span><span class="small muted">${esc(fmtDayLabel(a.day))} · ${esc(avWhenEvent(a.ev))} · ${esc(alarmLabel(a.ev.alarm))}</span></span></div>`).join('')
+    : '<div class="empty small">Ningún aviso programado para los próximos 30 días. Se ponen al crear o editar un evento, en el campo «Aviso».</div>';
+  const lista = $('#avNext'); if (lista && lista.innerHTML !== html) lista.innerHTML = html;
+}
+if ($('#avSound')) $('#avSound').addEventListener('change', e => {
+  store.set('avisos', { ...avPrefs(), sound: e.target.checked });
+  if (e.target.checked) { ensureAudio(); avBeep(); }
+});
+if ($('#avPerm')) $('#avPerm').addEventListener('click', async () => {
+  if (!('Notification' in window)) { toast('Este navegador no admite notificaciones', 'warning'); return; }
+  try {
+    const p = await Notification.requestPermission();
+    toast(p === 'granted' ? 'Notificaciones activadas' : 'El navegador no ha concedido el permiso (al abrir el archivo en local algunos navegadores lo bloquean)', p === 'granted' ? 'success' : 'warning', 4500);
+  } catch { toast('No se pudieron activar las notificaciones', 'warning'); }
+  renderAv();
+});
+/* =====================================================================
    ARRANQUE
    ===================================================================== */
 function startApp() {
@@ -12172,6 +12548,7 @@ function startApp() {
   const start = TABS.some(t => t.id === hash) ? hash : (S.prefs.start && S.prefs.start !== 'last' ? S.prefs.start : store.get('lastTab', 'dashboard'));
   showTab(start);
   updateClock(); setInterval(updateClock, 15000);
+  try { avInit(); } catch (e) { console.warn(e); }
   ttTick(); renderSecurity(); histInit().catch(() => {}).then(fsInit).then(() => { try { cpInit(); } catch (e) { console.warn(e); } });
   if (!window.crypto || !crypto.subtle) toast('Aviso: este navegador no permite el cifrado en este contexto', 'warning', 6000);
 }
@@ -12198,6 +12575,7 @@ function refreshApp() {
   try { tagStyleRefresh(); } catch {}
   try { blocRefresh(); } catch {}
   renderFsPill(); updateClock();
+  try { avCheck(); } catch {}
   showTab(currentTab);          // repinta la pestaña que estés viendo
 }
 async function boot() {

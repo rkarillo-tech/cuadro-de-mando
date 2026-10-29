@@ -16,7 +16,7 @@ Una regla práctica para decidir dónde va cada cosa:
 | Un tema que necesitas desmenuzar o planificar | 🧠 Mapa mental | Notas (📝 en cada idea) y tareas (☑️) |
 | Algo que tienes que hacer tú, con fecha o sin ella | ☑️ Tareas | Una nota con `[[Título]]` en sus notas |
 | Trabajo con etapas (por hacer, en curso, hecho) | 📋 Kanban | Una nota con `[[Título]]` en la descripción |
-| Algo que ocurre en un día y hora concretos | 📅 Calendario | — |
+| Algo que ocurre en un día y hora concretos | 📅 Calendario | Con aviso, si quieres que te lo recuerde |
 | Un enlace web que usas a menudo | 🔖 Marcadores | — |
 
 ## Notas enlazadas: tu red de conocimiento
@@ -226,6 +226,30 @@ El aviso que sale después lleva **Deshacer**.
 
 **Criterio para no duplicar**: la tarea dice *qué* hay que hacer y *cuándo*; la nota guarda el *porqué* y el *cómo*. Si el texto de una tarea pasa de unas líneas, muévelo a una nota y deja en la tarea solo el enlace.
 
+## Avisos de eventos: la alarma que se queda en pantalla
+
+Al crear o editar un evento del calendario hay un campo **Aviso**. Puedes elegir un rato antes (5, 10, 15 o 30 minutos, 1 o 2 horas, 1 día) o **a una hora concreta**, que es lo más útil cuando lo que quieres es acordarte *la noche de antes*:
+
+| Lo que quieres | Qué eliges |
+| --- | --- |
+| Que me avise justo cuando empiece | **A la hora del evento** |
+| Salir con tiempo a la reunión | **15 minutos antes** |
+| Preparar los papeles la noche anterior | **A una hora concreta…** → *El día antes* + `20:00` |
+| Acordarme una semana antes de la renovación | **A una hora concreta…** → *Una semana antes* + `09:00` |
+
+Cuando llega el momento aparece un cartel **abajo a la izquierda** con el título del evento, su hora y sus notas, y **se queda ahí hasta que lo cierras**: aunque cambies de sección, aunque estuvieras en otra cosa. Tres salidas:
+
+- **📅 Ver en el calendario**: te lleva al día del evento.
+- **Posponer**: 5, 10, 30 minutos o 1 hora, y vuelve a avisar.
+- **✕ Cerrar**: se va y no vuelve (si coinciden varios, hay un **Cerrar todos**).
+
+Además, el título de la pestaña del navegador pasa a `⏰ (1) Cuadro de Mando`, suena un aviso corto y, si le das permiso, el navegador te lo notifica aunque estés en otra pestaña. El permiso, el sonido y la lista de **próximos avisos** están en **Ajustes → ⏰ Avisos de eventos**.
+
+**Dos cosas que conviene saber**, para que no te lleves sorpresas:
+
+- La aplicación no tiene servidor ni nada corriendo por detrás: **los avisos solo suenan con la aplicación abierta** (basta con que esté en otra pestaña o minimizada). Si la tenías cerrada, el aviso **te espera** y lo ves al abrirla, hasta 36 horas después. Para algo que no te puedes jugar, pon el aviso aquí *y* exporta el `.ics` a tu calendario del móvil: al exportar, los avisos viajan dentro del archivo.
+- Lo que cierras o pospones es **de este equipo**. Así el aviso te salta igual en el portátil de casa aunque ese día lo cerraras en el del trabajo.
+
 ## Siete casos prácticos, de principio a fin
 
 **1. Arrancar un proyecto**
@@ -293,7 +317,7 @@ La regla es la de siempre: si es algo que **se consulta**, nota; si es algo que 
 | Sección | Para qué sirve |
 | --- | --- |
 | 🏠 Inicio | Resumen del día: tareas, eventos, avisos |
-| 📅 Calendario | Eventos, fechas límite y festivos; importa y exporta `.ics` |
+| 📅 Calendario | Eventos con aviso, fechas límite y festivos; importa y exporta `.ics` |
 | 🔖 Marcadores | Enlaces web frecuentes, por categorías |
 | 🍅 Pomodoro | Bloques de concentración con descansos |
 | ⏱️ Horas | Registro de tiempo por proyecto y cliente |
@@ -306,7 +330,7 @@ La regla es la de siempre: si es algo que **se consulta**, nota; si es algo que 
 
 ## Proteger lo que construyes
 
-Cuatro capas, cada una contra un riesgo distinto (todo está en Ajustes):
+Cinco capas, cada una contra un riesgo distinto (todo está en Ajustes):
 
 | Capa | Qué hace | Te protege de | Qué tienes que hacer |
 | --- | --- | --- | --- |

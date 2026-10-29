@@ -23,6 +23,7 @@ function startApp() {
   const start = TABS.some(t => t.id === hash) ? hash : (S.prefs.start && S.prefs.start !== 'last' ? S.prefs.start : store.get('lastTab', 'dashboard'));
   showTab(start);
   updateClock(); setInterval(updateClock, 15000);
+  try { avInit(); } catch (e) { console.warn(e); }
   ttTick(); renderSecurity(); histInit().catch(() => {}).then(fsInit).then(() => { try { cpInit(); } catch (e) { console.warn(e); } });
   if (!window.crypto || !crypto.subtle) toast('Aviso: este navegador no permite el cifrado en este contexto', 'warning', 6000);
 }
@@ -49,6 +50,7 @@ function refreshApp() {
   try { tagStyleRefresh(); } catch {}
   try { blocRefresh(); } catch {}
   renderFsPill(); updateClock();
+  try { avCheck(); } catch {}
   showTab(currentTab);          // repinta la pestaña que estés viendo
 }
 async function boot() {

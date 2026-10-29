@@ -86,7 +86,7 @@ function pomoRender() {
   const filled = P.mode === 'long' && P.cycle > 0 ? every : P.cycle % every;
   const dots = Array.from({ length: every }, (_, i) => `<i class="${i < filled ? 'on' : ''}"></i>`).join('');
   if ($('#pomoDots').innerHTML !== dots) $('#pomoDots').innerHTML = dots;
-  const t = P.running ? `${txt} · ${POMO_MODES[P.mode].label}` : 'Cuadro de Mando';
+  const t = (avBadge ? `⏰ (${avBadge}) ` : '') + (P.running ? `${txt} · ${POMO_MODES[P.mode].label}` : 'Cuadro de Mando');
   if (t !== lastTitle) { document.title = t; lastTitle = t; }
 }
 function renderPomoToday() {

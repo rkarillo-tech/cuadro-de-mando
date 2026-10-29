@@ -152,6 +152,7 @@ function todoItemHtml(t, opts = {}) {
     meta.push(`<span class="${cls}">📅 ${esc(fmtDayLabel(t.due))}</span>`);
   }
   if (t.repeat) meta.push(`<span title="${esc(REPEAT_LABELS[t.repeat])}">🔁 ${esc(REPEAT_LABELS[t.repeat])}</span>`);
+  if (t.alarm && t.due && !t.done) meta.push(`<span title="Aviso: ${esc(alarmLabel(t.alarm))}">⏰ ${esc(alarmLabel(t.alarm))}</span>`);
   if (opts.showList) { const l = listOf(t.listId); meta.push(`<span>${l.emoji || '📋'} ${esc(l.name)}</span>`); }
   if (t.steps && t.steps.length) meta.push(`<span>☑ ${t.steps.filter(s => s.done).length}/${t.steps.length}</span>`);
   if (t.notes) { const ln = wlTextTitles(t.notes); meta.push(ln.length ? `<span title="Notas enlazadas: ${esc(ln.join(', '))}">🔗 ${ln.length} nota${ln.length === 1 ? '' : 's'}</span>` : '<span title="Tiene notas">📝</span>'); }
@@ -246,6 +247,7 @@ function completeTodo(id, done = true) {
 }
 function refreshTodoViews() {
   renderTodos();
+  try { avCheck(); } catch {}
   if (currentTab === 'dashboard') renderDashboard();
   if (currentTab === 'calendar') renderCalendar();
 }
@@ -262,7 +264,7 @@ function deleteTodo(id) {
  */
 function todoToKanban(id, { keep = false } = {}) {
   const t = getTodo(id); if (!t) return;
-  const card = { id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() };
+  const card = { id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), ...(t.alarm && t.due ? { alarm: t.alarm } : {}), created: Date.now() };
   S.tasks.push(card);
   const i = S.todos.findIndex(x => x.id === id);
   if (!keep) S.todos.splice(i, 1);
@@ -308,6 +310,7 @@ async function openTodo(id) {
       <button type="button" class="btn sm" data-q="0">Hoy</button><button type="button" class="btn sm" data-q="1">Mañana</button><button type="button" class="btn sm" data-q="week">Próx. lunes</button><button type="button" class="btn sm ghost" data-q="none">Sin fecha</button>
       <label class="check-row" style="margin-left:auto"><input type="checkbox" class="check" name="important"${draft.important ? ' checked' : ''}> ⭐ Importante</label>
     </div>
+    ${alarmTaskFieldHtml(draft.alarm)}
     ${tagFieldHtml('tags', draft.tags || [], { src: 'text,notes' })}
     <div><label class="lbl">Pasos <span id="stProg"></span></label>
       <div id="stList"></div>
@@ -321,7 +324,7 @@ async function openTodo(id) {
       { label: '🗑️', value: 'delete', cls: 'danger left' },
       { label: '📋 Pasar a Kanban', value: 'kanban', cls: '' },
       { label: 'Cancelar', value: null, cls: 'ghost' },
-      { label: 'Guardar', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('text').value.trim() ? null : 'La tarea no puede estar vacía' }
+      { label: 'Guardar', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('text').value.trim() ? alarmTaskValidate(f) : 'La tarea no puede estar vacía' }
     ],
     onOpen: form => {
       const due = form.elements.namedItem('due');
@@ -346,6 +349,7 @@ async function openTodo(id) {
       render();
       wlAttachField(form, 'notes', { kind: 'Tareas', titleField: 'text' });
       tagFieldInit(form);
+      alarmTaskFieldInit(form);
     }
   });
   if (!r) return;
@@ -358,6 +362,7 @@ async function openTodo(id) {
   });
   if (!t.tags.length) delete t.tags;
   if (t.repeat && !t.due) t.due = todayKey();
+  alarmTaskSet(t, d);
   save.todos();
   if (r.action === 'kanban') { todoToKanbanAsk(id); return; }
   refreshTodoViews();

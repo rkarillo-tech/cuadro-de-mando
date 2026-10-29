@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Cuadro de Mando 1.7.0 (2026-10-29) · productividad personal 100 % local, sin servidor
+  Cuadro de Mando 1.8.0 (2026-10-29) · productividad personal 100 % local, sin servidor
   https://github.com/rkarillo-tech/cuadro-de-mando
 
   MIT License
@@ -30,7 +30,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-pv14w24lIMAkZPuh2wso5xhE0gq9oiSVa2/Upc/64PA='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-yWDdswWzKnzwb2iW8wO5HKQHP+Z0dmW0sYrl0UAmV1k='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
 <title>Cuadro de Mando</title>
@@ -911,7 +911,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 .df-list.good li::marker{color:var(--success)}
 @media (max-width:600px){.df-table td:nth-child(2),.df-table td:nth-child(3),.df-table th:nth-child(2),.df-table th:nth-child(3){width:44px}}
 
-/* Avisos de eventos: el cartel que se queda hasta que lo cierras */
+/* Avisos (eventos, tareas y tarjetas): el cartel que se queda hasta que lo cierras */
 .avisos{position:fixed;left:254px;bottom:20px;width:340px;max-width:calc(100vw - 36px);z-index:480;display:flex;flex-direction:column;gap:8px}
 .aviso-top{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px 8px;box-shadow:var(--shadow)}
 .aviso{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--c,var(--accent));border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;animation:avIn .22s ease}
@@ -947,7 +947,7 @@ details.bl-row summary.bl-h{cursor:pointer}
   <aside class="sidebar" id="sidebar">
     <div class="brand"><div class="brand-logo">◆</div><div>Cuadro de Mando<div class="muted small" style="font-weight:500">Tu espacio personal</div></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.7.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
+    <div class="sidebar-foot" id="sidebarFoot">🔒 100 % local · sin servidor<div class="credits">v1.8.0 · © 2026 Rafael Karino Arillo · <button type="button" class="link-inline" id="licLink" title="Ver la licencia y los créditos">Licencia MIT</button></div></div>
   </aside>
   <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -2013,7 +2013,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
 
         <div class="card" id="avCard">
-          <div class="card-h"><h3>⏰ Avisos de eventos</h3></div>
+          <div class="card-h"><h3>⏰ Avisos</h3></div>
           <div class="status-line" id="avStatus"></div>
           <div class="row" style="margin-top:4px">
             <button class="btn" id="avPerm" hidden>🔔 Permitir notificaciones del navegador</button>
@@ -2021,7 +2021,7 @@ details.bl-row summary.bl-h{cursor:pointer}
           </div>
           <label class="lbl" style="margin-top:12px">Próximos avisos (30 días)</label>
           <div class="list" id="avNext"></div>
-          <p class="hint">El aviso se pone en cada evento, en el campo <b>Aviso</b>: a su hora, un rato antes, o <b>a una hora concreta</b> (el mismo día o días antes). Cuando llega, aparece un cartel abajo a la izquierda que <b>se queda ahí hasta que lo cierres</b> o lo pospongas. Como la app no tiene servidor ni nada corriendo por detrás, los avisos solo suenan <b>con la aplicación abierta</b> (aunque sea en otra pestaña); si estaba cerrada, el aviso te espera y lo ves al abrirla (hasta 36 horas después). Lo que cierras o pospones es de <b>este equipo</b>: así el aviso te salta igual en el otro portátil.</p>
+          <p class="hint">El aviso se pone en cada evento, tarea o tarjeta del Kanban, en el campo <b>Aviso</b>. En los eventos: a su hora, un rato antes, o <b>a una hora concreta</b> (el mismo día o días antes). En las tareas y tarjetas, que solo tienen fecha: a una hora concreta del día en que vencen o de días antes. Cuando llega, aparece un cartel abajo a la izquierda que <b>se queda ahí hasta que lo cierres</b> o lo pospongas. Como la app no tiene servidor ni nada corriendo por detrás, los avisos solo suenan <b>con la aplicación abierta</b> (aunque sea en otra pestaña); si estaba cerrada, el aviso te espera y lo ves al abrirla (hasta 36 horas después). Lo que cierras o pospones es de <b>este equipo</b>: así el aviso te salta igual en el otro portátil.</p>
         </div>
 
 
@@ -2046,7 +2046,7 @@ details.bl-row summary.bl-h{cursor:pointer}
 
         <div class="card" id="licCard">
           <div class="card-h"><h3>ℹ️ Licencia y créditos</h3><span class="badge">MIT</span></div>
-          <p>Cuadro de Mando 1.7.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
+          <p>Cuadro de Mando 1.8.0 · © 2026 Rafael Karino Arillo (rkarillo-tech) · <a href="https://github.com/rkarillo-tech/cuadro-de-mando" target="_blank" rel="noopener noreferrer">github.com/rkarillo-tech/cuadro-de-mando</a></p>
           <p class="small">Software libre con licencia MIT: puedes usarlo, copiarlo, modificarlo y distribuirlo, también con fines comerciales, siempre que conserves este aviso de copyright y el texto de la licencia. Se ofrece tal cual, sin garantía de ningún tipo.</p>
           <details class="lic-det" id="licDetails"><summary>Ver el texto de la licencia</summary><pre class="lic-text">MIT License
 
@@ -3304,6 +3304,7 @@ function todoItemHtml(t, opts = {}) {
     meta.push(`<span class="${cls}">📅 ${esc(fmtDayLabel(t.due))}</span>`);
   }
   if (t.repeat) meta.push(`<span title="${esc(REPEAT_LABELS[t.repeat])}">🔁 ${esc(REPEAT_LABELS[t.repeat])}</span>`);
+  if (t.alarm && t.due && !t.done) meta.push(`<span title="Aviso: ${esc(alarmLabel(t.alarm))}">⏰ ${esc(alarmLabel(t.alarm))}</span>`);
   if (opts.showList) { const l = listOf(t.listId); meta.push(`<span>${l.emoji || '📋'} ${esc(l.name)}</span>`); }
   if (t.steps && t.steps.length) meta.push(`<span>☑ ${t.steps.filter(s => s.done).length}/${t.steps.length}</span>`);
   if (t.notes) { const ln = wlTextTitles(t.notes); meta.push(ln.length ? `<span title="Notas enlazadas: ${esc(ln.join(', '))}">🔗 ${ln.length} nota${ln.length === 1 ? '' : 's'}</span>` : '<span title="Tiene notas">📝</span>'); }
@@ -3398,6 +3399,7 @@ function completeTodo(id, done = true) {
 }
 function refreshTodoViews() {
   renderTodos();
+  try { avCheck(); } catch {}
   if (currentTab === 'dashboard') renderDashboard();
   if (currentTab === 'calendar') renderCalendar();
 }
@@ -3414,7 +3416,7 @@ function deleteTodo(id) {
  */
 function todoToKanban(id, { keep = false } = {}) {
   const t = getTodo(id); if (!t) return;
-  const card = { id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), created: Date.now() };
+  const card = { id: uid(), title: t.text, desc: t.notes || '', col: 'todo', priority: t.important ? 'alta' : 'media', due: t.due || '', tags: (t.tags || []).slice(), subtasks: (t.steps || []).map(s => ({ id: uid(), text: s.text, done: s.done })), ...(t.alarm && t.due ? { alarm: t.alarm } : {}), created: Date.now() };
   S.tasks.push(card);
   const i = S.todos.findIndex(x => x.id === id);
   if (!keep) S.todos.splice(i, 1);
@@ -3460,6 +3462,7 @@ async function openTodo(id) {
       <button type="button" class="btn sm" data-q="0">Hoy</button><button type="button" class="btn sm" data-q="1">Mañana</button><button type="button" class="btn sm" data-q="week">Próx. lunes</button><button type="button" class="btn sm ghost" data-q="none">Sin fecha</button>
       <label class="check-row" style="margin-left:auto"><input type="checkbox" class="check" name="important"${draft.important ? ' checked' : ''}> ⭐ Importante</label>
     </div>
+    ${alarmTaskFieldHtml(draft.alarm)}
     ${tagFieldHtml('tags', draft.tags || [], { src: 'text,notes' })}
     <div><label class="lbl">Pasos <span id="stProg"></span></label>
       <div id="stList"></div>
@@ -3473,7 +3476,7 @@ async function openTodo(id) {
       { label: '🗑️', value: 'delete', cls: 'danger left' },
       { label: '📋 Pasar a Kanban', value: 'kanban', cls: '' },
       { label: 'Cancelar', value: null, cls: 'ghost' },
-      { label: 'Guardar', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('text').value.trim() ? null : 'La tarea no puede estar vacía' }
+      { label: 'Guardar', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('text').value.trim() ? alarmTaskValidate(f) : 'La tarea no puede estar vacía' }
     ],
     onOpen: form => {
       const due = form.elements.namedItem('due');
@@ -3498,6 +3501,7 @@ async function openTodo(id) {
       render();
       wlAttachField(form, 'notes', { kind: 'Tareas', titleField: 'text' });
       tagFieldInit(form);
+      alarmTaskFieldInit(form);
     }
   });
   if (!r) return;
@@ -3510,6 +3514,7 @@ async function openTodo(id) {
   });
   if (!t.tags.length) delete t.tags;
   if (t.repeat && !t.due) t.due = todayKey();
+  alarmTaskSet(t, d);
   save.todos();
   if (r.action === 'kanban') { todoToKanbanAsk(id); return; }
   refreshTodoViews();
@@ -3695,6 +3700,7 @@ function cardHtml(t) {
     <div class="kb-meta">
       <span class="badge ${p.cls}">${p.label}</span>
       ${di ? `<span class="badge ${di.cls}">${di.label}</span>` : ''}
+      ${t.alarm && t.due && t.col !== 'done' ? `<span class="badge" title="Aviso: ${esc(alarmLabel(t.alarm))}">⏰ ${esc(alarmLabel(t.alarm))}</span>` : ''}
       ${subs.length ? `<span class="badge${doneN === subs.length ? ' success' : ''}">☑ ${doneN}/${subs.length}</span>` : ''}
       ${t.pomodoros ? `<span class="badge" title="Pomodoros dedicados">🍅 ${t.pomodoros}</span>` : ''}
       ${tagUniq(t.tags || []).map(g => `<span class="badge tg-mini tg-pill" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
@@ -3735,6 +3741,7 @@ function renderBoard() {
       <div class="kb-list" data-col="${c.id}">${items.map(cardHtml).join('') || `<div class="empty small">${q || pf || tf ? 'Sin coincidencias' : 'Arrastra tareas aquí'}</div>`}</div>
     </div>`;
   }).join('');
+  try { avCheck(); } catch {}
 }
 onShow.kanban = renderBoard;
 $('#kbDens').addEventListener('click', e => {
@@ -3780,7 +3787,7 @@ function taskToTodo(id, { keep = false } = {}) {
     id: uid(), listId: 'inbox', text: t.title.slice(0, 300), done: t.col === 'done',
     due: t.due || '', important: t.priority === 'alta', repeat: '', notes: t.desc || '',
     tags: (t.tags || []).slice(), steps: (t.subtasks || []).map(s => ({ id: uid(), text: s.text, done: s.done })),
-    created: Date.now(), order: Math.min(0, ...S.todos.filter(x => x.listId === 'inbox').map(x => x.order ?? 0)) - 1
+    ...(t.alarm && t.due ? { alarm: t.alarm } : {}), created: Date.now(), order: Math.min(0, ...S.todos.filter(x => x.listId === 'inbox').map(x => x.order ?? 0)) - 1
   };
   S.todos.push(todo);
   const i = S.tasks.indexOf(t);
@@ -3848,6 +3855,7 @@ async function openTask(id, col = 'todo') {
       <div><label class="lbl">Prioridad</label><select class="field" name="priority">${Object.entries(PRIO).map(([k, p]) => `<option value="${k}"${k === draft.priority ? ' selected' : ''}>${p.label}</option>`).join('')}</select></div>
       <div><label class="lbl">Fecha límite</label><input type="date" class="field" name="due" value="${esc(draft.due)}"></div>
     </div>
+    ${alarmTaskFieldHtml(draft.alarm)}
     ${tagFieldHtml('tags', draft.tags || [], { src: 'title,desc' })}
     <div><label class="lbl">Subtareas <span id="subProg"></span></label>
       <div id="subList"></div>
@@ -3857,7 +3865,7 @@ async function openTask(id, col = 'todo') {
     ...(existing ? [{ label: '🗑️ Eliminar', value: 'delete', cls: 'danger left' }] : []),
     ...(existing ? [{ label: '📤 Enviar a…', value: 'send', cls: '' }] : []),
     { label: 'Cancelar', value: null, cls: 'ghost' },
-    { label: existing ? 'Guardar' : 'Crear tarea', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('title').value.trim() ? null : 'Escribe un título para la tarea' }
+    { label: existing ? 'Guardar' : 'Crear tarea', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('title').value.trim() ? alarmTaskValidate(f) : 'Escribe un título para la tarea' }
   ];
   const r = await modal({
     title: existing ? '✏️ Editar tarea' : '＋ Nueva tarea', body, actions, wide: true,
@@ -3877,6 +3885,7 @@ async function openTask(id, col = 'todo') {
       render();
       wlAttachField(form, 'desc', { kind: 'Kanban', titleField: 'title' });
       tagFieldInit(form);
+      alarmTaskFieldInit(form);
     }
   });
   if (!r) return;
@@ -3888,6 +3897,7 @@ async function openTask(id, col = 'todo') {
       due: d.due || '', tags: tagsFromField(d.tags),
       subtasks: draft.subtasks.map(sb => ({ ...sb, text: sb.text.trim() })).filter(sb => sb.text)
     });
+    alarmTaskSet(existing, d);
     save.tasks(); renderBoard();
     taskSendAsk(existing.id);
     return;
@@ -3897,9 +3907,11 @@ async function openTask(id, col = 'todo') {
     tags: tagsFromField(d.tags)
   });
   draft.subtasks = draft.subtasks.map(s => ({ ...s, text: s.text.trim() })).filter(s => s.text);
+  alarmTaskSet(draft, d);
   if (existing) {
     const oldCol = existing.col;
     Object.assign(existing, draft, { col: oldCol });
+    if (!draft.alarm) delete existing.alarm;            // quitar el aviso lo borra de la tarjeta
     save.tasks();
     if (d.col !== oldCol) moveTask(existing.id, d.col); else renderBoard();
   } else {
@@ -4019,8 +4031,8 @@ function calDayItems(key, opts = {}) {
   if (f.events) S.events.forEach(ev => {
     if (eventDates(ev, key, key).length) out.push({ kind: 'event', icon: ev.repeat ? '🔁' : '📅', title: ev.title + (ev.alarm ? ' ⏰' : ''), time: ev.allDay ? '' : ev.start + (ev.end && ev.end !== ev.start ? '–' + ev.end : ''), sort: ev.allDay ? '' : ev.start, color: safeColor(ev.color), id: ev.id });
   });
-  if (f.kanban) S.tasks.filter(t => t.due === key && t.col !== 'done').forEach(t => out.push({ kind: 'kanban', icon: '📋', title: t.title, color: PRIO[t.priority]?.color || 'var(--warning)', id: t.id }));
-  if (f.todos) S.todos.filter(t => !t.done && t.due === key).forEach(t => out.push({ kind: 'todo', icon: '☑️', title: t.text, color: 'var(--info)', id: t.id }));
+  if (f.kanban) S.tasks.filter(t => t.due === key && t.col !== 'done').forEach(t => out.push({ kind: 'kanban', icon: '📋', title: t.title + (t.alarm ? ' ⏰' : ''), color: PRIO[t.priority]?.color || 'var(--warning)', id: t.id }));
+  if (f.todos) S.todos.filter(t => !t.done && t.due === key).forEach(t => out.push({ kind: 'todo', icon: '☑️', title: t.text + (t.alarm ? ' ⏰' : ''), color: 'var(--info)', id: t.id }));
   return out.sort((a, b) => (KIND_ORDER[a.kind] - KIND_ORDER[b.kind]) || String(a.sort || '').localeCompare(String(b.sort || '')));
 }
 
@@ -4150,8 +4162,8 @@ function buildIcs(includeTasks) {
   };
   S.events.forEach(e => ve(e.id, e.date, e.allDay, e.start, e.end, e.title, e.notes, e.repeat, e.until, e.alarm));
   if (includeTasks) {
-    S.tasks.filter(t => t.due && t.col !== 'done').forEach(t => ve('k' + t.id, t.due, true, '', '', '📋 ' + t.title, t.desc, '', ''));
-    S.todos.filter(t => t.due && !t.done).forEach(t => ve('t' + t.id, t.due, true, '', '', '☑️ ' + t.text, t.notes, '', ''));
+    S.tasks.filter(t => t.due && t.col !== 'done').forEach(t => ve('k' + t.id, t.due, true, '', '', '📋 ' + t.title, t.desc, '', '', t.alarm));
+    S.todos.filter(t => t.due && !t.done).forEach(t => ve('t' + t.id, t.due, true, '', '', '☑️ ' + t.text, t.notes, '', '', t.alarm));
   }
   L.push('END:VCALENDAR');
   return L.join('\r\n') + '\r\n';
@@ -12199,10 +12211,12 @@ if (dashBloc) {
   });
 }
 /* =====================================================================
-   AVISOS DE EVENTOS · la alarma que se queda en pantalla
+   AVISOS · la alarma que se queda en pantalla
    =====================================================================
    Cada evento puede llevar un aviso: a su hora, un rato antes, o a una hora
-   concreta que elijas (el mismo día o días antes). Cuando llega el momento, el
+   concreta que elijas (el mismo día o días antes). Las tareas y las tarjetas del
+   Kanban también, a una hora concreta del día en que vencen o de días antes
+   (solo tienen fecha, no hora, así que «un rato antes» no tendría de dónde contar). Cuando llega el momento, el
    aviso aparece abajo a la izquierda y SE QUEDA AHÍ hasta que lo cierres o lo
    pospongas: así queda constancia aunque no estuvieras mirando. Si el navegador
    tiene permiso, además salta una notificación del sistema y suena un aviso.
@@ -12317,15 +12331,62 @@ function alarmFromTrigger(trg, ev, dt) {
   return '';
 }
 
+/* ---------- Tareas y tarjetas del Kanban ---------- */
+/** El campo «Aviso» de una tarea o tarjeta: el día (o «Sin aviso») y la hora. */
+function alarmTaskFieldHtml(alarm) {
+  const p = alarmParts(alarm), on = p.preset === 'custom';
+  return `<div><label class="lbl">Aviso</label>
+    <div class="row" style="gap:6px;flex-wrap:nowrap">
+      <select class="field" name="alarmDay" style="flex:1;min-width:0"><option value="">Sin aviso</option>${ALARM_DAYS.map(([k, v]) => `<option value="${k}"${on && k === p.day ? ' selected' : ''}>${v}</option>`).join('')}</select>
+      <input type="time" class="field" name="alarmTime" value="${esc(p.time)}" style="width:9.5em;flex:none"${on ? '' : ' hidden'}>
+    </div></div>`;
+}
+function alarmTaskFieldInit(form) {
+  const day = form.elements.namedItem('alarmDay'), time = form.elements.namedItem('alarmTime');
+  day.addEventListener('change', () => { time.hidden = day.value === ''; });
+}
+/** Sin fecha no hay día del que contar: se pide antes de guardar. */
+function alarmTaskValidate(form) {
+  if (form.elements.namedItem('alarmDay').value === '') return null;
+  if (!isValidDay(form.elements.namedItem('due').value)) return 'Pon una fecha para poder avisarte';
+  if (!/^\d{1,2}:\d{2}$/.test(form.elements.namedItem('alarmTime').value)) return 'Elige la hora del aviso';
+  return null;
+}
+const alarmTaskValue = d => d.alarmDay === '' || d.alarmDay == null ? '' : alarmValue('custom', d.alarmDay, d.alarmTime);
+/** Guarda el aviso en la tarea o tarjeta (y lo quita del todo si no lleva). */
+function alarmTaskSet(obj, d) {
+  const v = alarmTaskValue(d);
+  if (v && obj.due) obj.alarm = v; else delete obj.alarm;
+}
+const KB_AV_COLOR = { alta: COLORS[4], media: COLORS[3], baja: COLORS[1] };
+
 /* ---------- Qué avisos toca enseñar ---------- */
+/**
+ * Todo lo que lleva aviso, con lo necesario para enseñarlo. «uid» va en la clave de lo
+ * cerrado o pospuesto: el de los eventos es su id a secas, como antes; tareas y tarjetas
+ * llevan delante «td:» o «kb:» para no confundirse con ellos.
+ */
+function avSources() {
+  const out = [];
+  (S.events || []).forEach(ev => {
+    if (ev.alarm) out.push({ kind: 'event', id: ev.id, uid: ev.id, title: ev.title, color: ev.color, notes: ev.notes, when: avWhenEvent(ev), alarm: ev.alarm, base: ev, dates: (a, b) => eventDates(ev, a, b) });
+  });
+  const due = t => (a, b) => t.due >= a && t.due <= b ? [t.due] : [];
+  (S.todos || []).forEach(t => {
+    if (t.alarm && isValidDay(t.due) && !t.done) out.push({ kind: 'todo', id: t.id, uid: 'td:' + t.id, title: t.text, color: COLORS[1], notes: t.notes, when: '☑️ tarea', alarm: t.alarm, base: { alarm: t.alarm, allDay: true }, dates: due(t) });
+  });
+  (S.tasks || []).forEach(t => {
+    if (t.alarm && isValidDay(t.due) && t.col !== 'done') out.push({ kind: 'kanban', id: t.id, uid: 'kb:' + t.id, title: t.title, color: KB_AV_COLOR[t.priority] || COLORS[3], notes: t.desc, when: '📋 Kanban · ' + ((COLS.find(c => c.id === t.col) || {}).name || ''), alarm: t.alarm, base: { alarm: t.alarm, allDay: true }, dates: due(t) });
+  });
+  return out;
+}
 /** Todos los avisos (pasados y futuros) que caen en el rango de días indicado. */
 function avScan(desde, hasta) {
   const out = [];
-  (S.events || []).forEach(ev => {
-    if (!ev.alarm) return;
-    eventDates(ev, desde, hasta).forEach(key => {
-      const at = alarmAt(ev, key);
-      if (at) out.push({ ev, day: key, at, key: ev.id + '|' + key });
+  avSources().forEach(ev => {
+    ev.dates(desde, hasta).forEach(key => {
+      const at = alarmAt(ev.base, key);
+      if (at) out.push({ ev, day: key, at, key: ev.uid + '|' + key });
     });
   });
   return out.sort((a, b) => a.at - b.at);
@@ -12340,7 +12401,7 @@ function avDue() {
   });
   // De un evento que se repite, solo el aviso más reciente: no tiene sentido amontonar los de días pasados.
   const ultimo = new Map();
-  due.forEach(a => { const o = ultimo.get(a.ev.id); if (!o || a.at > o.at) ultimo.set(a.ev.id, a); });
+  due.forEach(a => { const o = ultimo.get(a.ev.uid); if (!o || a.at > o.at) ultimo.set(a.ev.uid, a); });
   return [...ultimo.values()].sort((a, b) => a.at - b.at);
 }
 /** Los próximos, para la lista de Ajustes. */
@@ -12376,13 +12437,16 @@ const AV_SONADOS = new Set();
 
 function avItemHtml(a) {
   const ev = a.ev;
-  const cuando = a.day === dayKey() ? 'hoy' : a.day === dayKey(addDays(new Date(), 1)) ? 'mañana' : fmtDayLabel(a.day);
+  let cuando = a.day === dayKey() ? 'hoy' : a.day === dayKey(addDays(new Date(), 1)) ? 'mañana' : fmtDayLabel(a.day);
+  if (ev.kind !== 'event') cuando = (a.day < dayKey() ? 'venció ' : 'vence ') + (cuando === 'hoy' || cuando === 'mañana' ? cuando : cuando.toLowerCase());
+  const ir = { event: '📅 Ver en el calendario', todo: '☑️ Abrir la tarea', kanban: '📋 Abrir la tarjeta' }[ev.kind];
   return `<div class="aviso" style="--c:${safeColor(ev.color)}">
     <div class="aviso-h"><b class="grow ellipsis">⏰ ${esc(ev.title)}</b><button type="button" class="btn icon sm ghost" data-av-close="${esc(a.key)}" title="Cerrar este aviso" aria-label="Cerrar aviso">✕</button></div>
-    <div class="small muted">${esc(cap(cuando))} · ${esc(avWhenEvent(ev))} · aviso ${esc(avAgo(a.at))}</div>
+    <div class="small muted">${esc(cap(cuando))} · ${esc(ev.when)} · aviso ${esc(avAgo(a.at))}</div>
     ${ev.notes ? `<div class="aviso-notes small">${esc(ev.notes.slice(0, 200))}</div>` : ''}
     <div class="row aviso-btns">
-      <button type="button" class="btn sm" data-av-go="${esc(a.key)}">📅 Ver en el calendario</button>
+      <button type="button" class="btn sm" data-av-go="${esc(a.key)}">${ir}</button>
+      ${ev.kind !== 'event' ? `<button type="button" class="btn sm" data-av-done="${esc(a.key)}" title="Darla por hecha y cerrar el aviso">✓ Hecha</button>` : ''}
       <select class="field sm" data-av-snooze="${esc(a.key)}" title="Volver a avisar más tarde"><option value="">Posponer…</option>${AV_SNOOZES.map(([m, l]) => `<option value="${m}">${l}</option>`).join('')}</select>
     </div>
   </div>`;
@@ -12422,7 +12486,7 @@ function avBeep() {
 function avSystem(a) {
   try {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    new Notification('⏰ ' + a.ev.title, { body: `${cap(avWhenEvent(a.ev) || 'hoy')} · ${fmtLongDay(a.day)}`, tag: a.key });
+    new Notification('⏰ ' + a.ev.title, { body: `${cap(a.ev.when || 'hoy')} · ${fmtLongDay(a.day)}`, tag: a.key });
   } catch {}
 }
 /** Se llama cada poco: lo que acaba de sonar avisa (sonido y notificación) y el panel se repinta. */
@@ -12455,7 +12519,8 @@ function avSnooze(key, mins) {
 }
 /** Limpia los apuntes de avisos ya cerrados que no hacen falta (y los de eventos borrados). */
 function avPrune() {
-  const limite = Date.now() - 60 * 864e5, ids = new Set((S.events || []).map(e => e.id));
+  const limite = Date.now() - 60 * 864e5;
+  const ids = new Set([...(S.events || []).map(e => e.id), ...(S.todos || []).map(t => 'td:' + t.id), ...(S.tasks || []).map(t => 'kb:' + t.id)]);
   ['alarmSeen', 'alarmSnooze'].forEach(k => {
     const v = avMap(k); let toca = false;
     Object.keys(v).forEach(key => {
@@ -12480,7 +12545,19 @@ avWrap.addEventListener('click', e => {
   const g = e.target.closest('[data-av-go]');
   if (g) {
     const a = avDue().find(x => x.key === g.dataset.avGo);
-    if (a) { showTab('calendar'); calGoto(a.day); }
+    if (!a) return;
+    if (a.ev.kind === 'todo') { showTab('todos'); openTodo(a.ev.id); }
+    else if (a.ev.kind === 'kanban') { showTab('kanban'); openTask(a.ev.id); }
+    else { showTab('calendar'); calGoto(a.day); }
+    return;
+  }
+  const h = e.target.closest('[data-av-done]');
+  if (h) {
+    const a = avDue().find(x => x.key === h.dataset.avDone);
+    if (!a) return;
+    avClose(a.key);
+    if (a.ev.kind === 'todo') completeTodo(a.ev.id);
+    else if (a.ev.kind === 'kanban') moveTask(a.ev.id, 'done');
   }
 });
 avWrap.addEventListener('change', e => {
@@ -12507,8 +12584,8 @@ function renderAv() {
   const btn = $('#avPerm'); if (btn) btn.hidden = perm !== 'default';
   const prox = avNext().slice(0, 8);
   const html = prox.length
-    ? prox.map(a => `<div class="agenda-item" style="--c:${safeColor(a.ev.color)}"><span class="agenda-bar"></span><span class="time">${esc(avIn(a.at))}</span><span class="grow" style="min-width:0"><span class="ellipsis" style="display:block">⏰ ${esc(a.ev.title)}</span><span class="small muted">${esc(fmtDayLabel(a.day))} · ${esc(avWhenEvent(a.ev))} · ${esc(alarmLabel(a.ev.alarm))}</span></span></div>`).join('')
-    : '<div class="empty small">Ningún aviso programado para los próximos 30 días. Se ponen al crear o editar un evento, en el campo «Aviso».</div>';
+    ? prox.map(a => `<div class="agenda-item" style="--c:${safeColor(a.ev.color)}"><span class="agenda-bar"></span><span class="time">${esc(avIn(a.at))}</span><span class="grow" style="min-width:0"><span class="ellipsis" style="display:block">⏰ ${esc(a.ev.title)}</span><span class="small muted">${esc(fmtDayLabel(a.day))} · ${esc(a.ev.when)} · ${esc(alarmLabel(a.ev.alarm))}</span></span></div>`).join('')
+    : '<div class="empty small">Ningún aviso programado para los próximos 30 días. Se ponen al crear o editar un evento, una tarea o una tarjeta del Kanban, en el campo «Aviso».</div>';
   const lista = $('#avNext'); if (lista && lista.innerHTML !== html) lista.innerHTML = html;
 }
 if ($('#avSound')) $('#avSound').addEventListener('change', e => {

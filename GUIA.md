@@ -226,7 +226,7 @@ El aviso que sale después lleva **Deshacer**.
 
 **Criterio para no duplicar**: la tarea dice *qué* hay que hacer y *cuándo*; la nota guarda el *porqué* y el *cómo*. Si el texto de una tarea pasa de unas líneas, muévelo a una nota y deja en la tarea solo el enlace.
 
-## Avisos de eventos: la alarma que se queda en pantalla
+## Avisos: la alarma que se queda en pantalla
 
 Al crear o editar un evento del calendario hay un campo **Aviso**. Puedes elegir un rato antes (5, 10, 15 o 30 minutos, 1 o 2 horas, 1 día) o **a una hora concreta**, que es lo más útil cuando lo que quieres es acordarte *la noche de antes*:
 
@@ -237,13 +237,15 @@ Al crear o editar un evento del calendario hay un campo **Aviso**. Puedes elegir
 | Preparar los papeles la noche anterior | **A una hora concreta…** → *El día antes* + `20:00` |
 | Acordarme una semana antes de la renovación | **A una hora concreta…** → *Una semana antes* + `09:00` |
 
+**En las tareas y en las tarjetas del Kanban** también hay un campo **Aviso**. Como solo tienen fecha (no hora), el aviso es siempre **a una hora concreta** del día en que vencen o de días antes: *El mismo día* + `08:30`, *El día antes* + `20:00`… Para ponerlo hace falta que tengan fecha. Al pasar una tarea al Kanban (o una tarjeta a Tareas) el aviso va con ella, y en una tarea que se repite, al completarla la siguiente hereda el aviso. Las que llevan aviso se marcan con ⏰ en la lista, en el tablero y en el calendario.
+
 Cuando llega el momento aparece un cartel **abajo a la izquierda** con el título del evento, su hora y sus notas, y **se queda ahí hasta que lo cierras**: aunque cambies de sección, aunque estuvieras en otra cosa. Tres salidas:
 
-- **📅 Ver en el calendario**: te lleva al día del evento.
+- **📅 Ver en el calendario**: te lleva al día del evento (en una tarea o tarjeta, **Abrir la tarea / la tarjeta**, y además **✓ Hecha** para completarla y cerrar el aviso de una vez).
 - **Posponer**: 5, 10, 30 minutos o 1 hora, y vuelve a avisar.
 - **✕ Cerrar**: se va y no vuelve (si coinciden varios, hay un **Cerrar todos**).
 
-Además, el título de la pestaña del navegador pasa a `⏰ (1) Cuadro de Mando`, suena un aviso corto y, si le das permiso, el navegador te lo notifica aunque estés en otra pestaña. El permiso, el sonido y la lista de **próximos avisos** están en **Ajustes → ⏰ Avisos de eventos**.
+Además, el título de la pestaña del navegador pasa a `⏰ (1) Cuadro de Mando`, suena un aviso corto y, si le das permiso, el navegador te lo notifica aunque estés en otra pestaña. El permiso, el sonido y la lista de **próximos avisos** están en **Ajustes → ⏰ Avisos**.
 
 **Dos cosas que conviene saber**, para que no te lleves sorpresas:
 

@@ -160,6 +160,82 @@ with sync_playwright() as p:
     ok(pg.is_visible('#avisos .aviso'), 'y vuelve al desbloquear')
     pg.evaluate("avCloseAll(); S.events=[]; save.events(); 0"); pg.wait_for_timeout(200)
 
+    # ===== Tareas: aviso a una hora concreta del día en que vencen =====
+    pg.evaluate("""(() => { S.todos=[{id:'t1', listId:'inbox', text:'Pagar el seguro', done:false, due:'', important:false,
+        repeat:'', notes:'', steps:[], created:Date.now(), order:0}]; save.todos(); showTab('todos'); openTodo('t1'); 0})()"""); pg.wait_for_timeout(500)
+    ok(pg.locator('.modal select[name=alarmDay]').count() == 1, 'el formulario de la tarea tiene el campo «Aviso»')
+    ok(not pg.is_visible('.modal input[name=alarmTime]'), 'la hora está escondida mientras no hay aviso')
+    pg.select_option('.modal select[name=alarmDay]', '-1'); pg.wait_for_timeout(200)
+    ok(pg.is_visible('.modal input[name=alarmTime]'), 'al elegir el día aparece la hora')
+    pg.fill('.modal input[name=alarmTime]', '20:00')
+    pg.locator('.modal button:has-text("Guardar")').click(); pg.wait_for_timeout(350)
+    ok(pg.locator('.modal').count() > 0 and 'fecha' in pg.inner_text('.modal'), 'sin fecha no deja poner aviso')
+    pg.fill('.modal input[name=due]', '2026-12-01')
+    pg.locator('.modal button:has-text("Guardar")').click(); pg.wait_for_timeout(450)
+    ok(pg.evaluate("S.todos[0].alarm") == '-1@20:00', 'la tarea se guarda con su aviso')
+    pg.evaluate("todoView='all'; renderTodos(); 0"); pg.wait_for_timeout(200)
+    ok('⏰ 20:00' in pg.locator('.todo-item[data-id=t1]').inner_text(), 'en la lista se ve que la tarea lleva aviso')
+    pg.evaluate("openTodo('t1'); 0"); pg.wait_for_timeout(400)
+    ok(pg.input_value('.modal select[name=alarmDay]') == '-1' and pg.input_value('.modal input[name=alarmTime]') == '20:00', 'al reabrirla, el aviso sale tal como se dejó')
+    pg.select_option('.modal select[name=alarmDay]', '')
+    pg.locator('.modal button:has-text("Guardar")').click(); pg.wait_for_timeout(400)
+    ok(pg.evaluate("'alarm' in S.todos[0]") is False, 'quitar el aviso lo borra de la tarea')
+
+    pg.evaluate("""(() => { const h = new Date(Date.now()-6*60000);
+        S.todos=[{id:'t2', listId:'inbox', text:'Llamar al gestor', done:false, due:dayKey(new Date()), important:false,
+          repeat:'', notes:'Lo del IVA', steps:[], created:Date.now(), order:0, alarm:'@'+pad(h.getHours())+':'+pad(h.getMinutes())}];
+        S.events=[]; save.todos(); save.events(); store.set('alarmSeen',{}); store.set('alarmSnooze',{}); avCheck(); 0})()"""); pg.wait_for_timeout(450)
+    ok(pg.is_visible('#avisos .aviso') and 'Llamar al gestor' in pg.inner_text('#avisos') and 'Vence hoy' in pg.inner_text('#avisos'), 'el aviso de una tarea sale en pantalla, con cuándo vence')
+    ok(pg.locator('#avisos [data-av-go]').inner_text().find('tarea') >= 0, 'con un botón para abrir la tarea')
+    pg.locator('#avisos [data-av-done]').click(); pg.wait_for_timeout(450)
+    ok(pg.evaluate("S.todos.find(t=>t.id==='t2').done") is True and not pg.is_visible('#avisos .aviso'), '«✓ Hecha» la completa y cierra el aviso')
+
+    pg.evaluate("""(() => { const h = new Date(Date.now()-3*60000);
+        S.todos=[{id:'t3', listId:'inbox', text:'Regar', done:false, due:dayKey(new Date()), important:false,
+          repeat:'', notes:'', steps:[], created:Date.now(), order:0, alarm:'@'+pad(h.getHours())+':'+pad(h.getMinutes())}];
+        save.todos(); store.set('alarmSeen',{}); avCheck(); 0})()"""); pg.wait_for_timeout(400)
+    ok(pg.is_visible('#avisos .aviso'), 'otra tarea con aviso vencido sale en pantalla')
+    pg.evaluate("completeTodo('t3'); 0"); pg.wait_for_timeout(400)
+    ok(not pg.is_visible('#avisos .aviso'), 'y completarla desde la lista quita el aviso al momento')
+
+    # ===== Kanban =====
+    pg.evaluate("S.tasks=[]; save.tasks(); showTab('kanban'); openTask(null,'todo'); 0"); pg.wait_for_timeout(450)
+    ok(pg.locator('.modal select[name=alarmDay]').count() == 1, 'el formulario de la tarjeta tiene el campo «Aviso»')
+    pg.fill('.modal input[name=title]', 'Entregar informe')
+    pg.fill('.modal input[name=due]', '2026-12-01')
+    pg.select_option('.modal select[name=alarmDay]', '0'); pg.fill('.modal input[name=alarmTime]', '08:30')
+    pg.locator('.modal button:has-text("Crear tarea")').click(); pg.wait_for_timeout(450)
+    ok(pg.evaluate("S.tasks[0].alarm") == '@08:30', 'la tarjeta se guarda con su aviso')
+    ok('⏰ 08:30' in pg.inner_text('#kbBoard'), 'y en el tablero se ve el aviso en la tarjeta')
+    pg.evaluate("S.tasks[0].due = dayKey(addDays(new Date(), 2)); save.tasks(); showTab('settings'); 0"); pg.wait_for_timeout(400)
+    ok('Entregar informe' in pg.inner_text('#avNext'), 'los avisos de tarjetas también salen en «Próximos avisos»')
+    pg.evaluate("showTab('kanban'); openTask(S.tasks[0].id); 0"); pg.wait_for_timeout(400)
+    pg.select_option('.modal select[name=alarmDay]', '')
+    pg.locator('.modal button:has-text("Guardar")').click(); pg.wait_for_timeout(400)
+    ok(pg.evaluate("'alarm' in S.tasks[0]") is False, 'quitar el aviso lo borra de la tarjeta')
+
+    pg.evaluate("""(() => { const h = new Date(Date.now()-4*60000);
+        S.tasks=[{id:'k1', title:'Revisar contrato', desc:'', col:'doing', priority:'alta', due:dayKey(new Date()), tags:[], subtasks:[],
+          created:Date.now(), alarm:'@'+pad(h.getHours())+':'+pad(h.getMinutes())}];
+        save.tasks(); store.set('alarmSeen',{}); avCheck(); 0})()"""); pg.wait_for_timeout(400)
+    ok(pg.is_visible('#avisos .aviso') and 'Revisar contrato' in pg.inner_text('#avisos') and 'Kanban' in pg.inner_text('#avisos'), 'el aviso de una tarjeta sale en pantalla')
+    pg.locator('#avisos [data-av-go]').click(); pg.wait_for_timeout(450)
+    ok(pg.evaluate("currentTab") == 'kanban' and pg.locator('.modal input[name=title]').input_value() == 'Revisar contrato', '«Abrir la tarjeta» lleva a ella')
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
+    pg.locator('#avisos [data-av-done]').click(); pg.wait_for_timeout(400)
+    ok(pg.evaluate("S.tasks[0].col") == 'done' and not pg.is_visible('#avisos .aviso'), '«✓ Hecha» la pasa a Hecho y cierra el aviso')
+
+    # ===== El aviso viaja al pasar de Tareas al Kanban y viceversa, y en el .ics =====
+    pg.evaluate("""S.todos=[{id:'t9', listId:'inbox', text:'Viajera', done:false, due:'2026-12-01', important:false, repeat:'', notes:'', steps:[], created:Date.now(), order:0, alarm:'-1@20:00'}];
+        S.tasks=[]; save.todos(); save.tasks(); todoToKanban('t9'); 0"""); pg.wait_for_timeout(300)
+    ok(pg.evaluate("(S.tasks.find(t=>t.title==='Viajera')||{}).alarm") == '-1@20:00', 'al pasar una tarea al Kanban conserva su aviso')
+    pg.evaluate("taskToTodo(S.tasks.find(t=>t.title==='Viajera').id); 0"); pg.wait_for_timeout(300)
+    ok(pg.evaluate("(S.todos.find(t=>t.text==='Viajera')||{}).alarm") == '-1@20:00', 'y al volver a Tareas también')
+    ok('BEGIN:VALARM' in pg.evaluate("buildIcs(true)"), 'al exportar el .ics con tareas, su aviso va dentro')
+    pg.evaluate("avPrune(); 0")
+    ok(pg.evaluate("Object.keys(store.get('alarmSeen',{})).every(k => !k.startsWith('td:t2|') && !k.startsWith('kb:k1|'))") is True, 'lo cerrado de tareas y tarjetas que ya no existen se limpia')
+    pg.evaluate("S.todos=[]; S.tasks=[]; save.todos(); save.tasks(); 0")
+
     # ===== Móvil =====
     m = ctx.new_page()
     m.on('pageerror', lambda e: errs.append('PAGEERR móvil ' + str(e)))

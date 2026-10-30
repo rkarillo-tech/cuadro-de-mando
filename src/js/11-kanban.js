@@ -38,6 +38,7 @@ function cardHtml(t) {
     <div class="kb-meta">
       <span class="badge ${p.cls}">${p.label}</span>
       ${di ? `<span class="badge ${di.cls}">${di.label}</span>` : ''}
+      ${t.alarm && t.due && t.col !== 'done' ? `<span class="badge" title="Aviso: ${esc(alarmLabel(t.alarm))}">⏰ ${esc(alarmLabel(t.alarm))}</span>` : ''}
       ${subs.length ? `<span class="badge${doneN === subs.length ? ' success' : ''}">☑ ${doneN}/${subs.length}</span>` : ''}
       ${t.pomodoros ? `<span class="badge" title="Pomodoros dedicados">🍅 ${t.pomodoros}</span>` : ''}
       ${tagUniq(t.tags || []).map(g => `<span class="badge tg-mini tg-pill" data-tag="${esc(tagKey(g))}" title="Ver #${esc(g)}">#${esc(g)}</span>`).join('')}
@@ -78,6 +79,7 @@ function renderBoard() {
       <div class="kb-list" data-col="${c.id}">${items.map(cardHtml).join('') || `<div class="empty small">${q || pf || tf ? 'Sin coincidencias' : 'Arrastra tareas aquí'}</div>`}</div>
     </div>`;
   }).join('');
+  try { avCheck(); } catch {}
 }
 onShow.kanban = renderBoard;
 $('#kbDens').addEventListener('click', e => {
@@ -123,7 +125,7 @@ function taskToTodo(id, { keep = false } = {}) {
     id: uid(), listId: 'inbox', text: t.title.slice(0, 300), done: t.col === 'done',
     due: t.due || '', important: t.priority === 'alta', repeat: '', notes: t.desc || '',
     tags: (t.tags || []).slice(), steps: (t.subtasks || []).map(s => ({ id: uid(), text: s.text, done: s.done })),
-    created: Date.now(), order: Math.min(0, ...S.todos.filter(x => x.listId === 'inbox').map(x => x.order ?? 0)) - 1
+    ...(t.alarm && t.due ? { alarm: t.alarm } : {}), created: Date.now(), order: Math.min(0, ...S.todos.filter(x => x.listId === 'inbox').map(x => x.order ?? 0)) - 1
   };
   S.todos.push(todo);
   const i = S.tasks.indexOf(t);
@@ -192,6 +194,7 @@ async function openTask(id, col = 'todo') {
       <div><label class="lbl">Fecha límite</label><input type="date" class="field" name="due" value="${esc(draft.due)}"></div>
     </div>
     ${tagFieldHtml('tags', draft.tags || [], { src: 'title,desc' })}
+    ${alarmTaskFieldHtml(draft.alarm)}
     <div><label class="lbl">Subtareas <span id="subProg"></span></label>
       <div id="subList"></div>
       <div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="field" type="text" id="subNew" placeholder="Nueva subtarea y Enter" data-noenter><button type="button" class="btn" id="subAdd">Añadir</button></div>
@@ -200,7 +203,7 @@ async function openTask(id, col = 'todo') {
     ...(existing ? [{ label: '🗑️ Eliminar', value: 'delete', cls: 'danger left' }] : []),
     ...(existing ? [{ label: '📤 Enviar a…', value: 'send', cls: '' }] : []),
     { label: 'Cancelar', value: null, cls: 'ghost' },
-    { label: existing ? 'Guardar' : 'Crear tarea', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('title').value.trim() ? null : 'Escribe un título para la tarea' }
+    { label: existing ? 'Guardar' : 'Crear tarea', value: 'ok', cls: 'primary', validate: f => f.elements.namedItem('title').value.trim() ? alarmTaskValidate(f) : 'Escribe un título para la tarea' }
   ];
   const r = await modal({
     title: existing ? '✏️ Editar tarea' : '＋ Nueva tarea', body, actions, wide: true,
@@ -220,6 +223,7 @@ async function openTask(id, col = 'todo') {
       render();
       wlAttachField(form, 'desc', { kind: 'Kanban', titleField: 'title' });
       tagFieldInit(form);
+      alarmTaskFieldInit(form);
     }
   });
   if (!r) return;
@@ -231,6 +235,7 @@ async function openTask(id, col = 'todo') {
       due: d.due || '', tags: tagsFromField(d.tags),
       subtasks: draft.subtasks.map(sb => ({ ...sb, text: sb.text.trim() })).filter(sb => sb.text)
     });
+    alarmTaskSet(existing, d);
     save.tasks(); renderBoard();
     taskSendAsk(existing.id);
     return;
@@ -240,9 +245,11 @@ async function openTask(id, col = 'todo') {
     tags: tagsFromField(d.tags)
   });
   draft.subtasks = draft.subtasks.map(s => ({ ...s, text: s.text.trim() })).filter(s => s.text);
+  alarmTaskSet(draft, d);
   if (existing) {
     const oldCol = existing.col;
     Object.assign(existing, draft, { col: oldCol });
+    if (!draft.alarm) delete existing.alarm;            // quitar el aviso lo borra de la tarjeta
     save.tasks();
     if (d.col !== oldCol) moveTask(existing.id, d.col); else renderBoard();
   } else {

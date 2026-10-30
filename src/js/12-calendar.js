@@ -37,8 +37,8 @@ function calDayItems(key, opts = {}) {
   if (f.events) S.events.forEach(ev => {
     if (eventDates(ev, key, key).length) out.push({ kind: 'event', icon: ev.repeat ? '🔁' : '📅', title: ev.title + (ev.alarm ? ' ⏰' : ''), time: ev.allDay ? '' : ev.start + (ev.end && ev.end !== ev.start ? '–' + ev.end : ''), sort: ev.allDay ? '' : ev.start, color: safeColor(ev.color), id: ev.id });
   });
-  if (f.kanban) S.tasks.filter(t => t.due === key && t.col !== 'done').forEach(t => out.push({ kind: 'kanban', icon: '📋', title: t.title, color: PRIO[t.priority]?.color || 'var(--warning)', id: t.id }));
-  if (f.todos) S.todos.filter(t => !t.done && t.due === key).forEach(t => out.push({ kind: 'todo', icon: '☑️', title: t.text, color: 'var(--info)', id: t.id }));
+  if (f.kanban) S.tasks.filter(t => t.due === key && t.col !== 'done').forEach(t => out.push({ kind: 'kanban', icon: '📋', title: t.title + (t.alarm ? ' ⏰' : ''), color: PRIO[t.priority]?.color || 'var(--warning)', id: t.id }));
+  if (f.todos) S.todos.filter(t => !t.done && t.due === key).forEach(t => out.push({ kind: 'todo', icon: '☑️', title: t.text + (t.alarm ? ' ⏰' : ''), color: 'var(--info)', id: t.id }));
   return out.sort((a, b) => (KIND_ORDER[a.kind] - KIND_ORDER[b.kind]) || String(a.sort || '').localeCompare(String(b.sort || '')));
 }
 
@@ -168,8 +168,8 @@ function buildIcs(includeTasks) {
   };
   S.events.forEach(e => ve(e.id, e.date, e.allDay, e.start, e.end, e.title, e.notes, e.repeat, e.until, e.alarm));
   if (includeTasks) {
-    S.tasks.filter(t => t.due && t.col !== 'done').forEach(t => ve('k' + t.id, t.due, true, '', '', '📋 ' + t.title, t.desc, '', ''));
-    S.todos.filter(t => t.due && !t.done).forEach(t => ve('t' + t.id, t.due, true, '', '', '☑️ ' + t.text, t.notes, '', ''));
+    S.tasks.filter(t => t.due && t.col !== 'done').forEach(t => ve('k' + t.id, t.due, true, '', '', '📋 ' + t.title, t.desc, '', '', t.alarm));
+    S.todos.filter(t => t.due && !t.done).forEach(t => ve('t' + t.id, t.due, true, '', '', '☑️ ' + t.text, t.notes, '', '', t.alarm));
   }
   L.push('END:VCALENDAR');
   return L.join('\r\n') + '\r\n';

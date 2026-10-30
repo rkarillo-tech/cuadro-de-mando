@@ -245,7 +245,9 @@ Cuando llega el momento aparece un cartel **abajo a la izquierda** con el títul
 - **Posponer**: 5, 10, 30 minutos o 1 hora, y vuelve a avisar.
 - **✕ Cerrar**: se va y no vuelve (si coinciden varios, hay un **Cerrar todos**).
 
-Además, el título de la pestaña del navegador pasa a `⏰ (1) Cuadro de Mando`, suena un aviso corto y, si le das permiso, el navegador te lo notifica aunque estés en otra pestaña. El permiso, el sonido y la lista de **próximos avisos** están en **Ajustes → ⏰ Avisos**.
+**Que se vea bien**: en **Ajustes → ⏰ Avisos** eliges cómo se ve el cartel (**Discreto**, **Destacado** —todo de color, el de por defecto— o **Muy llamativo**, arriba y más grande) y su color (el de cada evento o uno fijo). Con **👀 Probar el aviso** ves cómo queda sin esperar a uno de verdad.
+
+El cartel solo se pinta dentro de la pestaña de la aplicación. Fuera de ella: el título de la pestaña del navegador pasa a `⏰ (1) Cuadro de Mando` (y parpadea si estás en otra pestaña), suena un aviso corto y, si le das permiso, el navegador te lo notifica aunque estés en otra pestaña. El permiso, el sonido y la lista de **próximos avisos** están en **Ajustes → ⏰ Avisos**.
 
 **Dos cosas que conviene saber**, para que no te lleves sorpresas:
 

@@ -116,10 +116,21 @@
           <div class="row" style="margin-top:4px">
             <button class="btn" id="avPerm" hidden>🔔 Permitir notificaciones del navegador</button>
             <label class="check-row" style="margin:0"><input type="checkbox" class="check" id="avSound" checked> Sonido al avisar</label>
+            <label class="check-row" style="margin:0"><input type="checkbox" class="check" id="avBlink" checked> Hacer parpadear el título de la pestaña</label>
           </div>
+          <div class="form-grid" style="margin-top:10px">
+            <div><label class="lbl" for="avStyle">Cómo se ve el cartel</label>
+              <select class="field" id="avStyle">
+                <option value="discreto">Discreto</option>
+                <option value="destacado">Destacado</option>
+                <option value="llamativo">Muy llamativo</option>
+              </select></div>
+            <div><label class="lbl">Color del cartel</label><div class="swatches" id="avColor"></div></div>
+          </div>
+          <div class="row" style="margin-top:8px"><button class="btn" id="avTest" type="button">👀 Probar el aviso</button></div>
           <label class="lbl" style="margin-top:12px">Próximos avisos (30 días)</label>
           <div class="list" id="avNext"></div>
-          <p class="hint">El aviso se pone en cada evento, tarea o tarjeta del Kanban, en el campo <b>Aviso</b>. En los eventos: a su hora, un rato antes, o <b>a una hora concreta</b> (el mismo día o días antes). En las tareas y tarjetas, que solo tienen fecha: a una hora concreta del día en que vencen o de días antes. Cuando llega, aparece un cartel abajo a la izquierda que <b>se queda ahí hasta que lo cierres</b> o lo pospongas. Como la app no tiene servidor ni nada corriendo por detrás, los avisos solo suenan <b>con la aplicación abierta</b> (aunque sea en otra pestaña); si estaba cerrada, el aviso te espera y lo ves al abrirla (hasta 36 horas después). Lo que cierras o pospones es de <b>este equipo</b>: así el aviso te salta igual en el otro portátil.</p>
+          <p class="hint">El aviso se pone en cada evento, tarea o tarjeta del Kanban, en el campo <b>Aviso</b>. En los eventos: a su hora, un rato antes, o <b>a una hora concreta</b> (el mismo día o días antes). En las tareas y tarjetas, que solo tienen fecha: a una hora concreta del día en que vencen o de días antes. Cuando llega, aparece un cartel (abajo a la izquierda, o arriba en el estilo <b>Muy llamativo</b>) que <b>se queda ahí hasta que lo cierres</b> o lo pospongas. El cartel solo se ve en la pestaña de la aplicación; fuera de ella te avisan el título de la pestaña (que parpadea), el sonido y, si das permiso, la notificación del sistema. El primer círculo de colores (arcoíris) usa el color de cada evento, tarea o tarjeta. Como la app no tiene servidor ni nada corriendo por detrás, los avisos solo suenan <b>con la aplicación abierta</b> (aunque sea en otra pestaña); si estaba cerrada, el aviso te espera y lo ves al abrirla (hasta 36 horas después). Lo que cierras o pospones es de <b>este equipo</b>: así el aviso te salta igual en el otro portátil.</p>
         </div>
 
 

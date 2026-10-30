@@ -137,6 +137,27 @@ with sync_playwright() as p:
     ok(pg.evaluate("avPrefs().sound") is False, 'que se guarda')
     pg.check('#avSound'); pg.wait_for_timeout(300)
 
+    # ===== Ajustes: cómo se ve el cartel =====
+    ok(pg.evaluate("avPrefs().style") == 'destacado' and pg.input_value('#avStyle') == 'destacado', 'por defecto el cartel sale «Destacado» (todo de color)')
+    pg.click('#avTest'); pg.wait_for_timeout(400)
+    ok(pg.is_visible('#avisos .aviso') and 'Aviso de prueba' in pg.inner_text('#avisos'), '«Probar el aviso» enseña uno de muestra')
+    ok(pg.evaluate("avBadge") == 0, 'el de muestra no cuenta en el título de la pestaña')
+    ok(pg.get_attribute('#avisos', 'data-style') == 'destacado', 'con el estilo elegido')
+    pg.select_option('#avStyle', 'llamativo'); pg.wait_for_timeout(500)
+    ok(pg.evaluate("avPrefs().style") == 'llamativo' and pg.get_attribute('#avisos', 'data-style') == 'llamativo', 'cambiar el estilo se guarda y se aplica al momento')
+    ok(pg.locator('#avisos').bounding_box()['y'] < 100, '«Muy llamativo» lo pone arriba')
+    pg.locator('#avColor input[value="#f2667a"]').check(force=True); pg.wait_for_timeout(300)
+    ok(pg.evaluate("avPrefs().color") == '#f2667a' and '#f2667a' in (pg.get_attribute('#avisos .aviso', 'style') or ''), 'se puede elegir un color fijo para el cartel')
+    ok(pg.evaluate("avInk('#f5b94a')") == '#16181f' and pg.evaluate("avInk('#8b7cf6')") == '#ffffff', 'el texto se oscurece sobre colores claros para que se lea')
+    pg.locator('#avColor input[value=""]').check(force=True); pg.wait_for_timeout(200)
+    ok(pg.evaluate("avPrefs().color") == '', 'y volver al color de cada evento')
+    pg.uncheck('#avBlink'); pg.wait_for_timeout(200)
+    ok(pg.evaluate("avPrefs().blink") is False, 'el parpadeo del título se puede apagar')
+    pg.check('#avBlink')
+    pg.locator('#avisos [data-av-close]').click(); pg.wait_for_timeout(300)
+    ok(not pg.is_visible('#avisos .aviso') and pg.evaluate("Object.keys(store.get('alarmSeen',{})).includes('__prueba')") is False, 'el de muestra se cierra sin dejar rastro')
+    pg.select_option('#avStyle', 'destacado'); pg.wait_for_timeout(200)
+
     # ===== .ics: el aviso va y viene =====
     ics = pg.evaluate("buildIcs(false)")
     ok('BEGIN:VALARM' in ics and 'TRIGGER;VALUE=DATE-TIME:' in ics, 'al exportar el calendario, el aviso viaja en el .ics')

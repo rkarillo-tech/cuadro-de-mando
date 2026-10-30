@@ -35,7 +35,9 @@ const ALARM_DAYS = [[0, 'El mismo día'], [-1, 'El día antes'], [-2, 'Dos días
 const ALARM_RE = /^(-\d{1,2})?@(\d{1,2}):(\d{2})$/;
 const AV_BASE_HORA = '09:00';            // de qué hora se cuentan los avisos en eventos de todo el día
 const AV_VENTANA = 36 * 3600e3;          // un aviso más viejo que esto ya no se muestra
-const AV_DEF = { sound: true };
+const AV_DEF = { sound: true, style: 'destacado', color: '', blink: true };
+/** Cómo se ve el cartel: de discreto (solo un borde de color) a llamativo (arriba, grande y latiendo). */
+const AV_STYLES = { discreto: 'Discreto', destacado: 'Destacado', llamativo: 'Muy llamativo' };
 const AV_SNOOZES = [[5, '5 min'], [10, '10 min'], [30, '30 min'], [60, '1 hora']];
 
 const avPrefs = () => ({ ...AV_DEF, ...(plainObj(store.get('avisos', null)) ? store.get('avisos', {}) : {}) });
@@ -222,13 +224,27 @@ avWrap.className = 'avisos'; avWrap.id = 'avisos'; avWrap.hidden = true;
 document.body.append(avWrap);
 let avBadge = 0, avHtml = '';
 const AV_SONADOS = new Set();
+const AV_PRUEBA_KEY = '__prueba';
+let avPrueba = null;                     // el aviso de muestra de «Probar el aviso», mientras se ve
+
+/** Texto oscuro sobre colores claros y blanco sobre los oscuros, para que siempre se lea. */
+function avInk(hex) {
+  const n = parseInt(safeColor(hex).slice(1), 16);
+  const [r, g, b] = [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.36 ? '#16181f' : '#ffffff';
+}
+function avApplyStyle() {
+  const p = avPrefs();
+  avWrap.dataset.style = AV_STYLES[p.style] ? p.style : AV_DEF.style;
+}
 
 function avItemHtml(a) {
   const ev = a.ev;
   let cuando = a.day === dayKey() ? 'hoy' : a.day === dayKey(addDays(new Date(), 1)) ? 'mañana' : fmtDayLabel(a.day);
   if (ev.kind !== 'event') cuando = (a.day < dayKey() ? 'venció ' : 'vence ') + (cuando === 'hoy' || cuando === 'mañana' ? cuando : cuando.toLowerCase());
   const ir = { event: '📅 Ver en el calendario', todo: '☑️ Abrir la tarea', kanban: '📋 Abrir la tarjeta' }[ev.kind];
-  return `<div class="aviso" style="--c:${safeColor(ev.color)}">
+  const color = safeColor(avPrefs().color || ev.color);
+  return `<div class="aviso" style="--c:${color};--ink:${avInk(color)}">
     <div class="aviso-h"><b class="grow ellipsis">⏰ ${esc(ev.title)}</b><button type="button" class="btn icon sm ghost" data-av-close="${esc(a.key)}" title="Cerrar este aviso" aria-label="Cerrar aviso">✕</button></div>
     <div class="small muted">${esc(cap(cuando))} · ${esc(ev.when)} · aviso ${esc(avAgo(a.at))}</div>
     ${ev.notes ? `<div class="aviso-notes small">${esc(ev.notes.slice(0, 200))}</div>` : ''}
@@ -240,13 +256,39 @@ function avItemHtml(a) {
   </div>`;
 }
 function avRender(due) {
-  const list = due || avDue();
+  const reales = due || avDue();
+  const list = avPrueba ? [...reales, avPrueba] : reales;
+  avApplyStyle();
   const html = list.length
     ? (list.length > 1 ? `<div class="aviso-top"><b class="grow">⏰ ${list.length} avisos</b><button type="button" class="btn sm ghost" data-av-all="1">Cerrar todos</button></div>` : '') + list.map(avItemHtml).join('')
     : '';
   if (html !== avHtml) { avHtml = html; avWrap.innerHTML = html; }
   avWrap.hidden = !list.length;
-  avSetBadge(list.length);
+  avSetBadge(reales.length);
+  avBlinkSync();
+}
+/**
+ * Con la pestaña en segundo plano, el título alterna entre el aviso y lo de siempre: así
+ * se ve desde la barra de pestañas aunque estés en otra.
+ */
+let avBlinkTimer = 0, avBlinkOn = false;
+function avBlinkSync() {
+  const quiere = avBadge > 0 && avPrefs().blink;
+  if (quiere && !avBlinkTimer) avBlinkTimer = setInterval(avBlinkTick, 1000);
+  if (!quiere && avBlinkTimer) { clearInterval(avBlinkTimer); avBlinkTimer = 0; avBlinkStop(); }
+}
+function avBlinkTick() {
+  if (!document.hidden) { avBlinkStop(); return; }
+  avBlinkOn = !avBlinkOn;
+  if (avBlinkOn) {
+    const a = avDue()[0];
+    document.title = '🔔🔔 ' + (a ? a.ev.title : 'Aviso');
+  } else avBlinkStop(true);
+}
+function avBlinkStop(force) {
+  if (!avBlinkOn && !force) return;
+  avBlinkOn = false;
+  try { lastTitle = ''; pomoRender(); } catch { document.title = (avBadge ? `⏰ (${avBadge}) ` : '') + 'Cuadro de Mando'; }
 }
 /** El número en el título de la pestaña, para verlo sin tener la app delante. */
 function avSetBadge(n) {
@@ -290,6 +332,7 @@ function avCheck() {
   if (currentTab === 'settings') renderAv();
 }
 function avClose(key) {
+  if (key === AV_PRUEBA_KEY) { avPrueba = null; avRender(); return; }
   const v = avMap('alarmSeen'); v[key] = Date.now(); avSetMap('alarmSeen', v);
   avRender();
 }
@@ -300,6 +343,7 @@ function avCloseAll() {
   toast('Avisos cerrados', 'info', 2000);
 }
 function avSnooze(key, mins) {
+  if (key === AV_PRUEBA_KEY) { avClose(key); return; }
   const v = avMap('alarmSnooze'); v[key] = Date.now() + mins * 60000; avSetMap('alarmSnooze', v);
   AV_SONADOS.delete(key);
   avRender();
@@ -331,6 +375,7 @@ avWrap.addEventListener('click', e => {
   const c = e.target.closest('[data-av-close]'); if (c) return avClose(c.dataset.avClose);
   if (e.target.closest('[data-av-all]')) return avCloseAll();
   const g = e.target.closest('[data-av-go]');
+  if (g && g.dataset.avGo === AV_PRUEBA_KEY) return avClose(AV_PRUEBA_KEY);
   if (g) {
     const a = avDue().find(x => x.key === g.dataset.avGo);
     if (!a) return;
@@ -361,6 +406,12 @@ function renderAv() {
   const card = $('#avCard'); if (!card) return;
   const p = avPrefs();
   const sound = $('#avSound'); if (sound && sound.checked !== !!p.sound) sound.checked = !!p.sound;
+  const blink = $('#avBlink'); if (blink && blink.checked !== !!p.blink) blink.checked = !!p.blink;
+  const style = $('#avStyle'); if (style && style.value !== p.style) style.value = AV_STYLES[p.style] ? p.style : AV_DEF.style;
+  const col = $('#avColor');
+  if (col && !col.children.length) col.innerHTML = `<label title="El color de cada evento, tarea o tarjeta"><input type="radio" name="avColor" value=""><span class="av-auto"></span></label>` +
+    COLORS.map(c => `<label title="Color"><input type="radio" name="avColor" value="${c}"><span style="background:${c}"></span></label>`).join('');
+  if (col) col.querySelectorAll('input').forEach(i => { i.checked = i.value === (p.color || ''); });
   const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
   const estado = {
     granted: '<b>Notificaciones del sistema activadas.</b> Además del aviso en pantalla, el navegador te lo enseñará aunque estés en otra pestaña.',
@@ -376,6 +427,16 @@ function renderAv() {
     : '<div class="empty small">Ningún aviso programado para los próximos 30 días. Se ponen al crear o editar un evento, una tarea o una tarjeta del Kanban, en el campo «Aviso».</div>';
   const lista = $('#avNext'); if (lista && lista.innerHTML !== html) lista.innerHTML = html;
 }
+const avSetPref = (k, v) => { store.set('avisos', { ...avPrefs(), [k]: v }); avRender(); renderAv(); };
+if ($('#avStyle')) $('#avStyle').addEventListener('change', e => avSetPref('style', e.target.value));
+if ($('#avBlink')) $('#avBlink').addEventListener('change', e => avSetPref('blink', e.target.checked));
+if ($('#avColor')) $('#avColor').addEventListener('change', e => { if (e.target.name === 'avColor') avSetPref('color', /^#[0-9a-f]{6}$/i.test(e.target.value) ? e.target.value : ''); });
+/** Enseña un aviso de muestra con el estilo elegido, para ver cómo queda sin esperar a uno de verdad. */
+function avTest() {
+  avPrueba = { key: AV_PRUEBA_KEY, day: dayKey(), at: Date.now(), ev: { kind: 'event', id: '', uid: AV_PRUEBA_KEY, title: 'Aviso de prueba', color: COLORS[0], notes: 'Así se verán tus avisos. Ciérralo con ✕.', when: 'ahora', alarm: '' } };
+  avRender(); avBeep();
+}
+if ($('#avTest')) $('#avTest').addEventListener('click', avTest);
 if ($('#avSound')) $('#avSound').addEventListener('change', e => {
   store.set('avisos', { ...avPrefs(), sound: e.target.checked });
   if (e.target.checked) { ensureAudio(); avBeep(); }

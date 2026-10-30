@@ -579,6 +579,21 @@ details.bl-row summary.bl-h{cursor:pointer}
 .aviso-notes{white-space:pre-wrap;color:var(--muted);max-height:4.4em;overflow:hidden}
 .aviso-btns{gap:6px;flex-wrap:nowrap}
 .aviso-btns .field{padding:5px 7px;font-size:.8rem;width:auto;flex:none}
+/* Estilos «Destacado» y «Muy llamativo»: el cartel entero del color, con el texto que se lea encima */
+.avisos[data-style=destacado] .aviso,.avisos[data-style=llamativo] .aviso{background:var(--c);color:var(--ink);border-color:transparent;box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 45%,transparent),0 12px 32px rgba(0,0,0,.35)}
+.avisos[data-style=destacado] .aviso .muted,.avisos[data-style=llamativo] .aviso .muted,.avisos[data-style=destacado] .aviso-notes,.avisos[data-style=llamativo] .aviso-notes{color:var(--ink);opacity:.85}
+.avisos[data-style=destacado] .aviso .btn:not(.ghost),.avisos[data-style=llamativo] .aviso .btn:not(.ghost),.avisos[data-style=destacado] .aviso .field,.avisos[data-style=llamativo] .aviso .field{color:var(--text)}
+.avisos[data-style=destacado] .aviso .btn.ghost,.avisos[data-style=llamativo] .aviso .btn.ghost{color:var(--ink)}
+.avisos[data-style=destacado] .aviso-h b{font-size:1.05rem}
+.avisos[data-style=destacado] .aviso{animation:avIn .22s ease,avPulse 2.4s ease-in-out .3s infinite}
+.avisos[data-style=llamativo]{left:50%;right:auto;top:16px;bottom:auto;transform:translateX(-50%);width:min(520px,calc(100vw - 24px));z-index:900}
+.avisos[data-style=llamativo] .aviso{padding:14px 16px;border-radius:14px;animation:avShake .5s ease,avPulse 1.6s ease-in-out .5s infinite}
+.avisos[data-style=llamativo] .aviso-h b{font-size:1.2rem}
+@keyframes avPulse{0%,100%{box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 45%,transparent),0 12px 32px rgba(0,0,0,.35)}50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--c) 30%,transparent),0 12px 32px rgba(0,0,0,.35)}}
+@keyframes avShake{0%,100%{transform:none}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.swatches .av-auto{background:conic-gradient(#f2667a,#f5b94a,#3ecf8e,#4cb3f5,#8b7cf6,#f2667a)}
+@media (prefers-reduced-motion:reduce){.avisos .aviso{animation:none!important}}
 @media (max-width:900px){.avisos{left:18px}}
 @media (max-width:760px){.avisos{left:8px;right:8px;width:auto;bottom:calc(64px + env(safe-area-inset-bottom))}}
+@media (max-width:760px){.avisos[data-style=llamativo]{left:8px;right:8px;width:auto;transform:none;top:calc(8px + env(safe-area-inset-top));bottom:auto}}
 @media print{.avisos{display:none}}

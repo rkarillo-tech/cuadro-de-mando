@@ -254,6 +254,21 @@ El cartel solo se pinta dentro de la pestaña de la aplicación. Fuera de ella: 
 - La aplicación no tiene servidor ni nada corriendo por detrás: **los avisos solo suenan con la aplicación abierta** (basta con que esté en otra pestaña o minimizada). Si la tenías cerrada, el aviso **te espera** y lo ves al abrirla, hasta 36 horas después. Para algo que no te puedes jugar, pon el aviso aquí *y* exporta el `.ics` a tu calendario del móvil: al exportar, los avisos viajan dentro del archivo.
 - Lo que cierras o pospones es **de este equipo**. Así el aviso te salta igual en el portátil de casa aunque ese día lo cerraras en el del trabajo.
 
+## El calendario: abrir, arrastrar y cambiar un solo día
+
+- **Pincha cualquier cosa de la cuadrícula** (evento, tarea o tarjeta) para abrirla. **«+N más»** te lleva a la lista del día con todo lo que hay.
+- **Arrástrala a otro día** para cambiarle la fecha (en el ordenador; en el móvil, cambia la fecha desde el formulario). Sale un aviso con **Deshacer**.
+- **📆 Año** enseña los 12 meses de un vistazo: los días con cosas, más oscuros cuantas más tienen; los festivos en rojo; hoy, recuadrado. Pincha un día o el nombre de un mes para ir a él.
+
+**Eventos que se repiten: cambiar solo un día.** Si los lunes tienes reunión pero este lunes es festivo, **ábrela desde ese lunes** en el calendario. Arriba verás «Se repite · estás en el lunes…», y abajo dos botones:
+
+| Lo que quieres | Qué pulsas | Qué queda |
+| --- | --- | --- |
+| Ese lunes no hay reunión | **⏭️ Saltar este día** | Ese lunes, tachado como *cancelado* |
+| Esa semana la reunión es el martes | **📆 Mover solo este…** y eliges día y hora | El lunes, tachado como *aplazado al martes*; el martes, la reunión |
+
+El resto del formulario sigue cambiando **toda la serie**. Para deshacerlo, abre el día tachado y pulsa **↩️ Recuperar este día**. Al arrastrar un evento que se repite, te pregunta si mover **solo ese día** o **toda la serie**. Los días saltados viajan en el `.ics`, así que Outlook o Google Calendar también los respetan.
+
 ## Siete casos prácticos, de principio a fin
 
 **1. Arrancar un proyecto**
@@ -321,7 +336,7 @@ La regla es la de siempre: si es algo que **se consulta**, nota; si es algo que 
 | Sección | Para qué sirve |
 | --- | --- |
 | 🏠 Inicio | Resumen del día: tareas, eventos, avisos |
-| 📅 Calendario | Eventos con aviso, fechas límite y festivos; importa y exporta `.ics` |
+| 📅 Calendario | Eventos con aviso, fechas límite y festivos; arrastrar a otro día, cambiar un solo día de una serie, vista del año; importa y exporta `.ics` |
 | 🔖 Marcadores | Enlaces web frecuentes, por categorías |
 | 🍅 Pomodoro | Bloques de concentración con descansos |
 | ⏱️ Horas | Registro de tiempo por proyecto y cliente |

@@ -16,7 +16,7 @@ funciona **sin conexión a internet y sin servidor**, y tus datos **nunca salen 
 
 | Área | Funciones |
 | --- | --- |
-| **Organización** | Tareas en listas con lenguaje natural («mañana», «el viernes», «cada lunes»), Kanban, calendario (importa y exporta `.ics`), avisos a la hora que elijas en eventos, tareas y tarjetas, marcadores |
+| **Organización** | Tareas en listas con lenguaje natural («mañana», «el viernes», «cada lunes»), Kanban, calendario con vista del año, arrastrar a otro día y cambios de un solo día en eventos repetidos (importa y exporta `.ics`), avisos a la hora que elijas en eventos, tareas y tarjetas, marcadores |
 | **Conocimiento** | Notas con editor enriquecido, wiki en árbol, enlaces entre notas `[[Nota]]`, grafo de conexiones, mapas mentales, bloques de código con resaltado |
 | **Etiquetas** | Comunes a todas las secciones, con colores, niveles (`#trabajo/proyecto`), nube, filtros y gestión (crear, renombrar, fusionar, asignar en bloque) |
 | **Foco** | Pomodoro, registro de horas por proyecto, hábitos |
